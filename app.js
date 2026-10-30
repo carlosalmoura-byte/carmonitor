@@ -585,6 +585,7 @@ function renderSettings() {
   fillSelect(nf.price_drop_min_abs, OPTS.price_drop_min_abs, n.price_drop_min_abs, (v) => v ? brl(v) : "qualquer");
   fillSelect(nf.stale_days, OPTS.stale_days, S.settings.stale_days, (v) => v === 1 ? "1 dia" : `${v} dias`);
   fillSelect(nf.routine_hours, OPTS.routine_hours, S.settings.routine_hours, (v) => v === 1 ? "1 hora" : `${v} horas`);
+  $("#ghForm").token.value = S.settings.github_token || "";
   const df = $("#distForm2"); df.provider.value = S.settings.distance.provider; df.ors_key.value = S.settings.distance.ors_key || "";
   renderIgnoreSuggestions();
   $("#dlMakes").innerHTML = [...new Set([...Object.keys(CATALOG), ...S.listings.map((l) => l.make && cap(l.make))].filter(Boolean))].sort().map((m) => `<option value="${esc(m)}">`).join("");
@@ -608,7 +609,9 @@ function renderSettings() {
 $("#criteriaForm").ref_city.addEventListener("change", (e) => {
   const other = e.target.value === "__other"; $("#refOtherWrap").hidden = !other; if (other) $("#criteriaForm").ref_other.focus();
 });
+let critSnapshot = null;
 $("#criteriaForm").addEventListener("submit", (e) => {
+  critSnapshot ??= { ...S.settings.criteria };
   e.preventDefault(); const f = e.target, n = (k) => f.elements[k].value === "" ? null : Number(f.elements[k].value);
   if (n("year_min") && n("year_max") && n("year_min") > n("year_max")) return toast("Ano mínimo maior que o máximo.");
   act($("button[type=submit]", f), async () => {
@@ -628,6 +631,12 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")
       l.distance = { km: null, status: "nao_verificada", precision: null, note: "Aguardando cálculo da rota a partir da nova cidade." };
     E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast("Critérios salvos e anúncios reclassificados.");
+    const before = JSON.stringify(critSnapshot);
+    critSnapshot = { ...S.settings.criteria };
+    if (JSON.stringify(critSnapshot) !== before) {
+      if (S.settings.github_token) await sendResearchRequest("filtros");
+      else if (confirm("Filtros alterados. Pedir uma nova pesquisa com eles agora?\n(Abre o GitHub com o pedido pronto; toque em “Submit new issue”.)")) await sendResearchRequest("filtros");
+    }
     if (refChanged) fillDistancesBg();
   });
 });
@@ -729,13 +738,25 @@ $("#distForm2").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target;
   act(null, async () => { S.settings.distance = { provider: f.provider.value, ors_key: f.ors_key.value.trim() }; S.geo_cache = {}; toast("Serviço de rotas salvo. Use ↻ para recalcular."); });
 });
+$("#ghForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  act(null, async () => {
+    const t = f.token.value.trim();
+    if (t) {
+      const r = await fetch(`https://api.github.com/repos/${REPO}`, { headers: { Authorization: `Bearer ${t}`, Accept: "application/vnd.github+json" } });
+      if (!r.ok) throw new Error(`Token recusado pelo GitHub (${r.status}). Confira se ele dá acesso ao repositório.`);
+    }
+    S.settings.github_token = t; toast(t ? "Token salvo neste aparelho. Pedidos agora vão direto." : "Token removido.");
+  });
+});
 $("#contactForm").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target;
   act(null, async () => { S.settings.my_car = f.my_car.value.trim(); S.settings.contact_template = f.template.value.trim() || E.CONTACT_TEMPLATE_DEFAULT; toast("Mensagem padrão salva."); });
 });
 $("#contactReset").onclick = () => { $("#contactForm").template.value = E.CONTACT_TEMPLATE_DEFAULT; $("#contactForm").my_car.value = E.MY_CAR_DEFAULT; };
 $("#exportBtn").onclick = () => {
-  const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
+  const copy = JSON.parse(JSON.stringify(S)); copy.settings.github_token = ""; copy.settings.distance.ors_key = ""; // chaves não vão na cópia
+  const blob = new Blob([JSON.stringify(copy, null, 1)], { type: "application/json" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
   a.download = `carmonitor-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 };
@@ -783,25 +804,45 @@ const REPO = (() => {
   const h = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0];
   return h.endsWith(".github.io") && seg ? `${h.split(".")[0]}/${seg}` : "carlosalmoura-byte/carmonitor";
 })();
-function researchRequestUrl() {
+function researchRequest(reason = "manual") {
   const c = S.settings.criteria;
   const active = S.listings.filter((l) => !l.archived);
   const fav = active.filter((l) => l.favorite).map((l) => l.url);
   const others = active.filter((l) => !l.favorite && l.available !== false).map((l) => l.url).slice(0, 25);
   const payload = {
+    reason,
     criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
       transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km },
     exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
     favorites: fav, urls: others,
   };
   const when = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-  const body = `Pedido de nova pesquisa feito pelo app CarMonitor em ${when}. Não edite o bloco abaixo.\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\``;
-  return `https://github.com/${REPO}/issues/new?title=${encodeURIComponent(`Atualizar pesquisa — ${when}`)}&body=${encodeURIComponent(body)}`;
+  const why = reason === "filtros" ? "filtros alterados" : "pedido manual";
+  return { title: `Atualizar pesquisa — ${when} (${why})`,
+    body: `Pedido de nova pesquisa feito pelo app CarMonitor em ${when} (${why}). Não edite o bloco abaixo.\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\`` };
+}
+/** Envia o pedido: direto pela API se houver token salvo; senão abre o GitHub com o pedido pronto. */
+async function sendResearchRequest(reason = "manual") {
+  const { title, body } = researchRequest(reason);
+  const token = S.settings.github_token;
+  if (token) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${REPO}/issues`, { method: "POST",
+        headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+        body: JSON.stringify({ title, body }) });
+      if (!r.ok) throw new Error(`GitHub respondeu ${r.status}${r.status === 401 || r.status === 403 ? " (token inválido ou sem permissão de Issues)" : ""}`);
+      S.meta.research_requested_at = new Date().toISOString(); persist(); renderResearchStatus();
+      toast("Pedido enviado. A pesquisa roda em até ~1 h.");
+      return true;
+    } catch (e) { toast(`Não consegui enviar sozinho: ${e.message}. Abrindo o GitHub…`); }
+  }
+  S.meta.research_requested_at = new Date().toISOString(); persist(); renderResearchStatus();
+  openExternal(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`);
+  return false;
 }
 $("#researchBtn").onclick = () => {
-  if (!confirm("Vou abrir o GitHub com o pedido pronto (seus critérios, anúncios e favoritos).\nToque em “Submit new issue” lá para enviar.\n\nA pesquisa roda em até 1 hora; o app importa sozinho.")) return;
-  S.meta.research_requested_at = new Date().toISOString(); persist(); renderResearchStatus();
-  openExternal(researchRequestUrl());
+  if (!S.settings.github_token && !confirm("Vou abrir o GitHub com o pedido pronto. Toque em “Submit new issue” para enviar.\n(Para enviar sem esse passo, configure o token em Ajustes → Dados e rotas.)")) return;
+  sendResearchRequest("manual");
 };
 let lastStatus = null;
 async function loadResearchStatus() {
@@ -812,7 +853,7 @@ function renderResearchStatus() {
   const req = S.meta.research_requested_at, done = lastStatus?.processed_at || S.meta.feed_generated_at;
   let t;
   if (req && (!done || new Date(req) > new Date(done))) t = `Pedido enviado em ${E.fmtDate(req)} · aguardando (até ~1 h). Puxe a lista para baixo para conferir.`;
-  else if (done) t = `Última pesquisa: ${E.fmtDate(done)}${lastStatus && lastStatus.processed_at === done ? ` · ${lastStatus.novos} novo(s), ${lastStatus.atualizados} atualizado(s)` : ""}.`;
+  else if (done) t = `Última pesquisa: ${E.fmtDate(done)}${lastStatus && lastStatus.processed_at === done ? ` · ${lastStatus.novos} novo(s), ${lastStatus.atualizados} atualizado(s)` : ""}. Automáticas às 6h e 13h.`;
   else t = "Nenhuma pesquisa ainda.";
   $("#researchStatus").textContent = t;
 }

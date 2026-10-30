@@ -20,9 +20,17 @@ O corpo da issue tem um bloco ```json com:
 ref_location, max_distance_km), `exclusions` (modelos ignorados), `urls` (anúncios que já estão no app) e
 `favorites` (links favoritos — dê prioridade a reconferi-los).
 
+### Modo agendado (6h e 13h)
+
+As execuções agendadas das 6h e 13h (horário de Brasília) pesquisam **mesmo sem pedido pendente**, a pedido do
+usuário. Critérios: use o bloco JSON da issue "Atualizar pesquisa" **mais recente** (aberta ou fechada, processada
+ou não). Se não existir nenhuma, use: preço até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; câmbio automático;
+usados/seminovos; particular, loja e concessionária; Barueri, SP, até 60 km por estrada. Registre também como
+processados os pedidos pendentes que existirem (`--issue N,M`) e use `--note "pesquisa agendada"`.
+
 ## 2. Regras (obrigatórias)
 
-- Os Termos de Uso da Webmotors proíbem raspagem automatizada. A pesquisa acontece **somente quando há pedido** e
+- Os Termos de Uso da Webmotors proíbem raspagem automatizada. A pesquisa acontece **somente quando há pedido ou no horário agendado pelo usuário (6h e 13h)** e
   é feita página a página como uma consulta humana: **WebSearch** (com `allowed_domains: ["webmotors.com.br"]`)
   para achar páginas de listagem, **WebFetch** dessas páginas e dos anúncios que aparecem nelas. Nada de curl,
   scripts ou contornar bloqueios no webmotors.com.br. URL recusada = siga em frente.

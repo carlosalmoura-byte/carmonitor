@@ -213,6 +213,13 @@
         <label>Chave do OpenRouteService<input name="ors_key" type="password" autocomplete="off" placeholder="fica salva só neste aparelho"></label>
         <button class="primary" type="submit">Salvar</button>
       </form>
+      <h2 style="margin-top:1.2rem">Pesquisa automática</h2>
+      <p class="hint">A pesquisa roda sozinha às 6h e às 13h. Ao salvar filtros novos, o app pede uma pesquisa extra.
+        Com um token do GitHub (opcional), esse pedido vai direto, sem abrir o GitHub.</p>
+      <form id="ghForm">
+        <label>Token do GitHub (só Issues do repositório carmonitor)<input name="token" type="password" autocomplete="off" placeholder="github_pat_… — fica salvo só neste aparelho"></label>
+        <button class="primary" type="submit">Salvar token</button>
+      </form>
       <h2 style="margin-top:1.2rem">Seus dados</h2>
       <p class="hint" id="storageInfo">Tudo fica salvo só neste aparelho. Faça cópias de segurança de vez em quando.</p>
       <div class="actions left">

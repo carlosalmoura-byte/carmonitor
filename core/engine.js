@@ -25,7 +25,7 @@ export function newState() {
     version: 1, nextId: 1, listings: [], notifications: [],
     settings: { criteria: { ...DEFAULT_CRITERIA }, notify: { ...DEFAULT_NOTIFY }, accept_specs: true,
       only_official_specs: false, stale_days: 3, routine_hours: 12, distance: { provider: "osrm", ors_key: "" },
-      my_car: MY_CAR_DEFAULT, contact_template: CONTACT_TEMPLATE_DEFAULT },
+      my_car: MY_CAR_DEFAULT, contact_template: CONTACT_TEMPLATE_DEFAULT, github_token: "" },
     custom_specs: [], disabled_specs: [], exclusions: [], geo_cache: {}, meta: { last_routine: null, routines: [] },
   };
 }
