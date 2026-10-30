@@ -96,11 +96,16 @@ KM: <km>
 Câmbio: <câmbio>
 Cidade: <Cidade> - <UF>
 Vendedor: <nome do vendedor, com "(Pessoa Física)" quando a página indicar>
-FIPE: R$ <valor FIPE exibido na página do anúncio, se houver>
+FIPE: R$ <valor> (<fonte>, <mês de referência>)   ← OBRIGATÓRIO em todo anúncio apresentado
 Selo: Abaixo da Fipe   (só se a página/listagem mostrar esse selo)
 Itens de veículo: <lista separada por ; exatamente como na página>
 <trechos da descrição do vendedor que citem equipamentos, se houver>
 ```
+
+**FIPE é obrigatória.** Use o valor FIPE exibido na página do anúncio; se a página não mostrar, pesquise a Tabela
+FIPE da mesma versão e ano-modelo (página "Tabela Fipe" do WebMotors para a versão/ano, ou veiculos.fipe.org.br) e
+informe a fonte e o mês de referência, ex.: `FIPE: R$ 95.988 (Tabela Fipe no WebMotors, out/2026)`. Se não for
+possível achar a FIPE da versão exata, escreva `FIPE: não encontrada` — nunca estime.
 
 Grave um arquivo JSON (fora do repositório, ex.: no diretório temporário) com
 `[{ "url": "...", "text": "...", "available": true }]` e, para anúncios que saíram do ar,
