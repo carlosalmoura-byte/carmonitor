@@ -1,0 +1,531 @@
+"use strict";
+import { TR_LABEL } from "./core/classify.js";
+import { makeDistance } from "./core/distance.js";
+import * as E from "./core/engine.js";
+import { ITEMS } from "./core/equipment.js";
+import { firstUrl } from "./core/parsing.js";
+import { SEED_SPECS, exclusionLabel, validateSpec } from "./core/specs.js";
+import { loadState, requestPersistence, saveState } from "./core/store.js";
+
+// ---------------------------------------------------------------- utilidades
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const brl = (v) => v == null ? "—" : "R$ " + Math.round(v).toLocaleString("pt-BR");
+const num = (v, suf = "") => v == null ? "—" : Math.round(v).toLocaleString("pt-BR") + suf;
+const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descartado" };
+const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
+const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
+const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA sem fio" };
+const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
+
+let S = null;                        // estado (persistido no IndexedDB)
+const ui = { status: "", compare: new Set(), openId: null };
+const deps = {
+  distance: makeDistance(),
+  onNotify: (n) => systemNotify(n),
+};
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 3400);
+}
+let saveTimer = null;
+function persist() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => saveState(S).catch((e) => toast("Falha ao salvar: " + e.message)), 150);
+}
+async function act(btn, fn) {
+  if (btn) btn.disabled = true;
+  try { const r = await fn(); persist(); return r; }
+  catch (e) { console.error(e); toast(e.message || String(e)); }
+  finally { if (btn) btn.disabled = false; }
+}
+const byId = (id) => S.listings.find((l) => l.id === id);
+
+async function systemNotify(n) {
+  if (!S?.settings.notify.system || !("Notification" in window) || Notification.permission !== "granted") return;
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    const opts = { body: n.message, icon: "icons/icon-192.png", tag: n.dedupe, data: { listing: n.listing_id } };
+    if (reg) reg.showNotification(n.title, opts); else new Notification(n.title, opts);
+  } catch { /* ignora */ }
+}
+
+// ---------------------------------------------------------------- navegação
+$("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[data-view]"); if (b) showView(b.dataset.view); });
+function showView(v) {
+  $$("#nav button").forEach((x) => x.classList.toggle("active", x.dataset.view === v));
+  $$(".view").forEach((x) => x.classList.toggle("active", x.id === "view-" + v));
+  $("#fab").style.display = v === "listings" ? "" : "none";
+  if (v === "compare") renderCompare();
+  if (v === "alerts") renderAlerts();
+  if (v === "settings") renderSettings();
+  window.scrollTo(0, 0);
+}
+$("#settingsNav").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-sub]"); if (!b) return;
+  $$("#settingsNav button").forEach((x) => x.classList.toggle("active", x === b));
+  $$(".subview").forEach((x) => x.classList.toggle("active", x.id === "sub-" + b.dataset.sub));
+});
+function openSheet(id) { $(id).classList.add("open"); document.body.style.overflow = "hidden"; }
+function closeSheet(id) { $(id).classList.remove("open"); document.body.style.overflow = ""; if (id === "#detailSheet") ui.openId = null; }
+$$(".sheet").forEach((s) => s.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeSheet("#" + s.id); }));
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".sheet.open").forEach((s) => closeSheet("#" + s.id)); });
+window.addEventListener("popstate", () => $$(".sheet.open").forEach((s) => closeSheet("#" + s.id)));
+
+// ---------------------------------------------------------------- lista
+$("#statusTabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  ui.status = b.dataset.status;
+  $$("#statusTabs button").forEach((x) => x.classList.toggle("active", x === b));
+  renderCards();
+});
+$("#q").addEventListener("input", () => renderCards());
+$("#sort").addEventListener("change", () => renderCards());
+
+const title = (l) => [l.make, l.model].filter(Boolean).join(" ") || l.title || `Anúncio #${l.id}`;
+function distText(l) {
+  const d = l.distance || {};
+  if (d.status === "nao_verificada" || d.km == null) return "não verificada";
+  return num(d.km, " km") + (d.status === "manual" ? " (informada)" : d.precision === "cidade" ? " (centro da cidade)" : "");
+}
+const stale = (l) => E.isStale(l, S.settings.stale_days);
+
+function renderCards() {
+  const q = $("#q").value.trim().toLowerCase();
+  let items = S.listings.filter((l) => !l.archived);
+  const counts = { aprovado: 0, pendente: 0, descartado: 0 };
+  items.forEach((l) => counts[l.status]++);
+  $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
+  $("#c-descartado").textContent = counts.descartado; $("#c-all").textContent = items.length;
+  $("#c-reconferir").textContent = items.filter(stale).length;
+  if (ui.status === "reconferir") items = items.filter(stale);
+  else if (ui.status) items = items.filter((l) => l.status === ui.status);
+  if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
+  const order = { aprovado: 0, pendente: 1, descartado: 2 };
+  const keyf = {
+    price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
+    recent: (l) => -new Date(l.first_seen).getTime(),
+  }[$("#sort").value] || ((l) => order[l.status] * 1e12 + (l.price ?? 1e11));
+  items.sort((a, b) => keyf(a) - keyf(b));
+  $("#unread").textContent = S.notifications.filter((n) => !n.read).length;
+  const el = $("#cards");
+  if (!items.length) {
+    el.innerHTML = `<div class="empty">${S.listings.length ? "Nada neste filtro." :
+      "Nenhum anúncio ainda.<br>No app ou site do WebMotors, abra um anúncio e use <b>Compartilhar → CarMonitor</b>, ou toque em <b>+</b>."}</div>`;
+    return;
+  }
+  el.innerHTML = items.map((l) => {
+    const first = l.snapshots.find((s) => s.price)?.price;
+    const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
+    const chips = Object.keys(ITEMS).map((k) => {
+      const c = l.checks[k] || { state: "pendente" };
+      return `<span class="chip ${c.state}" title="${esc(ITEMS[k])}">${EQ_ICON[c.state]} ${SHORT[k]}${c.method === "ficha" ? " ·ficha" : ""}</span>`;
+    }).join("");
+    const extra = [
+      l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",
+      l.duplicate_group ? `<span class="chip info">possível duplicata</span>` : "",
+      l.available === false ? `<span class="chip ausente">indisponível</span>` : "",
+      stale(l) ? `<span class="chip pendente">reconferir</span>` : "",
+    ].join("");
+    return `<article class="card st-${l.status}">
+      <div class="cardTop"><span class="badge ${l.status}">${STATUS[l.status]}</span><span class="small">${esc(l.source)}${l.source_id ? " · " + esc(l.source_id) : ""}</span></div>
+      <h3>${esc(title(l))} ${l.year_model ? `<span class="small">${esc(l.year_fab ? l.year_fab + "/" : "")}${esc(l.year_model)}</span>` : ""}</h3>
+      <div class="ver">${esc(l.version || "versão não informada")}</div>
+      <div><span class="price">${brl(l.price)}</span>${delta}</div>
+      <div class="facts">
+        <div><span>Km</span> ${num(l.km)}</div><div><span>Câmbio</span> ${esc(TR[l.transmission] || "—")}</div>
+        <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> ${esc(distText(l))}</div>
+      </div>
+      <div class="chips">${chips}${extra}</div>
+      <div class="cardActions">
+        <label class="chk"><input type="checkbox" data-cmp="${l.id}" ${ui.compare.has(l.id) ? "checked" : ""}> Comparar</label>
+        <a class="btn ghost" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
+        <button data-open="${l.id}">Detalhes</button>
+      </div></article>`;
+  }).join("");
+}
+$("#cards").addEventListener("click", (e) => { const b = e.target.closest("[data-open]"); if (b) openDetail(+b.dataset.open); });
+$("#cards").addEventListener("change", (e) => {
+  const c = e.target.closest("[data-cmp]"); if (!c) return;
+  const id = +c.dataset.cmp;
+  if (c.checked) { if (ui.compare.size >= 5) { c.checked = false; return toast("Máximo de 5 veículos na comparação."); } ui.compare.add(id); }
+  else ui.compare.delete(id);
+  saveCompare();
+});
+function saveCompare() {
+  $("#cmpCount").textContent = ui.compare.size;
+  try { localStorage.setItem("cmp", JSON.stringify([...ui.compare])); } catch { /* sem armazenamento */ }
+}
+
+// ---------------------------------------------------------------- importar
+$("#fab").onclick = () => openImport();
+function openImport(url = "", text = "") {
+  const f = $("#importForm"); f.url.value = url; f.text.value = text; $("#importResult").innerHTML = "";
+  openSheet("#importSheet");
+  history.pushState({ sheet: 1 }, "");
+}
+$("#pasteBtn").onclick = async () => {
+  try {
+    const t = await navigator.clipboard.readText();
+    if (!t) return toast("A área de transferência está vazia.");
+    const f = $("#importForm");
+    if (!f.url.value) f.url.value = firstUrl(t) || "";
+    if (t.trim() !== f.url.value.trim()) f.text.value = t;
+    toast(`${t.length.toLocaleString("pt-BR")} caracteres colados.`);
+  } catch { toast("Sem permissão para ler a área de transferência; use o colar do teclado."); }
+};
+$("#importForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = e.target, btn = $("button[type=submit]", f);
+  const url = firstUrl(f.url.value) || f.url.value.trim();
+  $("#importResult").innerHTML = `<div class="msg warn">Analisando… (calcula a rota se houver cidade)</div>`;
+  act(btn, async () => {
+    const r = await E.importListing(S, { url, text: f.text.value.trim() || null, origin: "colado" }, deps);
+    const cls = r.result === "erro" ? "err" : r.result === "duplicado" ? "warn" : "ok";
+    $("#importResult").innerHTML = `<div class="msg ${cls}"><b>${esc(r.result)}</b> — ${esc(r.message)} ${r.id ? `<a href="#" data-open="${r.id}">abrir</a>` : ""}</div>`;
+    if (r.result !== "erro") { f.url.value = ""; f.text.value = ""; }
+    renderCards();
+  });
+});
+$("#importResult").addEventListener("click", (e) => {
+  const a = e.target.closest("[data-open]"); if (!a) return;
+  e.preventDefault(); closeSheet("#importSheet"); openDetail(+a.dataset.open);
+});
+
+// ---------------------------------------------------------------- detalhe
+const FIELD_LABELS = [["make", "Marca"], ["model", "Modelo"], ["version", "Versão"], ["year_fab", "Ano fabricação"],
+  ["year_model", "Ano-modelo"], ["price", "Preço"], ["km", "Quilometragem"], ["transmission", "Câmbio"],
+  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"]];
+const fmtField = (k, v) => v == null || v === "" ? "—" : k === "price" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
+
+function chart(snaps) {
+  const pts = snaps.filter((s) => s.price != null);
+  if (pts.length < 2) return `<p class="small">O gráfico aparece a partir de duas medições de preço.</p>`;
+  const W = 640, H = 170, P = 34, prices = pts.map((s) => s.price), min = Math.min(...prices), max = Math.max(...prices), span = max - min || 1;
+  const x = (i) => P + (i * (W - 2 * P)) / (pts.length - 1), y = (v) => H - P + 10 - ((v - min) / span) * (H - 2 * P);
+  const path = pts.map((s, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(s.price).toFixed(1)}`).join("");
+  const dots = pts.map((s, i) => `<circle cx="${x(i)}" cy="${y(s.price)}" r="4" fill="${s.available === false ? "var(--bad)" : "var(--accent)"}"><title>${esc(E.fmtDate(s.at))} — ${brl(s.price)}</title></circle>`).join("");
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histórico de preço">
+    <text x="${P}" y="14" font-size="12" fill="var(--muted)">${brl(max)}</text><text x="${P}" y="${H - 4}" font-size="12" fill="var(--muted)">${brl(min)}</text>
+    <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>${dots}</svg></div>`;
+}
+
+function openDetail(id) {
+  const l = byId(id); if (!l) return toast("Anúncio não encontrado.");
+  ui.openId = id; renderDetail(l);
+  if (!$("#detailSheet").classList.contains("open")) { openSheet("#detailSheet"); history.pushState({ sheet: 2 }, ""); }
+  $("#detailSheet").scrollTop = 0;
+}
+
+function renderDetail(d) {
+  $("#detailBadge").innerHTML = `<span class="badge ${d.status}">${STATUS[d.status]}</span>`;
+  const reasons = d.reasons.map((r) => `<li class="${r.level}">${r.level === "ok" ? "✓" : r.level === "fail" ? "✕" : "?"} ${esc(r.msg)}</li>`).join("");
+  const eq = Object.entries(ITEMS).map(([k, label]) => {
+    const c = d.checks[k] || { state: "pendente" };
+    const how = c.method === "ficha" ? `<span class="chip ficha">pela ficha da versão</span>` : c.method === "manual" ? `<span class="chip info">validação sua</span>` : "";
+    return `<div class="eq">
+      <div class="eqTop"><b>${esc(label)}</b><span class="chip ${c.state}">${EQ_ICON[c.state]} ${esc(c.state)}</span></div>
+      ${how}
+      ${c.detail ? `<div><span class="small">Sistema(s):</span> ${esc(c.detail)}</div>` : ""}
+      <div class="small">Fonte: ${esc(c.source || "—")} ${c.source_url ? `<a class="srcLink" href="${esc(safeUrl(c.source_url))}" target="_blank" rel="noopener">abrir fonte ↗</a>` : ""}</div>
+      ${c.evidence ? `<div class="ev">${esc(c.evidence)}</div>` : ""}
+      ${c.note ? `<div class="small">${esc(c.note)}</div>` : ""}
+      <details><summary>Validar manualmente</summary>
+        <form class="eqForm" data-item="${k}">
+          <label>Resultado<select name="state"><option value="confirmado">Confirmado</option><option value="ausente">Ausente</option><option value="pendente">Pendente</option><option value="auto">Voltar ao automático</option></select></label>
+          ${k === "adas" ? `<label>Nome do sistema ADAS<input name="detail" placeholder="ex.: Frenagem autônoma de emergência"></label>` : ""}
+          <label>Fonte<input name="source" placeholder="ex.: Foto 7 do anúncio; vendedor por WhatsApp em 27/10"></label>
+          <label>Evidência<textarea name="evidence" rows="2"></textarea></label>
+          <button type="submit">Salvar validação</button>
+        </form></details></div>`;
+  }).join("");
+  const specSearch = `https://www.google.com/search?q=${encodeURIComponent([d.make, d.model, d.version, d.year_model, "itens de série ficha técnica"].filter(Boolean).join(" "))}`;
+  const specInfo = d.spec_id ? (() => { const s = E.allSpecs(S).find((x) => x.id === d.spec_id); return s ? `<p class="small">Ficha aplicada: <b>${esc(s.source.title)}</b> (${esc(s.source.quality)}).</p>` : ""; })()
+    : `<p class="small">Nenhuma ficha cadastrada para esta versão e ano-modelo. <a href="${esc(specSearch)}" target="_blank" rel="noopener">Pesquisar ficha ↗</a> · <a href="#" id="dNewSpec">cadastrar ficha</a></p>`;
+  const snaps = d.snapshots.slice().reverse().map((s) => `<tr><td>${esc(E.fmtDate(s.at))}</td><td class="num">${brl(s.price)}</td><td class="num">${num(s.km)}</td><td>${s.available === false ? "indisponível" : s.available ? "disponível" : "—"}</td><td class="small">${esc(s.source)}</td></tr>`).join("");
+  const texts = d.texts.map((t) => `<div class="eq"><div class="eqTop"><span class="small">Texto ${esc(t.origin || "colado")} · ${esc(E.fmtDate(t.at))} · ${t.content.length} caracteres</span>
+      <button class="ghost danger" data-deltext="${esc(t.id)}">Remover</button></div><div class="ev">${esc(t.content.slice(0, 500))}${t.content.length > 500 ? "…" : ""}</div></div>`).join("") || `<p class="small">Nenhum texto do anúncio analisado ainda.</p>`;
+  const dups = d.duplicate_group ? S.listings.filter((o) => o.duplicate_group === d.duplicate_group && o.id !== d.id)
+    .map((o) => `<li><a href="#" data-open="${o.id}">#${o.id}</a> — ${brl(o.price)} · ${num(o.km, " km")} · ${esc(o.city || "")}</li>`).join("") : "";
+  const fields = FIELD_LABELS.map(([k, label]) => `<div class="k">${label}</div><div>${esc(fmtField(k, d[k]))}${d.conflicts?.[k] ? ` <span class="chip pendente">conflito</span>` : ""}</div><div class="src">${esc(E.SOURCE_LABEL[d.field_sources[k]] || "")}</div>`).join("");
+
+  $("#detail").innerHTML = `
+    <h2 style="margin:.2rem 0 .3rem">${esc(title(d))} ${esc(d.year_model || "")}</h2>
+    <div class="small">${esc(d.version || "")}</div>
+    <p><a class="btn primary" style="width:100%" href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio ↗</a></p>
+    <p class="small">Cadastrado ${esc(E.fmtDate(d.first_seen))} · Última confirmação ${esc(E.fmtDate(d.last_checked))} · Última alteração ${esc(E.fmtDate(d.last_changed))}</p>
+
+    <div class="reconfirm"><b>Reconferir</b> ${stale(d) ? `<span class="chip pendente">pendente</span>` : ""}
+      <p class="small">Abra o anúncio, confira e registre. Vai para o histórico e gera alertas (ex.: queda de preço).</p>
+      <form id="reconfForm">
+        <div class="row2">
+          <label>Situação<select name="available"><option value="1">Disponível</option><option value="0">Vendido / removido</option></select></label>
+          <label>Preço atual (R$)<input type="number" inputmode="numeric" name="price" value="${esc(d.price ?? "")}"></label>
+          <label>Km atual<input type="number" inputmode="numeric" name="km" value="${esc(d.km ?? "")}"></label>
+          <label>Observação<input name="note"></label>
+        </div>
+        <button type="submit" class="primary" style="width:100%">Registrar reconferência</button>
+      </form></div>
+
+    <h3>Critérios</h3><ul class="reasons">${reasons}</ul>
+    <h3>Equipamentos obrigatórios</h3>${specInfo}${eq}
+
+    <h3>Dados do anúncio</h3><div class="kv">${fields}</div>
+    <details><summary>Corrigir dados</summary>
+      <form id="fieldsForm" class="row2" style="margin-top:.5rem">
+        ${FIELD_LABELS.map(([k, label]) => k === "transmission"
+          ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(TR).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
+          : k === "condition"
+          ? `<label>${label}<select name="${k}"><option value=""></option>${["usado", "seminovo", "novo"].map((v) => `<option ${d[k] === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>`
+          : `<label>${label}<input name="${k}" value="${esc(d[k] ?? "")}" ${["price", "km", "year_fab", "year_model"].includes(k) ? 'type="number" inputmode="numeric"' : ""}></label>`).join("")}
+        <button type="submit" class="primary">Salvar correções</button>
+      </form></details>
+
+    <h3>Distância por estrada</h3>
+    <p>${esc(distText(d))} <span class="small">${esc(d.distance?.note || "")}</span></p>
+    <form id="distForm" class="row2">
+      <label>Km por estrada<input type="number" inputmode="decimal" name="km" step="0.1" min="0"></label>
+      <label>Fonte<input name="source" placeholder="ex.: Google Maps até a loja"></label>
+      <button type="submit">Informar</button><button type="button" id="dRecalc">Recalcular</button>
+    </form>
+
+    <h3>Histórico de preço, km e disponibilidade</h3>${chart(d.snapshots)}
+    <div class="tableWrap"><table><thead><tr><th>Data</th><th>Preço</th><th>Km</th><th>Situação</th><th>Origem</th></tr></thead><tbody>${snaps}</tbody></table></div>
+    ${dups ? `<h3>Possíveis duplicatas</h3><ul>${dups}</ul>` : ""}
+
+    <h3>Texto do anúncio</h3>
+    <form id="textForm"><textarea name="text" rows="5" placeholder="Cole o texto do anúncio (selecionar tudo → copiar)"></textarea>
+      <div class="actions"><button type="button" id="dPaste">Colar</button><button class="primary" type="submit">Analisar texto</button></div></form>
+    ${texts}
+
+    <h3>Anotações</h3>
+    <form id="notesForm"><textarea name="notes" rows="3">${esc(d.notes || "")}</textarea><div class="actions"><span></span><button type="submit">Salvar</button></div></form>
+
+    <h3>Mais ações</h3>
+    <div class="actions left">
+      <button id="dExclude">Ignorar este modelo</button>
+      <button class="ghost" id="dArchive">${d.archived ? "Desarquivar" : "Arquivar"}</button>
+      <button class="ghost danger" id="dDelete">Excluir</button>
+    </div>`;
+
+  const reload = () => { renderDetail(byId(d.id) || d); renderCards(); };
+  const el = $("#detail");
+  $("#reconfForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button", f), async () => {
+    const ev = E.reconfirm(S, d, { available: f.available.value === "1", price: f.price.value === "" ? null : +f.price.value, km: f.km.value === "" ? null : +f.km.value, note: f.note.value.trim() || null }, deps);
+    const L = { price_drop: "queda de preço", price_up: "aumento de preço", km_change: "km alterada", unavailable: "indisponível", available_again: "disponível de novo" };
+    toast(ev.length ? "Reconferido: " + ev.map((x) => L[x.type] || x.type).join(", ") : "Reconferido, sem alterações."); reload(); }); };
+  $("#fieldsForm").onsubmit = (e) => {
+    e.preventDefault(); const f = e.target, body = {};
+    for (const [k] of FIELD_LABELS) { const v = f.elements[k].value.trim(), cur = d[k] == null ? "" : String(d[k]); if (v !== cur) body[k] = v === "" ? null : v; }
+    if (!Object.keys(body).length) return toast("Nenhuma alteração.");
+    act($("button[type=submit]", f), async () => { await E.editFields(S, d, body, deps); toast("Dados corrigidos (marcados como informados por você)."); reload(); });
+  };
+  $("#distForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button[type=submit]", f), async () => {
+    E.setManualDistance(d, f.km.value === "" ? null : +f.km.value, f.source.value); E.refresh(S, d, deps); reload(); }); };
+  $("#dRecalc").onclick = (e) => act(e.target, async () => { await E.updateDistance(S, d, deps, true); E.refresh(S, d, deps); toast(distText(d)); reload(); });
+  $("#textForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button[type=submit]", f), async () => {
+    const r = await E.importListing(S, { url: d.url, text: f.text.value, origin: "colado" }, deps); toast(r.message); reload(); }); };
+  $("#dPaste").onclick = async () => { try { $("#textForm").text.value = await navigator.clipboard.readText(); } catch { toast("Use o colar do teclado."); } };
+  $("#notesForm").onsubmit = (e) => { e.preventDefault(); act(null, async () => { d.notes = e.target.notes.value; toast("Anotação salva."); }); };
+  $("#dArchive").onclick = () => act(null, async () => { d.archived = !d.archived; E.recomputeDuplicates(S); reload(); });
+  $("#dDelete").onclick = () => { if (confirm("Excluir este anúncio e todo o histórico?")) act(null, async () => {
+    S.listings = S.listings.filter((x) => x.id !== d.id); ui.compare.delete(d.id); saveCompare(); E.recomputeDuplicates(S); closeSheet("#detailSheet"); renderCards(); }); };
+  $("#dExclude").onclick = () => {
+    if (!d.model) return toast("Informe o modelo do anúncio primeiro.");
+    const withVersion = d.version && confirm(`Ignorar só a versão “${d.version}”?\nOK = só esta versão · Cancelar = todas as versões de ${title(d)}`);
+    act(null, async () => {
+      S.exclusions.push({ make: d.make || "", model: d.model, version_includes: withVersion ? d.version : "" });
+      E.reclassifyAll(S, deps); toast("Modelo adicionado à lista de ignorados."); reload(); });
+  };
+  const ns = $("#dNewSpec");
+  if (ns) ns.onclick = (e) => { e.preventDefault(); closeSheet("#detailSheet"); showView("settings");
+    $("#settingsNav [data-sub=specs]").click(); const f = $("#specForm"); $("#specDetails").open = true;
+    f.make.value = d.make || ""; f.model.value = d.model || ""; f.version_includes.value = (d.version || "").toLowerCase();
+    f.year_from.value = d.year_model || ""; f.year_to.value = d.year_model || ""; f.make.scrollIntoView({ block: "center" }); };
+  $$(".eqForm", el).forEach((f) => f.onsubmit = (e) => { e.preventDefault(); act($("button", f), async () => {
+    E.setManualCheck(d, f.dataset.item, { state: f.state.value, source: f.source.value, evidence: f.evidence.value, detail: f.detail ? f.detail.value : null }, deps);
+    E.refresh(S, d, deps); toast("Validação salva."); reload(); }); });
+  $$("[data-deltext]", el).forEach((b) => b.onclick = () => act(b, async () => { d.texts = d.texts.filter((t) => t.id !== b.dataset.deltext); E.refresh(S, d, deps); reload(); }));
+  $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
+}
+
+// ---------------------------------------------------------------- comparação
+$("#clearCmp").onclick = () => { ui.compare.clear(); saveCompare(); renderCompare(); renderCards(); };
+function renderCompare() {
+  const el = $("#compareTable");
+  const it = [...ui.compare].map(byId).filter(Boolean);
+  if (!it.length) { el.innerHTML = `<div class="empty">Nenhum veículo selecionado.</div>`; return; }
+  const best = (f, fn = Math.min) => { const v = it.map(f).filter((x) => x != null); return v.length ? fn(...v) : null; };
+  const bp = best((x) => x.price), bk = best((x) => x.km), bd = best((x) => x.distance?.km), by = best((x) => x.year_model, Math.max);
+  const row = (label, f) => `<tr><th>${label}</th>${it.map((x) => `<td>${f(x)}</td>`).join("")}</tr>`;
+  const mark = (v, b, txt) => v != null && v === b && it.length > 1 ? `<span class="best">${txt}</span>` : txt;
+  el.innerHTML = `<table class="cmp"><tbody>
+    ${row("Veículo", (x) => `<b>${esc(title(x))}</b><br><span class="small">${esc(x.version || "")}</span>`)}
+    ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`)}
+    ${row("Preço", (x) => mark(x.price, bp, brl(x.price)))}
+    ${row("Ano-modelo", (x) => mark(x.year_model, by, esc(x.year_model ?? "—")))}
+    ${row("Quilometragem", (x) => mark(x.km, bk, num(x.km, " km")))}
+    ${row("Câmbio", (x) => esc(TR[x.transmission] || "—"))}
+    ${row("Local", (x) => esc(x.city ? `${x.city}/${x.state || "?"}` : "—"))}
+    ${row("Distância", (x) => mark(x.distance?.km, bd, esc(distText(x))))}
+    ${Object.entries(ITEMS).map(([k, label]) => row(label, (x) => { const c = x.checks[k] || { state: "pendente" };
+      return `<span class="chip ${c.state}">${EQ_ICON[c.state]} ${esc(c.state)}</span>${c.method === "ficha" ? ` <span class="chip ficha">ficha</span>` : ""}${c.detail ? `<br><span class="small">${esc(c.detail)}</span>` : ""}`; })).join("")}
+    ${row("Disponível", (x) => x.available === false ? "Não" : x.available ? "Sim" : "—")}
+    ${row("Histórico", (x) => `${x.snapshots.length} medições`)}
+    ${row("", (x) => `<a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a> · <a href="#" data-open="${x.id}">detalhes</a>`)}
+  </tbody></table>`;
+  $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
+}
+
+// ---------------------------------------------------------------- alertas
+function renderAlerts() {
+  const items = S.notifications;
+  $("#alertsList").innerHTML = items.length ? items.map((n) => `
+    <div class="alert ${n.read ? "read" : "unread"}"><span class="dot"></span><div>
+      <div><b>${esc(n.title)}</b> <span class="small">${esc(E.fmtDate(n.at))}</span></div><pre>${esc(n.message)}</pre>
+      ${n.listing_id && byId(n.listing_id) ? `<a href="#" data-open="${n.listing_id}">abrir anúncio</a>` : ""}</div></div>`).join("")
+    : `<div class="empty">Nenhum alerta ainda.</div>`;
+  $$("[data-open]", $("#alertsList")).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
+}
+$("#markRead").onclick = () => act(null, async () => { S.notifications.forEach((n) => n.read = true); renderAlerts(); renderCards(); });
+
+// ---------------------------------------------------------------- ajustes
+function renderSettings() {
+  const c = S.settings.criteria, f = $("#criteriaForm");
+  for (const k of ["max_price", "year_min", "year_max", "max_km", "ref_location", "max_distance_km"]) f.elements[k].value = c[k] ?? "";
+  $$("input[name=tr]", f).forEach((i) => i.checked = c.transmissions.includes(i.value));
+  $$("input[name=cond]", f).forEach((i) => i.checked = c.conditions.includes(i.value));
+  f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
+  $("#wmFilters").innerHTML = `<ul style="margin:.2rem 0 0 1rem;padding:0">
+    <li>Preço até ${brl(c.max_price)} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km até ${num(c.max_km)}</li>
+    <li>Câmbio: ${esc(c.transmissions.map((t) => TR_LABEL[t] || t).join(", ") || "qualquer")} · Região: ${esc(c.ref_location)}</li>
+    <li>Os opcionais (ADAS, indução, Android Auto sem fio) são validados aqui, anúncio a anúncio.</li></ul>`;
+  const n = S.settings.notify, nf = $("#notifyForm");
+  for (const k of ["new_approved", "new_pending", "price_drop", "include_discarded", "unavailable", "review_digest", "system"]) nf.elements[k].checked = !!n[k];
+  nf.price_drop_min_pct.value = n.price_drop_min_pct; nf.price_drop_min_abs.value = n.price_drop_min_abs;
+  nf.stale_days.value = S.settings.stale_days; nf.routine_hours.value = S.settings.routine_hours;
+  const df = $("#distForm2"); df.provider.value = S.settings.distance.provider; df.ors_key.value = S.settings.distance.ors_key || "";
+  $("#exclList").innerHTML = S.exclusions.length ? S.exclusions.map((r, i) => `<li><span>${esc(exclusionLabel(r))}${r.version_includes ? "" : ` <span class="small">todas as versões</span>`}</span><button class="ghost danger" data-delexcl="${i}">Remover</button></li>`).join("")
+    : `<li class="small">Nenhum modelo ignorado.</li>`;
+  $("#specList").innerHTML = E.allSpecs(S).concat(SEED_SPECS.filter((s) => S.disabled_specs.includes(s.id))).map((s) => {
+    const off = S.disabled_specs.includes(s.id), custom = S.custom_specs.some((x) => x.id === s.id);
+    const items = Object.entries(ITEMS).map(([k]) => `${SHORT[k]}: ${s.items?.[k]?.state || "—"}`).join(" · ");
+    return `<li><span><b>${esc(`${s.make} ${s.model} ${s.version_includes.join(" ")} ${s.year_from}${s.year_to !== s.year_from ? "–" + s.year_to : ""}`.toUpperCase())}</b>
+      <span class="small">${esc(items)}</span><span class="small"><a href="${esc(safeUrl(s.source.url))}" target="_blank" rel="noopener">${esc(s.source.title)}</a> · ${esc(s.source.quality)}</span></span>
+      ${custom ? `<button class="ghost danger" data-delspec="${esc(s.id)}">Remover</button>` : `<button class="ghost" data-togglespec="${esc(s.id)}">${off ? "Ativar" : "Desativar"}</button>`}</li>`;
+  }).join("");
+  const sz = JSON.stringify(S).length;
+  $("#storageInfo").textContent = `Tudo fica salvo só neste aparelho (${S.listings.length} anúncios, ${(sz / 1024).toFixed(0)} KB). Faça cópias de segurança de vez em quando.`;
+  const rs = S.meta.routines || [];
+  $("#routines").innerHTML = rs.length ? `<table><thead><tr><th>Quando</th><th>Processados</th><th>Rotas</th><th>Novos aprovados</th><th>A reconferir</th></tr></thead><tbody>${rs.map((r) =>
+    `<tr><td>${esc(E.fmtDate(r.at))}</td><td class="num">${r.processados}</td><td class="num">${r.distancias_calculadas}</td><td class="num">${r.novos_aprovados}</td><td class="num">${r.a_reconferir}</td></tr>`).join("")}</tbody></table>` : `<p class="small">Nenhuma ainda.</p>`;
+}
+
+$("#criteriaForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target, n = (k) => f.elements[k].value === "" ? null : Number(f.elements[k].value);
+  if (n("year_min") && n("year_max") && n("year_min") > n("year_max")) return toast("Ano mínimo maior que o máximo.");
+  act($("button[type=submit]", f), async () => {
+    const oldRef = S.settings.criteria.ref_location;
+    Object.assign(S.settings.criteria, { max_price: n("max_price"), year_min: n("year_min"), year_max: n("year_max"), max_km: n("max_km"),
+      max_distance_km: n("max_distance_km"), ref_location: f.ref_location.value.trim() || oldRef,
+      transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value) });
+    S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
+    if (S.settings.criteria.ref_location !== oldRef) for (const l of S.listings) if (l.distance?.status !== "manual") await E.updateDistance(S, l, deps, true);
+    E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Critérios salvos e anúncios reclassificados.");
+  });
+});
+$("#exclForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  act(null, async () => { S.exclusions.push({ make: f.make.value.trim(), model: f.model.value.trim(), version_includes: f.version_includes.value.trim() });
+    f.reset(); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Modelo ignorado."); });
+});
+$("#exclList").addEventListener("click", (e) => { const b = e.target.closest("[data-delexcl]"); if (!b) return;
+  act(null, async () => { S.exclusions.splice(+b.dataset.delexcl, 1); E.reclassifyAll(S, deps); renderSettings(); renderCards(); }); });
+$("#specList").addEventListener("click", (e) => {
+  const t = e.target.closest("[data-togglespec]"), d = e.target.closest("[data-delspec]");
+  if (t) act(null, async () => { const id = t.dataset.togglespec; S.disabled_specs = S.disabled_specs.includes(id) ? S.disabled_specs.filter((x) => x !== id) : [...S.disabled_specs, id];
+    E.reclassifyAll(S, deps); renderSettings(); renderCards(); });
+  if (d) act(null, async () => { S.custom_specs = S.custom_specs.filter((x) => x.id !== d.dataset.delspec); E.reclassifyAll(S, deps); renderSettings(); renderCards(); });
+});
+$("#specForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target, items = {};
+  for (const k of Object.keys(ITEMS)) if (f[k].value) items[k] = { state: f[k].value, quote: f.quote.value.trim() || null,
+    ...(k === "adas" ? { names: f.adas_names.value.split(/[;,]/).map((s) => s.trim()).filter(Boolean) } : {}) };
+  const spec = { id: "custom-" + Date.now(), make: f.make.value.trim().toLowerCase(), model: f.model.value.trim().toLowerCase(),
+    version_includes: [f.version_includes.value.trim().toLowerCase()].filter(Boolean),
+    version_excludes: f.version_excludes.value.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean),
+    year_from: +f.year_from.value, year_to: +f.year_to.value, items,
+    source: { title: f.source_title.value.trim(), url: f.source_url.value.trim(), quality: f.source_quality.value } };
+  const errs = validateSpec(spec);
+  if (errs.length) return toast("Faltou: " + errs.join(", "));
+  act(null, async () => { S.custom_specs.push(spec); f.reset(); $("#specDetails").open = false; E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Ficha salva e aplicada."); });
+});
+$("#notifyForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  act($("button[type=submit]", f), async () => {
+    Object.assign(S.settings.notify, { new_approved: f.new_approved.checked, new_pending: f.new_pending.checked, price_drop: f.price_drop.checked,
+      include_discarded: f.include_discarded.checked, unavailable: f.unavailable.checked, review_digest: f.review_digest.checked, system: f.system.checked,
+      price_drop_min_pct: +f.price_drop_min_pct.value || 0, price_drop_min_abs: +f.price_drop_min_abs.value || 0 });
+    S.settings.stale_days = Math.max(1, +f.stale_days.value || 3); S.settings.routine_hours = Math.max(1, +f.routine_hours.value || 12);
+    if (f.system.checked && "Notification" in window && Notification.permission === "default") await Notification.requestPermission();
+    if (f.system.checked && "Notification" in window && Notification.permission !== "granted") toast("Permissão de notificação negada no Android.");
+    else toast("Preferências salvas.");
+    renderCards();
+  });
+});
+$("#distForm2").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  act(null, async () => { S.settings.distance = { provider: f.provider.value, ors_key: f.ors_key.value.trim() }; S.geo_cache = {}; toast("Serviço de rotas salvo. Use ↻ para recalcular."); });
+});
+$("#exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `carmonitor-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+$("#importFile").onchange = (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  file.text().then((t) => {
+    const data = JSON.parse(t);
+    if (!Array.isArray(data.listings) || !data.settings) throw new Error("Arquivo não é uma cópia do CarMonitor.");
+    if (!confirm(`Substituir os dados atuais por esta cópia (${data.listings.length} anúncios)?`)) return;
+    S = E.upgradeState(data); persist(); renderSettings(); renderCards(); toast("Cópia restaurada.");
+  }).catch((err) => toast(err.message)).finally(() => { e.target.value = ""; });
+};
+
+// ---------------------------------------------------------------- rotina ao abrir
+async function routine(force = false) {
+  const r = await E.runRoutine(S, deps, { force });
+  if (!r) return;
+  persist(); renderCards();
+  if (!r.processados) return;
+  $("#routineMsg").innerHTML = `<div class="msg ok">Rotina: ${r.processados} processados · ${r.distancias_calculadas} rotas calculadas · ${r.novos_aprovados} novos aprovados · ${r.a_reconferir} a reconferir.</div>`;
+  setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 8000);
+}
+$("#routineBtn").onclick = (e) => act(e.target, () => routine(true));
+
+// ---------------------------------------------------------------- compartilhar (Android) e início
+function handleShare() {
+  const p = new URLSearchParams(location.search);
+  if (!p.has("url") && !p.has("text") && !p.has("title")) return;
+  const all = [p.get("title"), p.get("text"), p.get("url")].filter(Boolean).join("\n");
+  const url = p.get("url") || firstUrl(all) || "";
+  const text = (p.get("text") || "").trim();
+  history.replaceState(null, "", location.pathname);
+  openImport(url, text && text !== url && text.replace(url, "").trim().length > 40 ? text : "");
+  if (!url) toast("Não encontrei um link no conteúdo compartilhado.");
+}
+
+(async function init() {
+  S = await loadState();
+  try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
+  saveCompare(); renderCards(); handleShare();
+  const h = location.hash.match(/listing=(\d+)/);
+  if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
+  requestPersistence();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  routine(false).catch((e) => console.warn(e));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") routine(false).catch(() => {}); });
+  window.__cm = { get state() { return S; } }; // depuração/testes
+})();

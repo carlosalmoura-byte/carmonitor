@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f5c">
+<meta name="description" content="Busca, validação e acompanhamento de carros seminovos — dados só no seu celular.">
+<title>CarMonitor</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">◐</span> CarMonitor <small>seminovos</small></div>
+  <button class="ghost" id="routineBtn" title="Reprocessar agora">↻</button>
+</header>
+
+<main>
+  <!-- ANÚNCIOS -->
+  <section id="view-listings" class="view active">
+    <div class="searchRow">
+      <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
+      <select id="sort" aria-label="Ordenar">
+        <option value="status">Status</option><option value="price">Menor preço</option><option value="km">Menor km</option>
+        <option value="distance">Mais perto</option><option value="recent">Recentes</option>
+      </select>
+    </div>
+    <div class="statusTabs" id="statusTabs">
+      <button data-status="" class="active">Todos <span id="c-all">0</span></button>
+      <button data-status="aprovado">Aprovados <span id="c-aprovado">0</span></button>
+      <button data-status="pendente">Pendentes <span id="c-pendente">0</span></button>
+      <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
+      <button data-status="reconferir">A reconferir <span id="c-reconferir">0</span></button>
+    </div>
+    <div id="routineMsg"></div>
+    <div id="cards" class="cards"></div>
+  </section>
+
+  <!-- COMPARAR -->
+  <section id="view-compare" class="view">
+    <div class="panel">
+      <div class="head"><h2>Comparação lado a lado</h2><button class="ghost" id="clearCmp">Limpar</button></div>
+      <p class="hint">Marque até 5 veículos em “Comparar” na lista.</p>
+      <div class="tableWrap" id="compareTable"></div>
+    </div>
+  </section>
+
+  <!-- ALERTAS -->
+  <section id="view-alerts" class="view">
+    <div class="panel">
+      <div class="head"><h2>Alertas</h2><button class="ghost" id="markRead">Marcar como lidos</button></div>
+      <div id="alertsList"></div>
+    </div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="view-settings" class="view">
+    <div class="settingsNav" id="settingsNav">
+      <button data-sub="criteria" class="active">Critérios</button>
+      <button data-sub="exclusions">Modelos ignorados</button>
+      <button data-sub="specs">Fichas</button>
+      <button data-sub="notify">Alertas</button>
+      <button data-sub="data">Dados e rotas</button>
+    </div>
+
+    <div class="panel subview active" id="sub-criteria">
+      <h2>Critérios</h2>
+      <form id="criteriaForm" autocomplete="off">
+        <label>Preço máximo (R$)<input type="number" inputmode="numeric" name="max_price" min="0" step="500"></label>
+        <div class="row2">
+          <label>Ano-modelo de<input type="number" inputmode="numeric" name="year_min" min="1990" max="2100"></label>
+          <label>até<input type="number" inputmode="numeric" name="year_max" min="1990" max="2100"></label>
+        </div>
+        <label>Km máxima<input type="number" inputmode="numeric" name="max_km" min="0" step="500"></label>
+        <fieldset><legend>Câmbio</legend>
+          <label class="chk"><input type="checkbox" name="tr" value="automatico"> Automático (inclui CVT/dupla embreagem)</label>
+          <label class="chk"><input type="checkbox" name="tr" value="automatizado"> Automatizado</label>
+          <label class="chk"><input type="checkbox" name="tr" value="manual"> Manual</label>
+        </fieldset>
+        <fieldset><legend>Tipo</legend>
+          <label class="chk"><input type="checkbox" name="cond" value="usado"> Usado</label>
+          <label class="chk"><input type="checkbox" name="cond" value="seminovo"> Seminovo</label>
+          <label class="chk"><input type="checkbox" name="cond" value="novo"> Novo (0 km)</label>
+        </fieldset>
+        <label>Localização de referência<input type="text" name="ref_location"></label>
+        <label>Distância máxima por estrada (km)<input type="number" inputmode="numeric" name="max_distance_km" min="1"></label>
+        <fieldset><legend>Equipamentos obrigatórios</legend>
+          <p class="hint" style="margin:.2rem 0 .5rem">ADAS identificado pelo nome, carregador por indução e Android Auto sem fio.</p>
+          <label class="chk"><input type="checkbox" name="accept_specs"> Aceitar a ficha da mesma versão e ano-modelo quando o anúncio não disser</label>
+          <label class="chk"><input type="checkbox" name="only_official_specs"> Só fichas de fonte oficial da montadora</label>
+        </fieldset>
+        <button class="primary" type="submit" style="width:100%">Salvar e reclassificar</button>
+      </form>
+      <h3>Buscar no WebMotors</h3>
+      <p class="hint">Aplique estes filtros no site ou no app do WebMotors e use <b>Compartilhar → CarMonitor</b> em cada anúncio.</p>
+      <div id="wmFilters" class="small"></div>
+      <a class="btn ghost" style="width:100%;margin-top:.5rem" href="https://www.webmotors.com.br/carros-usados/sp-barueri" target="_blank" rel="noopener">Abrir WebMotors ↗</a>
+    </div>
+
+    <div class="panel subview" id="sub-exclusions">
+      <h2>Modelos desconsiderados</h2>
+      <p class="hint">Anúncios destes modelos vão para Descartados, mesmo que atendam a tudo, e não geram alertas. Deixe a versão em branco para ignorar todas.</p>
+      <form id="exclForm" class="row2">
+        <label>Marca<input name="make" placeholder="ex.: Chevrolet"></label>
+        <label>Modelo<input name="model" placeholder="ex.: Onix" required></label>
+        <label>Versão contém (opcional)<input name="version_includes" placeholder="ex.: plus"></label>
+        <label>&nbsp;<button class="primary" type="submit" style="width:100%">Adicionar</button></label>
+      </form>
+      <ul class="list" id="exclList"></ul>
+    </div>
+
+    <div class="panel subview" id="sub-specs">
+      <h2>Fichas por versão</h2>
+      <p class="hint">Valem só para a mesma marca, modelo, versão e ano-modelo. Item “opcional” nunca confirma. Toda ficha exige a fonte.</p>
+      <ul class="list" id="specList"></ul>
+      <details id="specDetails"><summary>Adicionar ficha</summary>
+        <form id="specForm">
+          <div class="row2">
+            <label>Marca<input name="make" required></label><label>Modelo<input name="model" required></label>
+            <label>Versão contém<input name="version_includes" required placeholder="ex.: premiere"></label>
+            <label>Versão não contém<input name="version_excludes" placeholder="ex.: plus"></label>
+            <label>Ano-modelo de<input type="number" name="year_from" required></label><label>até<input type="number" name="year_to" required></label>
+          </div>
+          <div class="row2">
+            <label>ADAS<select name="adas"><option value="">não informado</option><option value="confirmado">de série</option><option value="opcional">opcional</option><option value="ausente">não tem</option></select></label>
+            <label>Nome(s) do ADAS<input name="adas_names" placeholder="ex.: Frenagem autônoma; Ponto cego"></label>
+            <label>Carregador por indução<select name="inducao"><option value="">não informado</option><option value="confirmado">de série</option><option value="opcional">opcional</option><option value="ausente">não tem</option></select></label>
+            <label>Android Auto sem fio<select name="android_auto_sem_fio"><option value="">não informado</option><option value="confirmado">de série</option><option value="opcional">opcional</option><option value="ausente">não tem</option></select></label>
+          </div>
+          <label>Fonte (título)<input name="source_title" required placeholder="ex.: Catálogo oficial 2025"></label>
+          <label>Link da fonte<input name="source_url" type="url" required placeholder="https://..."></label>
+          <label>Tipo de fonte<select name="source_quality"><option value="oficial">oficial (montadora)</option><option value="concessionária">concessionária</option><option value="secundária">secundária (imprensa/portal)</option></select></label>
+          <label>Trecho da fonte (evidência)<textarea name="quote" rows="2"></textarea></label>
+          <button class="primary" type="submit">Salvar ficha</button>
+        </form>
+      </details>
+    </div>
+
+    <div class="panel subview" id="sub-notify">
+      <h2>Alertas</h2>
+      <form id="notifyForm">
+        <label class="chk"><input type="checkbox" name="new_approved"> Nova oportunidade aprovada</label>
+        <label class="chk"><input type="checkbox" name="new_pending"> Novo anúncio pendente de validação</label>
+        <label class="chk"><input type="checkbox" name="price_drop"> Redução de preço</label>
+        <div class="row2">
+          <label>Queda mínima (%)<input type="number" name="price_drop_min_pct" min="0" step="0.5"></label>
+          <label>ou mínima (R$)<input type="number" name="price_drop_min_abs" min="0" step="100"></label>
+        </div>
+        <label class="chk"><input type="checkbox" name="include_discarded"> Incluir quedas de preço de descartados</label>
+        <label class="chk"><input type="checkbox" name="unavailable"> Anúncio ficou indisponível</label>
+        <label class="chk"><input type="checkbox" name="review_digest"> Lembrete de anúncios a reconferir</label>
+        <label class="chk"><input type="checkbox" name="system"> Também mostrar como notificação do Android</label>
+        <div class="row2">
+          <label>Reconferir após (dias)<input type="number" name="stale_days" min="1" max="60"></label>
+          <label>Rotina ao abrir a cada (h)<input type="number" name="routine_hours" min="1" max="168"></label>
+        </div>
+        <button class="primary" type="submit" style="width:100%">Salvar</button>
+      </form>
+    </div>
+
+    <div class="panel subview" id="sub-data">
+      <h2>Distância por estrada</h2>
+      <form id="distForm2">
+        <label>Serviço de rotas<select name="provider">
+          <option value="osrm">OSRM + OpenStreetMap (gratuito, uso leve)</option>
+          <option value="ors">OpenRouteService (chave gratuita própria)</option>
+          <option value="none">Desativado</option></select></label>
+        <label>Chave do OpenRouteService<input name="ors_key" type="password" autocomplete="off" placeholder="fica salva só neste aparelho"></label>
+        <button class="primary" type="submit">Salvar</button>
+      </form>
+      <h2 style="margin-top:1.2rem">Seus dados</h2>
+      <p class="hint" id="storageInfo">Tudo fica salvo só neste aparelho. Faça cópias de segurança de vez em quando.</p>
+      <div class="actions left">
+        <button id="exportBtn">Exportar cópia (.json)</button>
+        <label class="btn" style="margin:0;color:var(--ink)">Importar cópia<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      </div>
+      <h3>Rotinas recentes</h3>
+      <div class="tableWrap" id="routines"></div>
+    </div>
+  </section>
+</main>
+
+<button class="fab primary" id="fab" aria-label="Adicionar anúncio">+</button>
+
+<nav class="bottomNav" id="nav">
+  <button data-view="listings" class="active"><span class="ic">▤</span>Anúncios</button>
+  <button data-view="compare"><span class="ic">⇆</span>Comparar <span class="pill" id="cmpCount">0</span></button>
+  <button data-view="alerts"><span class="ic">🔔</span>Alertas <span class="pill warn" id="unread">0</span></button>
+  <button data-view="settings"><span class="ic">⚙</span>Ajustes</button>
+</nav>
+
+<!-- Importar -->
+<div class="sheet" id="importSheet" role="dialog" aria-modal="true" aria-label="Adicionar anúncio">
+  <div class="sheetHead"><h2>Adicionar anúncio</h2><button class="ghost" data-close>✕</button></div>
+  <form id="importForm">
+    <label>Link do anúncio<input name="url" inputmode="url" placeholder="https://www.webmotors.com.br/comprar/..." required></label>
+    <label>Texto do anúncio (recomendado)
+      <textarea name="text" rows="9" placeholder="No anúncio: toque e segure no texto → Selecionar tudo → Copiar. Depois cole aqui."></textarea></label>
+    <div class="actions"><button type="button" id="pasteBtn">Colar da área de transferência</button><button class="primary" type="submit">Adicionar e analisar</button></div>
+  </form>
+  <p class="hint">O app não acessa o WebMotors sozinho: analisa só o link e o texto que você trouxer. Sem o texto, os equipamentos podem ser confirmados pela ficha da versão (se houver), e preço/km ficam pendentes.</p>
+  <div id="importResult"></div>
+</div>
+
+<!-- Detalhe -->
+<div class="sheet" id="detailSheet" role="dialog" aria-modal="true" aria-label="Detalhes do anúncio">
+  <div class="sheetHead"><span id="detailBadge"></span><button class="ghost" data-close>✕</button></div>
+  <div id="detail"></div>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
