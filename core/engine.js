@@ -215,17 +215,19 @@ export function findExisting(state, url, source, sourceId) {
     (sourceId ? state.listings.find((l) => l.source === source && l.source_id === sourceId) : null) || null;
 }
 
-export function addText(l, content, origin, deps) {
+export function addText(l, content, origin, deps, at = null) {
   content = String(content || "").trim();
   if (content.length < 10) return false;
-  l.texts.push({ id: `${Date.now()}-${l.texts.length}`, content: content.slice(0, 200000), origin, at: nowIso(deps) });
-  l.last_checked = nowIso(deps);
+  if (origin === FEED_ORIGIN) l.texts = l.texts.filter((t) => t.origin !== FEED_ORIGIN); // guarda só a pesquisa mais recente
+  const when = at || nowIso(deps);
+  l.texts.push({ id: `${Date.now()}-${l.texts.length}`, content: content.slice(0, 200000), origin, at: when });
+  if (!l.last_checked || new Date(when) > new Date(l.last_checked)) l.last_checked = when;
   const p = deriveFields(extractFromText(content, "texto_colado"));
   applyParsed(l, p);
   return true;
 }
 
-export async function importListing(state, { url, text, origin = "colado" }, deps) {
+export async function importListing(state, { url, text, origin = "colado", at = null }, deps) {
   let nurl;
   try { nurl = normalizeUrl(url); } catch { return { result: "erro", message: "Link inválido." }; }
   const hints = parseUrl(nurl);
@@ -234,8 +236,8 @@ export async function importListing(state, { url, text, origin = "colado" }, dep
   const ex = findExisting(state, nurl, source, sourceId);
   if (ex) {
     ex.archived = false;
-    if (text && addText(ex, text, origin, deps)) {
-      const events = takeSnapshot(ex, "texto_colado", deps);
+    if (text && addText(ex, text, origin, deps, at)) {
+      const events = takeSnapshot(ex, origin === FEED_ORIGIN ? "pesquisa" : "texto_colado", deps, origin === FEED_ORIGIN);
       if (["city", "state", "address"].some((f) => ex.field_sources[f]) && ex.distance?.status !== "verificada") await updateDistance(state, ex, deps);
       refresh(state, ex, deps, events);
       recomputeDuplicates(state);
@@ -251,18 +253,58 @@ export async function importListing(state, { url, text, origin = "colado" }, dep
   };
   for (const f of FIELDS) l[f] ??= null;
   applyParsed(l, hints);
-  if (text) addText(l, text, origin, deps);
+  if (text) addText(l, text, origin, deps, at);
   const p2 = new Parsed();
   for (const f of FIELDS) if (l[f] != null) p2.put(f, l[f], l.field_sources[f]);
   deriveFields(p2);
   applyParsed(l, p2);
   state.listings.push(l);
   await updateDistance(state, l, deps);
-  const events = takeSnapshot(l, "importacao", deps);
+  const events = takeSnapshot(l, origin === FEED_ORIGIN ? "pesquisa" : "importacao", deps);
   refresh(state, l, deps, events, true);
   recomputeDuplicates(state);
   return { result: "criado", id: l.id,
     message: text ? "Importado e texto analisado." : "Importado só com o link. Cole o texto do anúncio para validar." };
+}
+
+// ------------------------------------------------------------------ pesquisa publicada (data/anuncios.json)
+export const FEED_ORIGIN = "pesquisa do Claude";
+
+/**
+ * Importa/atualiza anúncios de uma pesquisa publicada junto com o app.
+ * feed: {generated_at, listings: [{url, checked_at, text, available?}]}
+ * Só processa itens com checked_at mais novo do que o já visto para aquele link.
+ */
+export async function syncFeed(state, feed, deps) {
+  const res = { novos: 0, atualizados: 0, indisponiveis: 0, ignorados: 0 };
+  if (!feed || !Array.isArray(feed.listings)) return res;
+  state.meta.feed_seen ||= {};
+  for (const it of feed.listings) {
+    if (!it?.url || !it.checked_at) { res.ignorados++; continue; }
+    let key;
+    try { key = normalizeUrl(it.url); } catch { res.ignorados++; continue; }
+    const seen = state.meta.feed_seen[key];
+    if (seen && new Date(seen) >= new Date(it.checked_at)) continue;
+    if (it.available === false) {
+      const l = state.listings.find((x) => x.url === key);
+      if (l && l.available !== false) {
+        l.available = false; l.last_checked = it.checked_at;
+        const events = takeSnapshot(l, "pesquisa", deps, true);
+        refresh(state, l, deps, events); res.indisponiveis++;
+      }
+    } else {
+      const r = await importListing(state, { url: key, text: it.text || null, origin: FEED_ORIGIN, at: it.checked_at }, deps);
+      if (r.result === "criado") res.novos++; else if (r.result === "atualizado") res.atualizados++;
+      const l = state.listings.find((x) => x.id === r.id);
+      const last = l?.snapshots[l.snapshots.length - 1];
+      if (last && last.source === "pesquisa") last.at = it.checked_at; // histórico com a data da pesquisa
+      if (l && it.available === true && l.available !== true) { l.available = true; refresh(state, l, deps); }
+    }
+    state.meta.feed_seen[key] = it.checked_at;
+  }
+  state.meta.feed_generated_at = feed.generated_at || null;
+  recomputeDuplicates(state);
+  return res;
 }
 
 // ------------------------------------------------------------------ reconferência / edição

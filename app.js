@@ -494,6 +494,22 @@ $("#importFile").onchange = (e) => {
   }).catch((err) => toast(err.message)).finally(() => { e.target.value = ""; });
 };
 
+// ---------------------------------------------------------------- pesquisa publicada pelo Claude
+async function syncResearch(showNone = false) {
+  let feed;
+  try {
+    const r = await fetch("data/anuncios.json", { cache: "no-store" });
+    if (!r.ok) { if (showNone) toast("Nenhuma pesquisa publicada ainda."); return; }
+    feed = await r.json();
+  } catch { if (showNone) toast("Sem internet para buscar a pesquisa."); return; }
+  const res = await E.syncFeed(S, feed, deps);
+  persist(); renderCards();
+  const when = feed.generated_at ? E.fmtDate(feed.generated_at) : "—";
+  if (res.novos || res.atualizados || res.indisponiveis)
+    $("#routineMsg").innerHTML = `<div class="msg ok">Pesquisa do Claude (${esc(when)}): ${res.novos} novo(s), ${res.atualizados} atualizado(s)${res.indisponiveis ? `, ${res.indisponiveis} indisponível(is)` : ""}.</div>`;
+  else if (showNone) toast(`Pesquisa de ${when} já importada.`);
+}
+
 // ---------------------------------------------------------------- rotina ao abrir
 async function routine(force = false) {
   const r = await E.runRoutine(S, deps, { force });
@@ -503,7 +519,7 @@ async function routine(force = false) {
   $("#routineMsg").innerHTML = `<div class="msg ok">Rotina: ${r.processados} processados · ${r.distancias_calculadas} rotas calculadas · ${r.novos_aprovados} novos aprovados · ${r.a_reconferir} a reconferir.</div>`;
   setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 8000);
 }
-$("#routineBtn").onclick = (e) => act(e.target, () => routine(true));
+$("#routineBtn").onclick = (e) => act(e.target, async () => { await syncResearch(true); await routine(true); });
 
 // ---------------------------------------------------------------- compartilhar (Android) e início
 function handleShare() {
@@ -525,7 +541,9 @@ function handleShare() {
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-  routine(false).catch((e) => console.warn(e));
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") routine(false).catch(() => {}); });
+  syncResearch(false).then(() => routine(false)).catch((e) => console.warn(e));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") syncResearch(false).then(() => routine(false)).catch(() => {});
+  });
   window.__cm = { get state() { return S; } }; // depuração/testes
 })();
