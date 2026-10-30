@@ -48,8 +48,8 @@ export function makeDistance(fetchFn = (...a) => fetch(...a)) {
     return km;
   }
 
-  return async function distance(state, ref, city, uf, address) {
-    let provider = state.settings.distance.provider;
+  async function distance(state, ref, city, uf, address, forced = null) {
+    let provider = forced || state.settings.distance.provider;
     if (provider === "ors" && !state.settings.distance.ors_key) provider = "none";
     if (provider === "none") return { km: null, status: "nao_verificada", precision: null, note: "Cálculo de rota desativado nos ajustes." };
     if (!city || !uf) return { km: null, status: "nao_verificada", precision: null, note: "Cidade/UF do anúncio desconhecida." };
@@ -64,7 +64,13 @@ export function makeDistance(fetchFn = (...a) => fetch(...a)) {
       const alvo = precision === "endereco" ? "endereço/CEP do anúncio" : "centro da cidade do anúncio";
       return { km, status: "verificada", precision, note: `Rota de carro (${provider.toUpperCase()}) de ${ref} até o ${alvo}.` };
     } catch (e) {
+      if (provider === "ors") { // OpenRouteService fora do ar ou chave inválida: usa o OSRM gratuito
+        const r = await distance(state, ref, city, uf, address, "osrm");
+        if (r.status === "verificada") r.note += ` (OpenRouteService indisponível: ${e.message || e.name}; usado o OSRM.)`;
+        return r;
+      }
       return { km: null, status: "nao_verificada", precision: null, note: `Falha no serviço de rotas (${e.message || e.name}). Sem internet? Tente de novo.` };
     }
-  };
+  }
+  return distance;
 }

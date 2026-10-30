@@ -274,3 +274,16 @@ test("preço e km mínimos", () => {
   assert.equal(classify({ ...base, km: 1000 }, allOk, c).status, DISCARDED);
   assert.equal(classify(base, allOk, c).status, APPROVED);
 });
+
+import { makeDistance } from "../core/distance.js";
+test("rotas: se o OpenRouteService falhar, usa o OSRM", async () => {
+  const fake = async (url) => {
+    if (url.includes("openrouteservice")) return { ok: false, status: 503, json: async () => ({}) };
+    if (url.includes("nominatim")) return { ok: true, json: async () => [{ lat: "-23.5", lon: "-46.8" }] };
+    if (url.includes("project-osrm")) return { ok: true, json: async () => ({ code: "Ok", routes: [{ distance: 31234 }] }) };
+    throw new Error("inesperado " + url);
+  };
+  const s = newState(); s.settings.distance = { provider: "ors", ors_key: "x" };
+  const r = await makeDistance(fake)(s, "Barueri, SP", "São Paulo", "SP", null);
+  assert.equal(r.status, "verificada"); assert.equal(r.km, 31.2); assert.match(r.note, /usado o OSRM/);
+});
