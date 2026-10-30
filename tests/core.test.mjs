@@ -357,3 +357,27 @@ test("fichas publicadas em data/fichas.json entram na validação", async () => 
   assert.ok(allSpecs(s).some((x) => x.id === "vw-virtus-exclusive-2023"));
   assert.equal(findSpec(allSpecs(s), L("VOLKSWAGEN", "VIRTUS", "10 200 TSI EXCLUSIVE AUTOMATICO", 2023)).id, "vw-virtus-exclusive-2023");
 });
+
+// ------------------------------------------------------------ ADAS desejável e FIPE
+import { fipeDiscount } from "../core/score.js";
+test("ADAS desejável: sem ADAS ainda aprova; com ADAS a nota sobe; opção de tornar obrigatório", () => {
+  const sem = { ...allOk, adas: { state: PENDING } }, nao = { ...allOk, adas: { state: ABSENT } };
+  assert.equal(classify(base, sem, DEFAULT_CRITERIA).status, APPROVED);
+  assert.equal(classify(base, nao, DEFAULT_CRITERIA).status, APPROVED);
+  assert.equal(classify(base, sem, { ...DEFAULT_CRITERIA, adas_required: true }).status, ST_PENDING);
+  assert.equal(classify(base, nao, { ...DEFAULT_CRITERIA, adas_required: true }).status, DISCARDED);
+  const mk = (checks) => { const r = classify(base, checks, DEFAULT_CRITERIA); return scoreListing({ ...base, ...r, checks }, DEFAULT_CRITERIA).total; };
+  assert.ok(mk(allOk) > mk(sem), `${mk(allOk)} > ${mk(sem)}`);
+});
+test("FIPE: extrai do texto, não confunde com o preço e calcula o desconto", () => {
+  const p = extractFromText("ONIX\nFIPE: R$ 95.988\nPreço: R$ 88.800\nAno: 2025/2025\nSelo: Abaixo da Fipe");
+  assert.equal(p.fields.price, 88800); assert.equal(p.fields.fipe, 95988); assert.equal(p.fields.below_fipe_tag, true);
+  const q = extractFromText("Preço: R$ 97.990\nFIPE: R$ 95.988");
+  assert.equal(q.fields.price, 97990); assert.equal(q.fields.fipe, 95988);
+  assert.equal(fipeDiscount({ price: 88800, fipe: 95988 }), 7.5);
+  assert.equal(fipeDiscount({ price: 97990, fipe: 95988 }), -2.1);
+  assert.equal(fipeDiscount({ price: 90000 }), null);
+  const cheap = scoreListing({ ...base, status: "aprovado", reasons: [], price: 88800, fipe: 95988 }, DEFAULT_CRITERIA).total;
+  const exp = scoreListing({ ...base, status: "aprovado", reasons: [], price: 88800, fipe: 85000 }, DEFAULT_CRITERIA).total;
+  assert.ok(cheap > exp);
+});

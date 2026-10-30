@@ -88,7 +88,7 @@ const CITY_ANY = new RegExp(CITY);
 export function extractFromText(text, source = "texto_colado", p = new Parsed()) {
   if (!text) return p;
   const n = normalize(text);
-  let m = n.match(/(?:preco|valor)\s*[:\-]?\s*r\$\s*([\d.]+(?:,\d{2})?)/) || n.match(/r\$\s*([\d.]+(?:,\d{2})?)/);
+  let m = n.match(/(?:preco|valor anunciado)\s*[:\-]?\s*r\$\s*([\d.]+(?:,\d{2})?)/) || n.match(/(?<!fipe\s*[:\-]?\s*)r\$\s*([\d.]+(?:,\d{2})?)/);
   if (m) { const v = parseNumber(m[1]); if (v && v >= 1000) p.put("price", v, source); }
 
   m = n.match(/\b((?:19|20)\d{2})\s*\/\s*((?:19|20)\d{2})\b/);
@@ -112,6 +112,9 @@ export function extractFromText(text, source = "texto_colado", p = new Parsed())
   m = text.match(/\b(\d{5}-?\d{3})\b/);
   if (m && /cep/.test(n.slice(Math.max(0, m.index - 15), m.index))) p.put("address", "CEP " + m[1], source);
 
+  m = n.match(/(?:valor\s+)?fipe\s*[:\-]?\s*r\$\s*([\d.]+(?:,\d{2})?)/);
+  if (m) { const v = parseNumber(m[1]); if (v && v >= 1000) p.put("fipe", v, source); }
+  if (/abaixo\s+da\s+fipe/.test(n)) p.put("below_fipe_tag", true, source);
   m = text.match(/(?:^|\n)\s*(?:Vendedor|Anunciante|Loja)\s*:\s*([^\n]{2,80})/i);
   if (m && !/n[ãa]o verificado/i.test(m[1])) p.put("seller", m[1].trim(), source);
   if (UNAVAILABLE.some((r) => r.test(n))) p.put("available", false, source);

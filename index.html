@@ -25,7 +25,7 @@
       <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
       <select id="sort" aria-label="Ordenar">
         <option value="score">Mais aderente</option><option value="price">Menor preço</option><option value="km">Menor km</option>
-        <option value="distance">Mais perto</option><option value="recent">Recentes</option>
+        <option value="distance">Mais perto</option><option value="fipe">Mais abaixo da FIPE</option><option value="recent">Recentes</option>
       </select>
     </div>
     <div class="researchBar">
@@ -38,6 +38,7 @@
       <button data-status="pendente">Pendentes <span id="c-pendente">0</span></button>
       <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
       <button data-status="reconferir">A reconferir <span id="c-reconferir">0</span></button>
+      <button data-status="fipe">💰 Abaixo da FIPE <span id="c-fipe">0</span></button>
       <button data-status="favoritos">★ Favoritos <span id="c-fav">0</span></button>
     </div>
     <div id="routineMsg"></div>
@@ -112,7 +113,8 @@
         <label id="refOtherWrap" hidden>Outra cidade (Cidade, UF)<input type="text" name="ref_other" placeholder="ex.: Osasco, SP"></label>
         <label>Distância máxima por estrada<select name="max_distance_km"></select></label>
         <fieldset><legend>Equipamentos obrigatórios</legend>
-          <p class="hint" style="margin:.2rem 0 .5rem">ADAS identificado pelo nome, carregador por indução e Android Auto sem fio.</p>
+          <p class="hint" style="margin:.2rem 0 .5rem">Obrigatórios: carregador por indução e Android Auto sem fio. ADAS (identificado pelo nome) é desejável e soma na nota.</p>
+          <label class="chk"><input type="checkbox" name="adas_required"> Tornar o ADAS obrigatório</label>
           <label class="chk"><input type="checkbox" name="accept_specs"> Aceitar a ficha da mesma versão e ano-modelo quando o anúncio não disser</label>
           <label class="chk"><input type="checkbox" name="only_official_specs"> Só fichas de fonte oficial da montadora</label>
         </fieldset>

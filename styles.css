@@ -189,3 +189,4 @@ main{padding-bottom:88px}
 .sugg button.done{background:var(--bad-bg);color:var(--bad);border-color:transparent}
 .sugg .lvl{display:block;font-size:.72rem;color:var(--muted);margin-top:.35rem}
 .researchBar{display:flex;gap:.6rem;align-items:center;justify-content:space-between;margin-bottom:.6rem}.researchBar .small{flex:1}
+.reasons .info{color:var(--muted)}

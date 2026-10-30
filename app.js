@@ -6,7 +6,7 @@ import { ITEMS } from "./core/equipment.js";
 import { firstUrl } from "./core/parsing.js";
 import { SEED_SPECS, exclusionLabel, findExclusion as findExcl, validateSpec } from "./core/specs.js";
 import { CATALOG, CITIES, ignoreSuggestions } from "./core/catalog.js";
-import { LEVEL_LABEL, byAdherence } from "./core/score.js";
+import { LEVEL_LABEL, byAdherence, fipeDiscount } from "./core/score.js";
 import { loadState, requestPersistence, saveState } from "./core/store.js";
 
 // ---------------------------------------------------------------- utilidades
@@ -19,6 +19,14 @@ const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descar
 const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
 const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
 const SELLER = { particular: "Particular", loja: "Loja", concessionaria: "Concessionária" };
+const pct = (v) => Math.abs(v).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
+function fipeChip(l) {
+  const fd = fipeDiscount(l);
+  if (fd != null && fd > 0) return `<span class="chip confirmado" title="FIPE exibida no anúncio: ${brl(l.fipe)}">💰 ${pct(fd)} abaixo da FIPE</span>`;
+  if (fd == null && l.below_fipe_tag) return `<span class="chip confirmado" title="Selo do WebMotors">💰 abaixo da FIPE</span>`;
+  return "";
+}
+const isBelowFipe = (l) => (fipeDiscount(l) ?? 0) > 0 || (fipeDiscount(l) == null && !!l.below_fipe_tag);
 const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA sem fio" };
 const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
 
@@ -139,13 +147,16 @@ function renderCards() {
   $("#c-descartado").textContent = counts.descartado; $("#c-all").textContent = items.length;
   $("#c-reconferir").textContent = items.filter(stale).length;
   $("#c-fav").textContent = items.filter((l) => l.favorite).length;
+  $("#c-fipe").textContent = items.filter(isBelowFipe).length;
   if (ui.status === "reconferir") items = items.filter(stale);
   else if (ui.status === "favoritos") items = items.filter((l) => l.favorite);
+  else if (ui.status === "fipe") items = items.filter(isBelowFipe);
   else if (ui.status) items = items.filter((l) => l.status === ui.status);
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
   const keyf = {
     price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
     recent: (l) => -new Date(l.first_seen).getTime(),
+    fipe: (l) => -(fipeDiscount(l) ?? (l.below_fipe_tag ? 0.01 : -100)),
   }[$("#sort").value];
   items.sort(keyf ? (a, b) => keyf(a) - keyf(b) : byAdherence);
   const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
@@ -159,9 +170,11 @@ function renderCards() {
   el.innerHTML = items.map((l) => {
     const first = l.snapshots.find((s) => s.price)?.price;
     const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
-    const chips = Object.keys(ITEMS).map((k) => {
+    const optAdas = !S.settings.criteria.adas_required;
+    const chips = fipeChip(l) + Object.keys(ITEMS).map((k) => {
       const c = l.checks[k] || { state: "pendente" };
-      return `<span class="chip ${c.state}" title="${esc(ITEMS[k])}">${EQ_ICON[c.state]} ${SHORT[k]}${c.method === "ficha" ? " ·ficha" : ""}</span>`;
+      const cls = k === "adas" && optAdas && c.state !== "confirmado" ? "info" : c.state;
+      return `<span class="chip ${cls}" title="${esc(ITEMS[k])}">${EQ_ICON[c.state]} ${SHORT[k]}${k === "adas" && optAdas ? " (desejável)" : ""}${c.method === "ficha" ? " ·ficha" : ""}</span>`;
     }).join("");
     const extra = [
       l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",
@@ -265,8 +278,8 @@ $("#importResult").addEventListener("click", (e) => {
 // ---------------------------------------------------------------- detalhe
 const FIELD_LABELS = [["make", "Marca"], ["model", "Modelo"], ["version", "Versão"], ["year_fab", "Ano fabricação"],
   ["year_model", "Ano-modelo"], ["price", "Preço"], ["km", "Quilometragem"], ["transmission", "Câmbio"],
-  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"]];
-const fmtField = (k, v) => v == null || v === "" ? "—" : k === "seller_type" ? (SELLER[v] || v) : k === "price" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
+  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"], ["fipe", "Valor FIPE"]];
+const fmtField = (k, v) => v == null || v === "" ? "—" : k === "seller_type" ? (SELLER[v] || v) : k === "price" || k === "fipe" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
 
 function chart(snaps) {
   const pts = snaps.filter((s) => s.price != null);
@@ -290,7 +303,10 @@ function openDetail(id) {
 function renderDetail(d) {
   $("#detailBadge").innerHTML = `<span class="badge ${d.status}">${STATUS[d.status]}</span> <button class="favBtn ${d.favorite ? "on" : ""}" id="dFav" aria-label="Favorito">${d.favorite ? "★" : "☆"}</button>`;
   $("#dFav").onclick = () => toggleFav(d.id);
-  const reasons = d.reasons.map((r) => `<li class="${r.level}">${r.level === "ok" ? "✓" : r.level === "fail" ? "✕" : "?"} ${esc(r.msg)}</li>`).join("");
+  const reasons = d.reasons.map((r) => `<li class="${r.level}">${r.level === "ok" ? "✓" : r.level === "fail" ? "✕" : r.level === "info" ? "•" : "?"} ${esc(r.msg)}</li>`).join("");
+  const fd = fipeDiscount(d);
+  const fipeLine = d.fipe ? `<p class="${fd > 0 ? "msg ok" : "small"}">FIPE exibida no anúncio: <b>${brl(d.fipe)}</b> — preço ${fd > 0 ? `${pct(fd)} abaixo` : fd < 0 ? `${pct(fd)} acima` : "igual"} da FIPE${fd >= 5 ? " · possível oportunidade" : ""}.</p>`
+    : d.below_fipe_tag ? `<p class="msg ok">O WebMotors marcou este anúncio como <b>abaixo da FIPE</b>.</p>` : "";
   const eq = Object.entries(ITEMS).map(([k, label]) => {
     const c = d.checks[k] || { state: "pendente" };
     const how = c.method === "ficha" ? `<span class="chip ficha">pela ficha da versão</span>` : c.method === "manual" ? `<span class="chip info">validação sua</span>` : "";
@@ -322,6 +338,7 @@ function renderDetail(d) {
 
   $("#detail").innerHTML = `
     <h2 style="margin:.2rem 0 .3rem">${esc(title(d))} ${esc(d.year_model || "")}</h2>
+    <div><span class="price">${brl(d.price)}</span></div>${fipeLine}
     <div class="small">${esc(d.version || "")}</div>
     ${d.unavailable_since ? `<div class="msg err">Este anúncio saiu do ar em ${esc(E.fmtDate(d.unavailable_since))}. O histórico fica guardado até você excluir.</div>` : ""}
     <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio ↗</a></p>
@@ -353,7 +370,7 @@ function renderDetail(d) {
           ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(SELLER).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
           : k === "condition"
           ? `<label>${label}<select name="${k}"><option value=""></option>${["usado", "seminovo", "novo"].map((v) => `<option ${d[k] === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>`
-          : `<label>${label}<input name="${k}" value="${esc(d[k] ?? "")}" ${["price", "km", "year_fab", "year_model"].includes(k) ? 'type="number" inputmode="numeric"' : ""}></label>`).join("")}
+          : `<label>${label}<input name="${k}" value="${esc(d[k] ?? "")}" ${["price", "km", "year_fab", "year_model", "fipe"].includes(k) ? 'type="number" inputmode="numeric"' : ""}></label>`).join("")}
         <button type="submit" class="primary">Salvar correções</button>
       </form></details>
 
@@ -518,6 +535,7 @@ function renderCompare() {
     ${row("Aderência", (x) => `🎯 ${x.score?.total ?? "—"} <span class="small">${LEVEL_LABEL[x.score?.level] || ""}</span>`, (x) => x.score?.total)}
     ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`, (x) => ({ aprovado: 2, pendente: 1, descartado: 0 })[x.status])}
     ${row("Preço", (x) => brl(x.price), (x) => x.price, "min")}
+    ${row("Em relação à FIPE", (x) => { const f = fipeDiscount(x); return f == null ? (x.below_fipe_tag ? "abaixo (selo)" : "—") : `${pct(f)} ${f >= 0 ? "abaixo" : "acima"}<br><span class="small">FIPE ${brl(x.fipe)}</span>`; }, (x) => fipeDiscount(x))}
     ${row("Ano-modelo", (x) => esc(x.year_model ?? "—"), (x) => x.year_model)}
     ${row("Quilometragem", (x) => num(x.km, " km"), (x) => x.km, "min")}
     ${row("Distância", (x) => esc(distText(x)), (x) => x.distance?.km, "min")}
@@ -574,6 +592,7 @@ function renderSettings() {
   $$("input[name=cond]", f).forEach((i) => i.checked = c.conditions.includes(i.value));
   $$("input[name=seller]", f).forEach((i) => i.checked = (c.seller_types || []).includes(i.value));
   const cf = $("#contactForm"); cf.my_car.value = S.settings.my_car || ""; cf.template.value = S.settings.contact_template || "";
+  f.adas_required.checked = !!c.adas_required;
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
   $("#wmFilters").innerHTML = `<ul style="margin:.2rem 0 0 1rem;padding:0">
     <li>Preço ${c.min_price != null ? `de ${brl(c.min_price)} ` : ""}${c.max_price != null ? `até ${brl(c.max_price)}` : ""} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km ${c.min_km != null ? `de ${num(c.min_km)} ` : ""}${c.max_km != null ? `até ${num(c.max_km)}` : ""}</li>
@@ -626,6 +645,7 @@ $("#criteriaForm").addEventListener("submit", (e) => {
       transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value),
       seller_types: $$("input[name=seller]:checked", f).map((i) => i.value) });
     if (!S.settings.criteria.seller_types.length) S.settings.criteria.seller_types = ["particular", "loja", "concessionaria"];
+    S.settings.criteria.adas_required = f.adas_required.checked;
     S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
     const refChanged = S.settings.criteria.ref_location !== oldRef;
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")

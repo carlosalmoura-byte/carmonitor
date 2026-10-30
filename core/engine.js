@@ -7,7 +7,7 @@ import { SEED_SPECS, SPEC_ABSENT, SPEC_CONFIRMED, SPEC_OPTIONAL, exclusionLabel,
 import { scoreListing } from "./score.js";
 
 export const FIELDS = ["title", "make", "model", "version", "year_fab", "year_model", "price", "km", "transmission",
-  "condition", "city", "state", "address", "seller", "seller_type"];
+  "condition", "city", "state", "address", "seller", "seller_type", "fipe", "below_fipe_tag"];
 const PRIORITY = { url: 1, derivado_km: 1, derivado_version: 1, derivado_title: 1, derivado_vendedor: 1, texto_colado: 3, manual: 10 };
 export const SOURCE_LABEL = { url: "URL do anúncio", texto_colado: "Texto do anúncio", manual: "Informado por você",
   derivado_km: "Derivado da km", derivado_version: "Derivado da versão", derivado_title: "Derivado do título",
@@ -194,6 +194,10 @@ export function handleNotifications(state, l, oldStatus, events, isNew, deps) {
     notify(state, "novo_aprovado", "Nova oportunidade aprovada",
       `${listingName(l)} — ${l.price != null ? brl(l.price) : "—"} — ${l.km ?? "—"} km — ${l.city || "?"}/${l.state || "?"}`,
       `aprovado:${l.id}:${l.price}`, l.id, deps);
+  const fd = l.price && l.fipe ? ((l.fipe - l.price) / l.fipe) * 100 : null;
+  if (isNew && l.status !== DISCARDED && fd != null && fd >= 5)
+    notify(state, "abaixo_fipe", "Oportunidade abaixo da FIPE",
+      `${listingName(l)}: ${brl(l.price)}, ${fd.toFixed(1).replace(".", ",")}% abaixo da FIPE (${brl(l.fipe)}).`, `fipe:${l.id}:${l.price}`, l.id, deps);
   if (isNew && p.new_pending && l.status !== APPROVED && l.status !== DISCARDED)
     notify(state, "novo_pendente", "Novo anúncio pendente de validação", listingName(l), `novo:${l.id}`, l.id, deps);
   for (const ev of events) {

@@ -60,6 +60,10 @@ Modelos a verificar em toda pesquisa (versões mais equipadas de cada um; pule o
 | Peugeot / Citroën | 208, 2008 / C3, Basalt, C3 Aircross |
 | Caoa Chery / BYD / GWM | Tiggo 5x / Dolphin Mini, Dolphin / Ora 03 |
 
+Obrigatórios: carregador por indução e Android Auto sem fio (Apple CarPlay sem fio não basta). ADAS é **desejável**:
+versões sem ADAS também entram, desde que tenham os dois itens obrigatórios. Anúncios com selo "Abaixo da Fipe" ou
+preço abaixo do valor FIPE exibido são oportunidades — priorize abri-los.
+
 Para cada modelo:
 1. Busque a página de listagem do WebMotors em SP (WebSearch, ex.: "webmotors Volkswagen Virtus Exclusive automático
    usado São Paulo"; use também páginas por ano, ex. `/de.2023/ate.2023`). Se `conditions` incluir `novo`, procure
@@ -92,6 +96,8 @@ KM: <km>
 Câmbio: <câmbio>
 Cidade: <Cidade> - <UF>
 Vendedor: <nome do vendedor, com "(Pessoa Física)" quando a página indicar>
+FIPE: R$ <valor FIPE exibido na página do anúncio, se houver>
+Selo: Abaixo da Fipe   (só se a página/listagem mostrar esse selo)
 Itens de veículo: <lista separada por ; exatamente como na página>
 <trechos da descrição do vendedor que citem equipamentos, se houver>
 ```

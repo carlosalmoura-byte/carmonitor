@@ -9,7 +9,7 @@ export const BORDERLINE_FRACTION = 0.10;
 
 export const DEFAULT_CRITERIA = {
   min_price: null, max_price: 100000, year_min: 2022, year_max: 2025, min_km: null, max_km: 35000,
-  transmissions: ["automatico"], conditions: ["usado", "seminovo"], seller_types: ["particular", "loja", "concessionaria"],
+  transmissions: ["automatico"], conditions: ["usado", "seminovo"], seller_types: ["particular", "loja", "concessionaria"], adas_required: false,
   ref_location: "Barueri, SP", max_distance_km: 60,
 };
 
@@ -80,6 +80,11 @@ export function classify(l, checks, criteria, exclusion = null) {
 
   for (const [item, label] of Object.entries(ITEMS)) {
     const ch = checks[item] || {};
+    if (item === "adas" && !c.adas_required) { // desejável: soma na nota, não aprova nem descarta
+      if (ch.state === CONFIRMED) add("info", item, `${label}: tem${ch.method === "ficha" ? " (pela ficha da versão)" : ""} — desejável.`);
+      else add("info", item, `${label}: ${ch.state === ABSENT ? "não tem" : "não comprovado"} — desejável, não obrigatório.`);
+      continue;
+    }
     if (ch.state === CONFIRMED) add("ok", item, `${label}: confirmado${ch.method === "ficha" ? " pela ficha da versão" : ""}.`);
     else if (ch.state === ABSENT) add("fail", item, `${label}: ausente${ch.method === "ficha" ? " segundo a ficha da versão" : ""}.`);
     else add("pending", item, `${label}: pendente de validação.`);
