@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f6f5c">
-<meta name="description" content="Busca, validação e acompanhamento de carros seminovos — dados só no seu celular.">
+<meta name="description" content="Busca, validação e acompanhamento de carros novos e seminovos — dados só no seu celular.">
 <title>CarMonitor</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
@@ -13,7 +13,7 @@
 </head>
 <body>
 <header class="top">
-  <div class="brand"><span class="logo">◐</span> CarMonitor <small>seminovos</small></div>
+  <div class="brand"><span class="logo">◐</span> CarMonitor <small id="brandSub">seminovos</small></div>
   <button class="ghost" id="routineBtn" title="Reprocessar agora">↻</button>
 </header>
 
@@ -33,6 +33,7 @@
       <button data-status="pendente">Pendentes <span id="c-pendente">0</span></button>
       <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
       <button data-status="reconferir">A reconferir <span id="c-reconferir">0</span></button>
+      <button data-status="favoritos">★ Favoritos <span id="c-fav">0</span></button>
     </div>
     <div id="routineMsg"></div>
     <div id="cards" class="cards"></div>
@@ -68,12 +69,12 @@
     <div class="panel subview active" id="sub-criteria">
       <h2>Critérios</h2>
       <form id="criteriaForm" autocomplete="off">
-        <label>Preço máximo (R$)<input type="number" inputmode="numeric" name="max_price" min="0" step="500"></label>
+        <label>Preço máximo<select name="max_price"></select></label>
         <div class="row2">
-          <label>Ano-modelo de<input type="number" inputmode="numeric" name="year_min" min="1990" max="2100"></label>
-          <label>até<input type="number" inputmode="numeric" name="year_max" min="1990" max="2100"></label>
+          <label>Ano-modelo de<select name="year_min"></select></label>
+          <label>até<select name="year_max"></select></label>
         </div>
-        <label>Km máxima<input type="number" inputmode="numeric" name="max_km" min="0" step="500"></label>
+        <label>Km máxima<select name="max_km"></select></label>
         <fieldset><legend>Câmbio</legend>
           <label class="chk"><input type="checkbox" name="tr" value="automatico"> Automático (inclui CVT/dupla embreagem)</label>
           <label class="chk"><input type="checkbox" name="tr" value="automatizado"> Automatizado</label>
@@ -83,9 +84,11 @@
           <label class="chk"><input type="checkbox" name="cond" value="usado"> Usado</label>
           <label class="chk"><input type="checkbox" name="cond" value="seminovo"> Seminovo</label>
           <label class="chk"><input type="checkbox" name="cond" value="novo"> Novo (0 km)</label>
+          <p class="hint" style="margin:.2rem 0">O título do app e as próximas pesquisas seguem este filtro.</p>
         </fieldset>
-        <label>Localização de referência<input type="text" name="ref_location"></label>
-        <label>Distância máxima por estrada (km)<input type="number" inputmode="numeric" name="max_distance_km" min="1"></label>
+        <label>Cidade de referência<select name="ref_city"></select></label>
+        <label id="refOtherWrap" hidden>Outra cidade (Cidade, UF)<input type="text" name="ref_other" placeholder="ex.: Osasco, SP"></label>
+        <label>Distância máxima por estrada<select name="max_distance_km"></select></label>
         <fieldset><legend>Equipamentos obrigatórios</legend>
           <p class="hint" style="margin:.2rem 0 .5rem">ADAS identificado pelo nome, carregador por indução e Android Auto sem fio.</p>
           <label class="chk"><input type="checkbox" name="accept_specs"> Aceitar a ficha da mesma versão e ano-modelo quando o anúncio não disser</label>
@@ -101,12 +104,16 @@
 
     <div class="panel subview" id="sub-exclusions">
       <h2>Modelos desconsiderados</h2>
-      <p class="hint">Anúncios destes modelos vão para Descartados, mesmo que atendam a tudo, e não geram alertas. Deixe a versão em branco para ignorar todas.</p>
-      <form id="exclForm" class="row2">
-        <label>Marca<input name="make" placeholder="ex.: Chevrolet"></label>
-        <label>Modelo<input name="model" placeholder="ex.: Onix" required></label>
-        <label>Versão contém (opcional)<input name="version_includes" placeholder="ex.: plus"></label>
-        <label>&nbsp;<button class="primary" type="submit" style="width:100%">Adicionar</button></label>
+      <p class="hint">Anúncios destes modelos vão para Descartados, mesmo que atendam a tudo, e não geram alertas.</p>
+      <form id="exclForm">
+        <div class="row2">
+          <label>Marca<input name="make" list="dlMakes" placeholder="escolha ou digite" autocomplete="off" required></label>
+          <label>Modelo<input name="model" list="dlModels" placeholder="escolha ou digite" autocomplete="off" required></label>
+        </div>
+        <label>Versão contém (opcional)<input name="version_includes" list="dlVersions" placeholder="vazio = todas as versões" autocomplete="off"></label>
+        <label>Motivo (opcional)<input name="reason" placeholder="ex.: porta-malas pequeno; já tive e não gostei"></label>
+        <button class="primary" type="submit" style="width:100%">Ignorar este modelo</button>
+        <datalist id="dlMakes"></datalist><datalist id="dlModels"></datalist><datalist id="dlVersions"></datalist>
       </form>
       <ul class="list" id="exclList"></ul>
     </div>
@@ -145,16 +152,16 @@
         <label class="chk"><input type="checkbox" name="new_pending"> Novo anúncio pendente de validação</label>
         <label class="chk"><input type="checkbox" name="price_drop"> Redução de preço</label>
         <div class="row2">
-          <label>Queda mínima (%)<input type="number" name="price_drop_min_pct" min="0" step="0.5"></label>
-          <label>ou mínima (R$)<input type="number" name="price_drop_min_abs" min="0" step="100"></label>
+          <label>Queda mínima (%)<select name="price_drop_min_pct"></select></label>
+          <label>ou mínima (R$)<select name="price_drop_min_abs"></select></label>
         </div>
         <label class="chk"><input type="checkbox" name="include_discarded"> Incluir quedas de preço de descartados</label>
         <label class="chk"><input type="checkbox" name="unavailable"> Anúncio ficou indisponível</label>
         <label class="chk"><input type="checkbox" name="review_digest"> Lembrete de anúncios a reconferir</label>
         <label class="chk"><input type="checkbox" name="system"> Também mostrar como notificação do Android</label>
         <div class="row2">
-          <label>Reconferir após (dias)<input type="number" name="stale_days" min="1" max="60"></label>
-          <label>Rotina ao abrir a cada (h)<input type="number" name="routine_hours" min="1" max="168"></label>
+          <label>Pedir reconferência após<select name="stale_days"></select></label>
+          <label>Reprocessar ao abrir a cada<select name="routine_hours"></select></label>
         </div>
         <button class="primary" type="submit" style="width:100%">Salvar</button>
       </form>

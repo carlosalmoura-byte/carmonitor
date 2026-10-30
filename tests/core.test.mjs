@@ -216,7 +216,7 @@ test("rotina ao abrir: respeita intervalo, calcula distância pendente e lista r
 });
 
 // ------------------------------------------------------------ pesquisa publicada
-import { syncFeed } from "../core/engine.js";
+import { syncFeed, fillDistances } from "../core/engine.js";
 test("pesquisa publicada: importa, atualiza preço só quando é mais nova e marca indisponível", async () => {
   const s = newState();
   const url = "https://www.webmotors.com.br/comprar/chevrolet/onix/10-turbo-flex-premier-automatico/4-portas/2024-2025/79501868";
@@ -225,6 +225,8 @@ test("pesquisa publicada: importa, atualiza preço só quando é mais nova e mar
   let r = await syncFeed(s, feed1, deps());
   assert.equal(r.novos, 1);
   const l = s.listings[0];
+  assert.equal(l.distance.status, "nao_verificada");      // lista aparece antes; rota vem depois
+  assert.equal(await fillDistances(s, deps()), 1);
   assert.equal(l.price, 93900); assert.equal(l.year_model, 2025); assert.equal(l.city, "São Paulo");
   assert.equal(l.checks.inducao.method, "ficha");          // Onix Premier 2025 pela ficha
   assert.equal(l.status, "aprovado", JSON.stringify(l.reasons));
@@ -239,4 +241,11 @@ test("pesquisa publicada: importa, atualiza preço só quando é mais nova e mar
   assert.equal(l.snapshots.at(-1).at, "2026-11-02T14:00:00Z");
   r = await syncFeed(s, { listings: [{ url, checked_at: "2026-11-05T14:00:00Z", available: false }] }, deps());
   assert.equal(r.indisponiveis, 1); assert.equal(l.status, "descartado");
+});
+
+test("ignorar 'Onix (hatch)' não atinge o Onix Plus, e vice-versa", () => {
+  const hatch = L("CHEVROLET", "ONIX", "10 TURBO FLEX PREMIER AUTOMATICO", 2025), sedan = L("CHEVROLET", "ONIX", "10 TURBO FLEX PLUS PREMIER AUTOMATICO", 2025);
+  const onlyHatch = [{ make: "Chevrolet", model: "onix", version_excludes: "plus" }], onlySedan = [{ make: "Chevrolet", model: "onix", version_includes: "plus" }];
+  assert.ok(findExclusion(onlyHatch, hatch)); assert.equal(findExclusion(onlyHatch, sedan), null);
+  assert.ok(findExclusion(onlySedan, sedan)); assert.equal(findExclusion(onlySedan, hatch), null);
 });

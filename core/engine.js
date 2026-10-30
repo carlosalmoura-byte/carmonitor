@@ -227,7 +227,7 @@ export function addText(l, content, origin, deps, at = null) {
   return true;
 }
 
-export async function importListing(state, { url, text, origin = "colado", at = null }, deps) {
+export async function importListing(state, { url, text, origin = "colado", at = null, skipDistance = false }, deps) {
   let nurl;
   try { nurl = normalizeUrl(url); } catch { return { result: "erro", message: "Link inválido." }; }
   const hints = parseUrl(nurl);
@@ -238,7 +238,7 @@ export async function importListing(state, { url, text, origin = "colado", at = 
     ex.archived = false;
     if (text && addText(ex, text, origin, deps, at)) {
       const events = takeSnapshot(ex, origin === FEED_ORIGIN ? "pesquisa" : "texto_colado", deps, origin === FEED_ORIGIN);
-      if (["city", "state", "address"].some((f) => ex.field_sources[f]) && ex.distance?.status !== "verificada") await updateDistance(state, ex, deps);
+      if (!skipDistance && ["city", "state", "address"].some((f) => ex.field_sources[f]) && ex.distance?.status !== "verificada") await updateDistance(state, ex, deps);
       refresh(state, ex, deps, events);
       recomputeDuplicates(state);
       return { result: "atualizado", id: ex.id, message: "Anúncio já existia: texto novo analisado." };
@@ -259,7 +259,8 @@ export async function importListing(state, { url, text, origin = "colado", at = 
   deriveFields(p2);
   applyParsed(l, p2);
   state.listings.push(l);
-  await updateDistance(state, l, deps);
+  if (skipDistance) l.distance = { km: null, status: "nao_verificada", precision: null, note: "Aguardando cálculo da rota." };
+  else await updateDistance(state, l, deps);
   const events = takeSnapshot(l, origin === FEED_ORIGIN ? "pesquisa" : "importacao", deps);
   refresh(state, l, deps, events, true);
   recomputeDuplicates(state);
@@ -293,7 +294,7 @@ export async function syncFeed(state, feed, deps) {
         refresh(state, l, deps, events); res.indisponiveis++;
       }
     } else {
-      const r = await importListing(state, { url: key, text: it.text || null, origin: FEED_ORIGIN, at: it.checked_at }, deps);
+      const r = await importListing(state, { url: key, text: it.text || null, origin: FEED_ORIGIN, at: it.checked_at, skipDistance: true }, deps);
       if (r.result === "criado") res.novos++; else if (r.result === "atualizado") res.atualizados++;
       const l = state.listings.find((x) => x.id === r.id);
       const last = l?.snapshots[l.snapshots.length - 1];
@@ -334,6 +335,19 @@ export async function editFields(state, l, data, deps) {
 export function reclassifyAll(state, deps) {
   for (const l of state.listings) if (!l.archived) refresh(state, l, deps);
   recomputeDuplicates(state);
+}
+
+/** Calcula as distâncias pendentes uma a uma (chamada em segundo plano). onEach(l) após cada uma. */
+export async function fillDistances(state, deps, onEach) {
+  let n = 0;
+  for (const l of state.listings) {
+    if (l.archived || l.distance?.status !== "nao_verificada" || !l.city || !l.state) continue;
+    await updateDistance(state, l, deps);
+    refresh(state, l, deps);
+    if (l.distance.status === "verificada") n++;
+    onEach?.(l);
+  }
+  return n;
 }
 
 // ------------------------------------------------------------------ rotina ao abrir

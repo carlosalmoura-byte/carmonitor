@@ -1,7 +1,7 @@
 {
-  "name": "CarMonitor — seminovos",
+  "name": "CarMonitor — carros novos e seminovos",
   "short_name": "CarMonitor",
-  "description": "Busca, validação e acompanhamento de carros seminovos. Dados só no seu celular.",
+  "description": "Busca, validação e acompanhamento de carros novos e seminovos. Dados só no seu celular.",
   "lang": "pt-BR",
   "id": "./",
   "start_url": "./",

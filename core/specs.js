@@ -107,7 +107,8 @@ export function exclusionMatches(rule, l) {
   if (rule.model && key(rule.model) !== key(l.model)) return false;
   if (!rule.make && !rule.model) return false;
   if (rule.version_includes && !containsPhrase(l.version, rule.version_includes)) return false;
+  if (rule.version_excludes && containsPhrase(l.version, rule.version_excludes)) return false;
   return true;
 }
 export const findExclusion = (rules, l) => (rules || []).find((r) => exclusionMatches(r, l)) || null;
-export const exclusionLabel = (r) => [r.make, r.model, r.version_includes].filter(Boolean).join(" ").toUpperCase();
+export const exclusionLabel = (r) => r.label || [r.make, r.model, r.version_includes].filter(Boolean).join(" ").toUpperCase();
