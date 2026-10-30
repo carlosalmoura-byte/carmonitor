@@ -770,12 +770,51 @@ async function syncResearch(showNone = false) {
     feed = await r.json();
   } catch { if (showNone) toast("Sem internet para buscar a pesquisa."); return; }
   const res = await E.syncFeed(S, feed, deps);
-  persist(); renderCards();
+  persist(); renderCards(); loadResearchStatus();
   fillDistancesBg();
   const when = feed.generated_at ? E.fmtDate(feed.generated_at) : "—";
   if (res.novos || res.atualizados || res.indisponiveis)
     $("#routineMsg").innerHTML = `<div class="msg ok">Pesquisa do Claude (${esc(when)}): ${res.novos} novo(s), ${res.atualizados} atualizado(s)${res.indisponiveis ? `, ${res.indisponiveis} indisponível(is)` : ""}.</div>`;
   else if (showNone) toast(`Pesquisa de ${when} já importada.`);
+}
+
+// ---------------------------------------------------------------- pedir nova pesquisa (via issue no GitHub)
+const REPO = (() => {
+  const h = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0];
+  return h.endsWith(".github.io") && seg ? `${h.split(".")[0]}/${seg}` : "carlosalmoura-byte/carmonitor";
+})();
+function researchRequestUrl() {
+  const c = S.settings.criteria;
+  const active = S.listings.filter((l) => !l.archived);
+  const fav = active.filter((l) => l.favorite).map((l) => l.url);
+  const others = active.filter((l) => !l.favorite && l.available !== false).map((l) => l.url).slice(0, 25);
+  const payload = {
+    criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
+      transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km },
+    exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
+    favorites: fav, urls: others,
+  };
+  const when = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const body = `Pedido de nova pesquisa feito pelo app CarMonitor em ${when}. Não edite o bloco abaixo.\n\n\`\`\`json\n${JSON.stringify(payload)}\n\`\`\``;
+  return `https://github.com/${REPO}/issues/new?title=${encodeURIComponent(`Atualizar pesquisa — ${when}`)}&body=${encodeURIComponent(body)}`;
+}
+$("#researchBtn").onclick = () => {
+  if (!confirm("Vou abrir o GitHub com o pedido pronto (seus critérios, anúncios e favoritos).\nToque em “Submit new issue” lá para enviar.\n\nA pesquisa roda em até 1 hora; o app importa sozinho.")) return;
+  S.meta.research_requested_at = new Date().toISOString(); persist(); renderResearchStatus();
+  openExternal(researchRequestUrl());
+};
+let lastStatus = null;
+async function loadResearchStatus() {
+  try { const r = await fetch("data/status.json", { cache: "no-store" }); if (r.ok) lastStatus = await r.json(); } catch { /* sem internet */ }
+  renderResearchStatus();
+}
+function renderResearchStatus() {
+  const req = S.meta.research_requested_at, done = lastStatus?.processed_at || S.meta.feed_generated_at;
+  let t;
+  if (req && (!done || new Date(req) > new Date(done))) t = `Pedido enviado em ${E.fmtDate(req)} · aguardando (até ~1 h). Puxe a lista para baixo para conferir.`;
+  else if (done) t = `Última pesquisa: ${E.fmtDate(done)}${lastStatus && lastStatus.processed_at === done ? ` · ${lastStatus.novos} novo(s), ${lastStatus.atualizados} atualizado(s)` : ""}.`;
+  else t = "Nenhuma pesquisa ainda.";
+  $("#researchStatus").textContent = t;
 }
 
 // ---------------------------------------------------------------- rotina ao abrir
@@ -828,7 +867,7 @@ function handleShare() {
   for (const l of S.listings) if (!("seller" in l)) { l.seller = null; l.seller_type = null; E.reparseTexts(l); migrate = true; }
   if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
-  saveCompare(); updateTitle(); renderCards(); handleShare();
+  saveCompare(); updateTitle(); renderCards(); handleShare(); renderResearchStatus();
   const h = location.hash.match(/listing=(\d+)/);
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();
