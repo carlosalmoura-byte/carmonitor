@@ -327,3 +327,23 @@ test("mensagem formata versão do WebMotors", () => {
   const m = contactMessage(newState(), { make: "CHEVROLET", model: "ONIX", version: "10 TURBO FLEX PLUS PREMIER AUTOMATICO", year_model: 2025, price: 88800, url: "u" });
   assert.match(m, /Chevrolet Onix 1\.0 Turbo Flex Plus Premier Automatico 2025/);
 });
+
+// ------------------------------------------------------------ sugestões de modelos ignorados
+import { ignoreSuggestions, trimOf } from "../core/catalog.js";
+test("acabamento e sugestões do mais amplo ao mais específico", () => {
+  assert.equal(trimOf("10 TURBO FLEX PLUS PREMIER AUTOMATICO"), "plus premier");
+  assert.equal(trimOf("10 TCE FLEX PREMIERE EDITION EDC"), "premiere edition");
+  assert.equal(trimOf("1.4 MPFI LTZ 8V FLEX 4P AUTOMATICO"), "ltz");
+  const ls = [L("CHEVROLET", "ONIX", "10 TURBO FLEX PREMIER AUTOMATICO", 2025), L("CHEVROLET", "ONIX", "10 TURBO FLEX PLUS PREMIER AUTOMATICO", 2025),
+    L("CHEVROLET", "ONIX", "14 MPFI LTZ 8V FLEX 4P AUTOMATICO", 2019), L("FIAT", "PULSE", "10 TURBO 200 FLEX IMPETUS CVT", 2022)];
+  const sg = ignoreSuggestions(ls);
+  const onix = sg.find((g) => g.model === "ONIX");
+  assert.equal(onix.count, 3);
+  const premier = onix.trims.find((t) => t.trim === "premier").rule, ltz = onix.trims.find((t) => t.trim === "ltz").rule;
+  assert.deepEqual(premier.version_excludes, ["plus"]);
+  assert.ok(findExclusion([premier], ls[0])); assert.equal(findExclusion([premier], ls[1]), null);   // só o hatch Premier
+  assert.ok(findExclusion([ltz], ls[2])); assert.equal(findExclusion([ltz], ls[0]), null);            // só o LTZ
+  assert.ok(ls.slice(0, 3).every((l) => findExclusion([onix.ruleModel], l)));                          // todos os Onix
+  assert.equal(findExclusion([onix.ruleModel], ls[3]), null);
+  assert.ok(ls.slice(0, 3).every((l) => findExclusion([onix.ruleMake], l)));                           // a marca toda
+});

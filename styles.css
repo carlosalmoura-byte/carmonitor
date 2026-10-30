@@ -183,3 +183,8 @@ main{padding-bottom:88px}
 .ptr.pulling{transition:none}.ptr span{padding-bottom:.5rem}
 .techGrid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem .8rem;font-size:.9rem}.techGrid .k{color:var(--muted);font-size:.8rem}
 @media (max-width:600px){.cmp th{width:96px;min-width:96px;font-size:.78rem}.cmp td{min-width:150px}}
+.sugg{border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;margin-bottom:.6rem;background:var(--surface)}
+.sugg .chips{margin-top:.45rem;gap:.4rem}
+.sugg button{font-size:.82rem;padding:.3rem .6rem;border-radius:99px}
+.sugg button.done{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.sugg .lvl{display:block;font-size:.72rem;color:var(--muted);margin-top:.35rem}

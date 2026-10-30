@@ -4,8 +4,8 @@ import { makeDistance } from "./core/distance.js";
 import * as E from "./core/engine.js";
 import { ITEMS } from "./core/equipment.js";
 import { firstUrl } from "./core/parsing.js";
-import { SEED_SPECS, exclusionLabel, validateSpec } from "./core/specs.js";
-import { CATALOG, CITIES } from "./core/catalog.js";
+import { SEED_SPECS, exclusionLabel, findExclusion as findExcl, validateSpec } from "./core/specs.js";
+import { CATALOG, CITIES, ignoreSuggestions } from "./core/catalog.js";
 import { LEVEL_LABEL, byAdherence } from "./core/score.js";
 import { loadState, requestPersistence, saveState } from "./core/store.js";
 
@@ -586,6 +586,7 @@ function renderSettings() {
   fillSelect(nf.stale_days, OPTS.stale_days, S.settings.stale_days, (v) => v === 1 ? "1 dia" : `${v} dias`);
   fillSelect(nf.routine_hours, OPTS.routine_hours, S.settings.routine_hours, (v) => v === 1 ? "1 hora" : `${v} horas`);
   const df = $("#distForm2"); df.provider.value = S.settings.distance.provider; df.ors_key.value = S.settings.distance.ors_key || "";
+  renderIgnoreSuggestions();
   $("#dlMakes").innerHTML = [...new Set([...Object.keys(CATALOG), ...S.listings.map((l) => l.make && cap(l.make))].filter(Boolean))].sort().map((m) => `<option value="${esc(m)}">`).join("");
   updateModelList();
   $("#exclList").innerHTML = S.exclusions.length ? S.exclusions.map((r, i) => `<li><span>${esc(exclusionLabel(r))}${r.version_includes ? "" : ` <span class="small">todas as versões</span>`}${r.reason ? `<span class="exclReason">Motivo: ${esc(r.reason)}</span>` : ""}</span><button class="ghost danger" data-delexcl="${i}">Remover</button></li>`).join("")
@@ -630,7 +631,38 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     if (refChanged) fillDistancesBg();
   });
 });
-const cap = (s) => String(s || "").toLowerCase().replace(/(^|[\s-])\S/g, (m) => m.toUpperCase());
+// ---- sugestões de modelos ignorados a partir dos anúncios
+const sameRule = (a, b) => JSON.stringify([normKey(a.make), normKey(a.model), normKey(a.version_includes), [].concat(a.version_excludes || []).map(normKey).sort()]) ===
+  JSON.stringify([normKey(b.make), normKey(b.model), normKey(b.version_includes), [].concat(b.version_excludes || []).map(normKey).sort()]);
+let SUGG = [];
+function renderIgnoreSuggestions() {
+  SUGG = ignoreSuggestions(S.listings.filter((l) => !l.archived));
+  const chip = (rule, text, key) => {
+    const done = S.exclusions.some((r) => sameRule(r, rule));
+    return `<button type="button" class="${done ? "done" : ""}" data-sugg="${key}" ${done ? "disabled" : ""}>${done ? "✓ " : "⊘ "}${esc(text)}</button>`;
+  };
+  $("#exclSuggest").innerHTML = SUGG.length ? SUGG.map((g, i) => `<div class="sugg">
+      <b>${esc(cap(g.make))} ${esc(cap(g.model))}</b> <span class="small">${g.count} anúncio(s)</span>
+      <span class="lvl">Mais amplo</span><div class="chips">
+        ${chip(g.ruleMake, `Toda a marca ${cap(g.make)}`, `${i}:make`)}
+        ${chip(g.ruleModel, `Todos os ${cap(g.model)} (${g.count})`, `${i}:model`)}</div>
+      ${g.trims.length ? `<span class="lvl">Só um acabamento</span><div class="chips">${g.trims.map((t, j) => chip(t.rule, `Só ${cap(t.trim)} (${t.count})`, `${i}:trim:${j}`)).join("")}</div>` : ""}
+    </div>`).join("") : `<p class="small">Quando houver anúncios no app, os modelos aparecem aqui para escolher.</p>`;
+}
+$("#exclSuggest").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-sugg]"); if (!b) return;
+  const [i, kind, j] = b.dataset.sugg.split(":"); const g = SUGG[+i]; if (!g) return;
+  const rule = kind === "make" ? { ...g.ruleMake, label: `${cap(g.make)} (marca inteira)`.toUpperCase() }
+    : kind === "model" ? { ...g.ruleModel, label: `${cap(g.make)} ${cap(g.model)} (todas as versões)`.toUpperCase() }
+    : { ...g.trims[+j].rule, label: `${cap(g.make)} ${cap(g.model)} — só ${cap(g.trims[+j].trim)}`.toUpperCase() };
+  const affected = S.listings.filter((l) => !l.archived && findExcl([rule], l)).length;
+  const reason = prompt(`Ignorar ${rule.label.toLowerCase()}?\n${affected} anúncio(s) irão para Descartados.\n\nMotivo (opcional):`, "");
+  if (reason === null) return; // cancelou
+  rule.reason = reason.trim();
+  act(null, async () => { S.exclusions.push(rule); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast(`Ignorado: ${affected} anúncio(s) descartados.`); });
+});
+
+const cap = (s) => String(s || "").split(/(\s+|-)/).map((w) => /\d/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
 const normKey = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
 function catalogFor(make) {
   const k = Object.keys(CATALOG).find((m) => normKey(m) === normKey(make));

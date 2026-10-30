@@ -123,9 +123,10 @@ export function validateSpec(s) {
 export function exclusionMatches(rule, l) {
   if (rule.make && key(rule.make) !== key(l.make)) return false;
   if (rule.model && key(rule.model) !== key(l.model)) return false;
-  if (!rule.make && !rule.model) return false;
+  if (!rule.make && !rule.model) return false; // regra vazia nunca vale (marca sozinha vale)
   if (rule.version_includes && !containsPhrase(l.version, rule.version_includes)) return false;
-  if (rule.version_excludes && containsPhrase(l.version, rule.version_excludes)) return false;
+  const exc = Array.isArray(rule.version_excludes) ? rule.version_excludes : rule.version_excludes ? [rule.version_excludes] : [];
+  if (exc.some((x) => containsPhrase(l.version, x))) return false;
   return true;
 }
 export const findExclusion = (rules, l) => (rules || []).find((r) => exclusionMatches(r, l)) || null;
