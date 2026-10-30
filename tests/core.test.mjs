@@ -287,3 +287,43 @@ test("rotas: se o OpenRouteService falhar, usa o OSRM", async () => {
   const r = await makeDistance(fake)(s, "Barueri, SP", "São Paulo", "SP", null);
   assert.equal(r.status, "verificada"); assert.equal(r.km, 31.2); assert.match(r.note, /usado o OSRM/);
 });
+
+// ------------------------------------------------------------ vendedor e contato
+import { contactMessage, whatsappLink } from "../core/engine.js";
+import { sellerType } from "../core/parsing.js";
+test("tipo de vendedor e filtro", async () => {
+  assert.equal(sellerType("Guilherme (Pessoa Física)"), "particular");
+  assert.equal(sellerType("Nissan Sinal Aricanduva"), "concessionaria");
+  assert.equal(sellerType("Bexp Jeep Bexp Brooklin"), "concessionaria");
+  assert.equal(sellerType("Dinho Multimarcas"), "loja");
+  const s = newState();
+  await importListing(s, { url: KARDIAN, text: KARDIAN_TXT + "\nVendedor: Guilherme (Pessoa Física)" }, deps());
+  const l = s.listings[0];
+  assert.equal(l.seller_type, "particular"); assert.equal(l.field_sources.seller_type, "derivado_vendedor");
+  assert.equal(l.status, "aprovado");
+  s.settings.criteria.seller_types = ["loja", "concessionaria"]; reclassifyAll(s, deps());
+  assert.equal(l.status, "descartado");
+  await editFields(s, l, { seller_type: "loja" }, deps());
+  assert.equal(l.status, "aprovado");
+});
+test("mensagem padrão e link do WhatsApp", () => {
+  const s = newState();
+  const l = { make: "RENAULT", model: "KARDIAN", version: "PREMIERE EDITION", year_fab: 2024, year_model: 2025, price: 97990, url: "https://x/1" };
+  const m = contactMessage(s, l);
+  assert.match(m, /Renault Kardian Premiere Edition 2024\/2025/); assert.match(m, /R\$ 97\.990/); assert.match(m, /Onix Hatch 1\.0 Turbo automático LT 2020, com 108 mil km/);
+  assert.equal(whatsappLink("(11) 98765-4321", "oi"), "https://wa.me/5511987654321?text=oi");
+  assert.equal(whatsappLink("123", "oi"), null);
+});
+test("favorito que sai do ar continua guardado e avisa", async () => {
+  const s = newState();
+  await importListing(s, { url: KARDIAN, text: KARDIAN_TXT }, deps());
+  const l = s.listings[0]; l.favorite = true;
+  reconfirm(s, l, { available: false }, deps());
+  assert.ok(s.notifications.some((n) => n.kind === "favorito_indisponivel"));
+  assert.ok(l.unavailable_since); assert.equal(s.listings.length, 1);
+});
+
+test("mensagem formata versão do WebMotors", () => {
+  const m = contactMessage(newState(), { make: "CHEVROLET", model: "ONIX", version: "10 TURBO FLEX PLUS PREMIER AUTOMATICO", year_model: 2025, price: 88800, url: "u" });
+  assert.match(m, /Chevrolet Onix 1\.0 Turbo Flex Plus Premier Automatico 2025/);
+});

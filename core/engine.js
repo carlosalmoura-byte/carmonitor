@@ -7,10 +7,14 @@ import { SEED_SPECS, SPEC_ABSENT, SPEC_CONFIRMED, SPEC_OPTIONAL, exclusionLabel,
 import { scoreListing } from "./score.js";
 
 export const FIELDS = ["title", "make", "model", "version", "year_fab", "year_model", "price", "km", "transmission",
-  "condition", "city", "state", "address"];
-const PRIORITY = { url: 1, derivado_km: 1, derivado_version: 1, derivado_title: 1, texto_colado: 3, manual: 10 };
+  "condition", "city", "state", "address", "seller", "seller_type"];
+const PRIORITY = { url: 1, derivado_km: 1, derivado_version: 1, derivado_title: 1, derivado_vendedor: 1, texto_colado: 3, manual: 10 };
 export const SOURCE_LABEL = { url: "URL do anúncio", texto_colado: "Texto do anúncio", manual: "Informado por você",
-  derivado_km: "Derivado da km", derivado_version: "Derivado da versão", derivado_title: "Derivado do título" };
+  derivado_km: "Derivado da km", derivado_version: "Derivado da versão", derivado_title: "Derivado do título",
+  derivado_vendedor: "Deduzido do nome do vendedor" };
+export const MY_CAR_DEFAULT = "Chevrolet Onix Hatch 1.0 Turbo automático LT 2020, com 108 mil km";
+export const CONTACT_TEMPLATE_DEFAULT = "Olá! Vi o anúncio do {carro} {ano}, por {preco}, no WebMotors ({link}). Tenho interesse no carro. " +
+  "Ele continua disponível? Gostaria de agendar uma visita para conhecê-lo. Também tenho um {meu_carro} para avaliação e possível inclusão na negociação. Obrigado!";
 const CONFLICT_FIELDS = ["year_fab", "year_model", "transmission"];
 
 export const DEFAULT_NOTIFY = { new_approved: true, new_pending: false, price_drop: true, price_drop_min_pct: 1,
@@ -20,7 +24,8 @@ export function newState() {
   return {
     version: 1, nextId: 1, listings: [], notifications: [],
     settings: { criteria: { ...DEFAULT_CRITERIA }, notify: { ...DEFAULT_NOTIFY }, accept_specs: true,
-      only_official_specs: false, stale_days: 3, routine_hours: 12, distance: { provider: "osrm", ors_key: "" } },
+      only_official_specs: false, stale_days: 3, routine_hours: 12, distance: { provider: "osrm", ors_key: "" },
+      my_car: MY_CAR_DEFAULT, contact_template: CONTACT_TEMPLATE_DEFAULT },
     custom_specs: [], disabled_specs: [], exclusions: [], geo_cache: {}, meta: { last_routine: null, routines: [] },
   };
 }
@@ -149,6 +154,8 @@ export function takeSnapshot(l, source, deps, force = false) {
   const changed = !prev || prev.price !== l.price || prev.km !== l.km || prev.available !== l.available;
   if (changed || force) l.snapshots.push({ at: nowIso(deps), price: l.price, km: l.km, available: l.available, source });
   if (events.length) l.last_changed = nowIso(deps);
+  if (events.some((e) => e.type === "unavailable")) l.unavailable_since = nowIso(deps);
+  if (events.some((e) => e.type === "available_again")) l.unavailable_since = null;
   return events;
 }
 
@@ -180,7 +187,7 @@ export function notify(state, kind, title, message, dedupe, listingId, deps) {
 
 export function handleNotifications(state, l, oldStatus, events, isNew, deps) {
   const p = state.settings.notify;
-  if (l.excluded) return;
+  if (l.excluded && !l.favorite) return;
   if (l.status === APPROVED && oldStatus !== APPROVED && p.new_approved)
     notify(state, "novo_aprovado", "Nova oportunidade aprovada",
       `${listingName(l)} — ${l.price != null ? brl(l.price) : "—"} — ${l.km ?? "—"} km — ${l.city || "?"}/${l.state || "?"}`,
@@ -194,7 +201,10 @@ export function handleNotifications(state, l, oldStatus, events, isNew, deps) {
         notify(state, "reducao_preco", "Redução de preço", `${listingName(l)}: ${brl(ev.old)} → ${brl(ev.new)} (−${pct.toFixed(1)}%)`,
           `queda:${l.id}:${ev.old}:${ev.new}`, l.id, deps);
     }
-    if (ev.type === "unavailable" && p.unavailable && oldStatus !== DISCARDED)
+    if (ev.type === "unavailable" && l.favorite)
+      notify(state, "favorito_indisponivel", "Favorito saiu do ar", `${listingName(l)} não está mais anunciado. O histórico fica guardado até você excluir.`,
+        `favindisp:${l.id}:${nowIso(deps).slice(0, 10)}`, l.id, deps);
+    else if (ev.type === "unavailable" && p.unavailable && oldStatus !== DISCARDED)
       notify(state, "indisponivel", "Anúncio indisponível", `${listingName(l)} saiu do ar ou foi vendido.`, `indisp:${l.id}:${nowIso(deps).slice(0, 10)}`, l.id, deps);
   }
 }
@@ -345,12 +355,38 @@ export async function fillDistances(state, deps, onEach) {
   let n = 0;
   for (const l of state.listings) {
     if (l.archived || l.distance?.status !== "nao_verificada" || !l.city || !l.state) continue;
+    const tried = l.distance?.tried_at ? new Date(l.distance.tried_at) : null;
+    if (tried && (deps?.now ? deps.now() : new Date()) - tried < 6 * 3600000) continue; // falhou há pouco: tenta de novo depois
     await updateDistance(state, l, deps);
+    if (l.distance.status !== "verificada" && l.distance.status !== "manual") l.distance.tried_at = nowIso(deps);
     refresh(state, l, deps);
     if (l.distance.status === "verificada") n++;
     onEach?.(l);
   }
   return n;
+}
+
+/** Reaplica a extração nos textos já guardados (migração quando surgem campos novos). */
+export function reparseTexts(l) {
+  for (const t of l.texts || []) applyParsed(l, deriveFields(extractFromText(t.content, "texto_colado")));
+}
+
+// ------------------------------------------------------------------ contato com o vendedor
+export function contactMessage(state, l, template = null) {
+  const t = template ?? state.settings.contact_template ?? CONTACT_TEMPLATE_DEFAULT;
+  const cap = (x) => String(x || "").toLowerCase().replace(/(^|[\s/-])([a-zà-ÿ])/g, (m, a, c) => a + c.toUpperCase());
+  const ver = cap(String(l.version || "").replace(/^(\d)(\d)\b/, "$1.$2")).replace(/\b(Tsi|Tgdi|Tce|Cvt|Edc|At|Gdi|Mt)\b/g, (m) => m.toUpperCase());
+  const carro = [cap(l.make), cap(l.model), ver].filter(Boolean).join(" ").replace(/\s+/g, " ").trim() || "carro";
+  return t.replace(/\{carro\}/g, carro).replace(/\{ano\}/g, l.year_fab && l.year_model ? `${l.year_fab}/${l.year_model}` : (l.year_model ?? ""))
+    .replace(/\{preco\}/g, l.price != null ? brl(l.price) : "preço anunciado").replace(/\{km\}/g, l.km != null ? `${l.km.toLocaleString("pt-BR")} km` : "")
+    .replace(/\{link\}/g, l.url).replace(/\{meu_carro\}/g, state.settings.my_car || MY_CAR_DEFAULT).replace(/\s+([,.!?])/g, "$1").replace(/ {2,}/g, " ");
+}
+/** Link do WhatsApp para um telefone brasileiro (com DDD). null se o número for inválido. */
+export function whatsappLink(phone, text) {
+  let d = String(phone || "").replace(/\D/g, "");
+  if (d.startsWith("55") && d.length >= 12) d = d.slice(2);
+  if (d.length < 10 || d.length > 11) return null;
+  return `https://wa.me/55${d}?text=${encodeURIComponent(text)}`;
 }
 
 // ------------------------------------------------------------------ rotina ao abrir

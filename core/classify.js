@@ -9,7 +9,7 @@ export const BORDERLINE_FRACTION = 0.10;
 
 export const DEFAULT_CRITERIA = {
   min_price: null, max_price: 100000, year_min: 2022, year_max: 2025, min_km: null, max_km: 35000,
-  transmissions: ["automatico"], conditions: ["usado", "seminovo"],
+  transmissions: ["automatico"], conditions: ["usado", "seminovo"], seller_types: ["particular", "loja", "concessionaria"],
   ref_location: "Barueri, SP", max_distance_km: 60,
 };
 
@@ -62,6 +62,14 @@ export function classify(l, checks, criteria, exclusion = null) {
   if (!cond) add("pending", "condition", "Tipo (usado/seminovo) não informado.");
   else if (allowedCond.length && !allowedCond.includes(cond)) add("fail", "condition", `Tipo ${cond} não aceito.`);
   else add("ok", "condition", `Tipo ${cond}.`);
+
+  const allowedSeller = c.seller_types || [];
+  const SELLER = { particular: "particular", loja: "loja", concessionaria: "concessionária" };
+  if (allowedSeller.length && allowedSeller.length < 3) {
+    if (!l.seller_type) add("pending", "seller", "Tipo de vendedor não identificado.");
+    else if (!allowedSeller.includes(l.seller_type)) add("fail", "seller", `Vendedor ${SELLER[l.seller_type] || l.seller_type} não aceito.`);
+    else add("ok", "seller", `Vendedor ${SELLER[l.seller_type]}.`);
+  }
 
   const maxD = c.max_distance_km, d = l.distance || {};
   if (d.km == null || !["verificada", "manual"].includes(d.status)) add("pending", "distance", "Distância por estrada não verificada.");

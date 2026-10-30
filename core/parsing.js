@@ -112,12 +112,24 @@ export function extractFromText(text, source = "texto_colado", p = new Parsed())
   m = text.match(/\b(\d{5}-?\d{3})\b/);
   if (m && /cep/.test(n.slice(Math.max(0, m.index - 15), m.index))) p.put("address", "CEP " + m[1], source);
 
+  m = text.match(/(?:^|\n)\s*(?:Vendedor|Anunciante|Loja)\s*:\s*([^\n]{2,80})/i);
+  if (m && !/n[ãa]o verificado/i.test(m[1])) p.put("seller", m[1].trim(), source);
   if (UNAVAILABLE.some((r) => r.test(n))) p.put("available", false, source);
   return p;
 }
 
+const DEALER_BRANDS = /\b(chevrolet|gm|jeep|nissan|renault|hyundai|fiat|volkswagen|vw|toyota|honda|ford|peugeot|citro[eë]n|caoa|chery|byd|gwm|kia|mitsubishi|ram|bmw|audi|mercedes|volvo|jac|land rover|porsche|suzuki|subaru|mini|dodge)\b/i;
+/** Tipo de vendedor a partir do nome: particular | concessionaria | loja (derivado, editável). */
+export function sellerType(seller) {
+  if (!seller) return null;
+  if (/pessoa\s+f[ií]sica|particular/i.test(seller)) return "particular";
+  if (/concession/i.test(seller) || DEALER_BRANDS.test(seller)) return "concessionaria";
+  return "loja";
+}
+
 /** Derivações explícitas e rotuladas (não são presunções de equipamento). */
 export function deriveFields(p) {
+  if (!("seller_type" in p.fields) && p.fields.seller) p.put("seller_type", sellerType(p.fields.seller), "derivado_vendedor");
   if (!("condition" in p.fields) && Number.isInteger(p.fields.km) && p.fields.km >= 1000) p.put("condition", "usado", "derivado_km");
   if (!("transmission" in p.fields)) {
     for (const k of ["version", "title"]) {

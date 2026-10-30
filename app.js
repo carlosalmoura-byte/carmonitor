@@ -18,6 +18,7 @@ const num = (v, suf = "") => v == null ? "—" : Math.round(v).toLocaleString("p
 const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descartado" };
 const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
 const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
+const SELLER = { particular: "Particular", loja: "Loja", concessionaria: "Concessionária" };
 const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA sem fio" };
 const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
 
@@ -167,6 +168,7 @@ function renderCards() {
       l.duplicate_group ? `<span class="chip info">possível duplicata</span>` : "",
       l.available === false ? `<span class="chip ausente">indisponível</span>` : "",
       stale(l) ? `<span class="chip pendente">reconferir</span>` : "",
+      l.unavailable_since ? `<span class="chip ausente">saiu do ar em ${esc(E.fmtDate(l.unavailable_since).slice(0, 10))}</span>` : "",
     ].join("");
     const sc = l.score || { total: 0, level: "baixa" };
     return `<article class="card st-${l.status}">
@@ -178,12 +180,13 @@ function renderCards() {
       <div><span class="price">${brl(l.price)}</span>${delta}</div>
       <div class="facts">
         <div><span>Km</span> ${num(l.km)}</div><div><span>Câmbio</span> ${esc(TR[l.transmission] || "—")}</div>
-        <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> ${esc(distText(l))}</div>
+        <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> <span data-dist="${l.id}">${esc(distText(l))}</span></div>
+        <div style="grid-column:1/-1"><span>Vendedor</span> ${esc(l.seller || "—")}${l.seller_type ? ` · ${SELLER[l.seller_type]}` : ""}</div>
       </div>
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
-        <label class="chk"><input type="checkbox" data-cmp="${l.id}" ${ui.compare.has(l.id) ? "checked" : ""}> Comparar</label>
-        <a class="btn ghost" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
+        <button class="${ui.compare.has(l.id) ? "primary" : ""}" data-cmpbtn="${l.id}">${ui.compare.has(l.id) ? "✓ Comparando" : "⇆ Comparar"}</button>
+        <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
         <button data-open="${l.id}">Detalhes</button>
       </div></article>`;
   }).join("");
@@ -191,6 +194,8 @@ function renderCards() {
 $("#cards").addEventListener("click", (e) => {
   const f = e.target.closest("[data-fav]");
   if (f) { toggleFav(+f.dataset.fav); return; }
+  const cb = e.target.closest("[data-cmpbtn]");
+  if (cb) { addToCompare(+cb.dataset.cmpbtn); return; }
   const sb = e.target.closest("[data-score]");
   if (sb) { openScore(+sb.dataset.score); return; }
   const b = e.target.closest("[data-open]"); if (b) openDetail(+b.dataset.open);
@@ -199,13 +204,24 @@ function toggleFav(id) {
   const l = byId(id); if (!l) return;
   act(null, async () => { l.favorite = !l.favorite; renderCards(); if (ui.openId === id) renderDetail(l); toast(l.favorite ? "Adicionado aos favoritos." : "Removido dos favoritos."); });
 }
-$("#cards").addEventListener("change", (e) => {
-  const c = e.target.closest("[data-cmp]"); if (!c) return;
-  const id = +c.dataset.cmp;
-  if (c.checked) { if (ui.compare.size >= 5) { c.checked = false; return toast("Máximo de 5 veículos na comparação."); } ui.compare.add(id); }
-  else ui.compare.delete(id);
-  saveCompare();
+function addToCompare(id) {
+  if (!ui.compare.has(id)) {
+    if (ui.compare.size >= 5) return toast("Máximo de 5 veículos. Remova um no comparativo.");
+    ui.compare.add(id); saveCompare();
+  }
+  closeSheet("#detailSheet"); showView("compare");
+}
+// links externos: abre explicitamente (mais confiável no app instalado)
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-ext]"); if (!a) return;
+  e.preventDefault();
+  const url = a.getAttribute("href"); if (!url || url === "#") return;
+  openExternal(url);
 });
+function openExternal(url) {
+  const w = window.open(url, "_blank");
+  if (w) { try { w.opener = null; } catch { /* ok */ } } else location.href = url; // bloqueado: abre na mesma janela
+}
 function saveCompare() {
   $("#cmpCount").textContent = ui.compare.size;
   try { localStorage.setItem("cmp", JSON.stringify([...ui.compare])); } catch { /* sem armazenamento */ }
@@ -249,8 +265,8 @@ $("#importResult").addEventListener("click", (e) => {
 // ---------------------------------------------------------------- detalhe
 const FIELD_LABELS = [["make", "Marca"], ["model", "Modelo"], ["version", "Versão"], ["year_fab", "Ano fabricação"],
   ["year_model", "Ano-modelo"], ["price", "Preço"], ["km", "Quilometragem"], ["transmission", "Câmbio"],
-  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"]];
-const fmtField = (k, v) => v == null || v === "" ? "—" : k === "price" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
+  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"]];
+const fmtField = (k, v) => v == null || v === "" ? "—" : k === "seller_type" ? (SELLER[v] || v) : k === "price" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
 
 function chart(snaps) {
   const pts = snaps.filter((s) => s.price != null);
@@ -307,7 +323,8 @@ function renderDetail(d) {
   $("#detail").innerHTML = `
     <h2 style="margin:.2rem 0 .3rem">${esc(title(d))} ${esc(d.year_model || "")}</h2>
     <div class="small">${esc(d.version || "")}</div>
-    <p><a class="btn primary" style="width:100%" href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio ↗</a></p>
+    ${d.unavailable_since ? `<div class="msg err">Este anúncio saiu do ar em ${esc(E.fmtDate(d.unavailable_since))}. O histórico fica guardado até você excluir.</div>` : ""}
+    <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio ↗</a></p>
     <p class="small">Cadastrado ${esc(E.fmtDate(d.first_seen))} · Última confirmação ${esc(E.fmtDate(d.last_checked))} · Última alteração ${esc(E.fmtDate(d.last_changed))}</p>
 
     <div class="reconfirm"><b>Reconferir</b> ${stale(d) ? `<span class="chip pendente">pendente</span>` : ""}
@@ -332,6 +349,8 @@ function renderDetail(d) {
       <form id="fieldsForm" class="row2" style="margin-top:.5rem">
         ${FIELD_LABELS.map(([k, label]) => k === "transmission"
           ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(TR).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
+          : k === "seller_type"
+          ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(SELLER).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
           : k === "condition"
           ? `<label>${label}<select name="${k}"><option value=""></option>${["usado", "seminovo", "novo"].map((v) => `<option ${d[k] === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>`
           : `<label>${label}<input name="${k}" value="${esc(d[k] ?? "")}" ${["price", "km", "year_fab", "year_model"].includes(k) ? 'type="number" inputmode="numeric"' : ""}></label>`).join("")}
@@ -355,18 +374,45 @@ function renderDetail(d) {
       <div class="actions"><button type="button" id="dPaste">Colar</button><button class="primary" type="submit">Analisar texto</button></div></form>
     ${texts}
 
+    <h3>Contatar vendedor</h3>
+    <div class="reconfirm">
+      <p class="small" style="margin-top:0">${esc(d.seller || "Vendedor não identificado")}${d.seller_type ? ` · ${SELLER[d.seller_type]}` : ""}.
+        O WebMotors não mostra WhatsApp e só libera o telefone com login: toque em <b>Abrir anúncio</b> → <b>Ver telefone</b> e cole o número abaixo.</p>
+      <label>Telefone / WhatsApp do vendedor<input name="phone" id="dPhone" inputmode="tel" placeholder="(11) 9xxxx-xxxx" value="${esc(d.seller_phone || "")}"></label>
+      <label>Mensagem (pode editar)<textarea id="dMsg" rows="7">${esc(d.contact_draft || E.contactMessage(S, d))}</textarea></label>
+      <div class="actions left">
+        <button class="primary" id="dWhats">WhatsApp</button><button id="dCopyMsg">Copiar mensagem</button>
+        <button id="dShareMsg">Compartilhar…</button><button class="ghost" id="dResetMsg">Mensagem padrão</button>
+      </div>
+      <p class="small">${d.contacted_at ? `Contato registrado em ${esc(E.fmtDate(d.contacted_at))}.` : "Ao enviar pelo WhatsApp, o contato fica registrado aqui."}</p>
+    </div>
+
     <h3>Anotações</h3>
     <form id="notesForm"><textarea name="notes" rows="3">${esc(d.notes || "")}</textarea><div class="actions"><span></span><button type="submit">Salvar</button></div></form>
 
     <h3>Mais ações</h3>
     <div class="actions left">
+      <button id="dCompare">⇆ Comparar</button>
       <button id="dExclude">Ignorar este modelo</button>
       <button class="ghost" id="dArchive">${d.archived ? "Desarquivar" : "Arquivar"}</button>
       <button class="ghost danger" id="dDelete">Excluir</button>
     </div>`;
 
   const reload = () => { renderDetail(byId(d.id) || d); renderCards(); };
+  const msg = () => $("#dMsg").value.trim();
+  $("#dPhone").onchange = () => act(null, async () => { d.seller_phone = $("#dPhone").value.trim(); });
+  $("#dMsg").onchange = () => act(null, async () => { d.contact_draft = $("#dMsg").value; });
+  $("#dResetMsg").onclick = () => act(null, async () => { delete d.contact_draft; $("#dMsg").value = E.contactMessage(S, d); });
+  $("#dCopyMsg").onclick = async () => { try { await navigator.clipboard.writeText(msg()); toast("Mensagem copiada. Cole no chat do WebMotors ou no WhatsApp."); } catch { toast("Não consegui copiar; selecione o texto e copie."); } };
+  $("#dShareMsg").onclick = async () => { try { await navigator.share({ text: msg() }); } catch { /* cancelado */ } };
+  $("#dWhats").onclick = () => {
+    const link = E.whatsappLink($("#dPhone").value, msg());
+    if (!link) { $("#dPhone").focus(); return toast("Informe o telefone do vendedor com DDD."); }
+    d.seller_phone = $("#dPhone").value.trim(); d.contacted_at = new Date().toISOString(); persist();
+    openExternal(link); reload();
+  };
   $("#dScore").onclick = () => openScore(d.id);
+  $("#dCompare").onclick = () => addToCompare(d.id);
   const el = $("#detail");
   $("#reconfForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button", f), async () => {
     const ev = E.reconfirm(S, d, { available: f.available.value === "1", price: f.price.value === "" ? null : +f.price.value, km: f.km.value === "" ? null : +f.km.value, note: f.note.value.trim() || null }, deps);
@@ -406,6 +452,7 @@ function renderDetail(d) {
     E.refresh(S, d, deps); toast("Validação salva."); reload(); }); });
   $$("[data-deltext]", el).forEach((b) => b.onclick = () => act(b, async () => { d.texts = d.texts.filter((t) => t.id !== b.dataset.deltext); E.refresh(S, d, deps); reload(); }));
   $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
+  $$("[data-uncmp]", el).forEach((b) => b.onclick = () => { ui.compare.delete(+b.dataset.uncmp); saveCompare(); renderCompare(); renderCards(); });
 }
 
 // ---------------------------------------------------------------- aderência e ficha técnica
@@ -447,7 +494,7 @@ $("#clearCmp").onclick = () => { ui.compare.clear(); saveCompare(); renderCompar
 function renderCompare() {
   const el = $("#compareTable");
   const it = [...ui.compare].map(byId).filter(Boolean);
-  if (!it.length) { el.innerHTML = `<div class="empty">Nenhum veículo selecionado.</div>`; return; }
+  if (!it.length) { el.innerHTML = `<div class="empty">Nenhum veículo no comparativo.<br>Na lista, toque em <b>⇆ Comparar</b> no anúncio.</div>`; return; }
   const T = (x) => specOf(x)?.tech || {};
   const EQV = { confirmado: 2, pendente: 1, ausente: 0 };
   // linha comparável: get(x) -> número; better: "max" | "min"
@@ -487,7 +534,7 @@ function renderCompare() {
     ${row("Câmbio", (x) => esc(T(x).gearbox || TR[x.transmission] || "—"))}
     ${row("Local", (x) => esc(x.city ? `${x.city}/${x.state || "?"}` : "—"))}
     ${row("Disponível", (x) => x.available === false ? "Não" : x.available ? "Sim" : "—")}
-    ${row("", (x) => `<a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a> · <a href="#" data-open="${x.id}">detalhes</a>`)}
+    ${row("", (x) => `<a data-ext href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a> · <a href="#" data-open="${x.id}">detalhes</a><br><button class="ghost danger" data-uncmp="${x.id}">✕ remover</button>`)}
   </tbody></table>`;
   // placar de vitórias por carro
   const tmp = document.createElement("div"); tmp.innerHTML = html;
@@ -496,6 +543,7 @@ function renderCompare() {
   html = html.replace("<tbody>", "<tbody>" + placar);
   el.innerHTML = `<div class="cmpLegend"><span class="win" style="background:var(--ok-bg);color:var(--ok)">▲ venceu</span><span style="background:var(--bad-bg);color:var(--bad)">▼ perdeu</span><span class="small">sem cor = empate ou sem dado</span></div>` + html;
   $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
+  $$("[data-uncmp]", el).forEach((b) => b.onclick = () => { ui.compare.delete(+b.dataset.uncmp); saveCompare(); renderCompare(); renderCards(); });
 }
 
 // ---------------------------------------------------------------- alertas
@@ -524,6 +572,8 @@ function renderSettings() {
   $("#refOtherWrap").hidden = true;
   $$("input[name=tr]", f).forEach((i) => i.checked = c.transmissions.includes(i.value));
   $$("input[name=cond]", f).forEach((i) => i.checked = c.conditions.includes(i.value));
+  $$("input[name=seller]", f).forEach((i) => i.checked = (c.seller_types || []).includes(i.value));
+  const cf = $("#contactForm"); cf.my_car.value = S.settings.my_car || ""; cf.template.value = S.settings.contact_template || "";
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
   $("#wmFilters").innerHTML = `<ul style="margin:.2rem 0 0 1rem;padding:0">
     <li>Preço ${c.min_price != null ? `de ${brl(c.min_price)} ` : ""}${c.max_price != null ? `até ${brl(c.max_price)}` : ""} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km ${c.min_km != null ? `de ${num(c.min_km)} ` : ""}${c.max_km != null ? `até ${num(c.max_km)}` : ""}</li>
@@ -569,7 +619,9 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     if (minK != null && maxK != null && minK > maxK) throw new Error("Km mínima maior que a máxima.");
     Object.assign(S.settings.criteria, { min_price: minP, max_price: maxP, year_min: n("year_min"), year_max: n("year_max"), min_km: minK, max_km: maxK,
       max_distance_km: n("max_distance_km"), ref_location: ref,
-      transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value) });
+      transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value),
+      seller_types: $$("input[name=seller]:checked", f).map((i) => i.value) });
+    if (!S.settings.criteria.seller_types.length) S.settings.criteria.seller_types = ["particular", "loja", "concessionaria"];
     S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
     const refChanged = S.settings.criteria.ref_location !== oldRef;
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")
@@ -645,6 +697,11 @@ $("#distForm2").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target;
   act(null, async () => { S.settings.distance = { provider: f.provider.value, ors_key: f.ors_key.value.trim() }; S.geo_cache = {}; toast("Serviço de rotas salvo. Use ↻ para recalcular."); });
 });
+$("#contactForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  act(null, async () => { S.settings.my_car = f.my_car.value.trim(); S.settings.contact_template = f.template.value.trim() || E.CONTACT_TEMPLATE_DEFAULT; toast("Mensagem padrão salva."); });
+});
+$("#contactReset").onclick = () => { $("#contactForm").template.value = E.CONTACT_TEMPLATE_DEFAULT; $("#contactForm").my_car.value = E.MY_CAR_DEFAULT; };
 $("#exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify(S, null, 1)], { type: "application/json" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
@@ -665,8 +722,10 @@ let filling = false;
 async function fillDistancesBg() {
   if (filling) return; filling = true;
   try {
-    const n = await E.fillDistances(S, deps, () => { persist(); renderCards(); if (ui.openId) { const l = byId(ui.openId); if (l) renderDetail(l); } });
-    if (n) toast(`${n} distância(s) calculada(s).`);
+    const n = await E.fillDistances(S, deps, (l) => {
+      persist(); const span = document.querySelector(`[data-dist="${l.id}"]`); if (span) span.textContent = distText(l);
+    });
+    if (n) { renderCards(); if (ui.openId) { const l = byId(ui.openId); if (l) renderDetail(l); } toast(`${n} distância(s) calculada(s).`); }
   } finally { filling = false; }
 }
 
@@ -733,7 +792,9 @@ function handleShare() {
 
 (async function init() {
   S = await loadState();
-  if (S.listings.some((l) => !l.score)) E.reclassifyAll(S, deps); // versões antigas: calcula a aderência
+  let migrate = false;
+  for (const l of S.listings) if (!("seller" in l)) { l.seller = null; l.seller_type = null; E.reparseTexts(l); migrate = true; }
+  if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
   saveCompare(); updateTitle(); renderCards(); handleShare();
   const h = location.hash.match(/listing=(\d+)/);
