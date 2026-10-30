@@ -249,3 +249,28 @@ test("ignorar 'Onix (hatch)' não atinge o Onix Plus, e vice-versa", () => {
   assert.ok(findExclusion(onlyHatch, hatch)); assert.equal(findExclusion(onlyHatch, sedan), null);
   assert.ok(findExclusion(onlySedan, sedan)); assert.equal(findExclusion(onlySedan, hatch), null);
 });
+
+// ------------------------------------------------------------ aderência e faixas
+import { scoreListing, byAdherence } from "../core/score.js";
+test("aderência: comprovado no anúncio > pela ficha; mais barato/menos km sobe; descartado fica embaixo", () => {
+  const reasons = (lvl = "ok") => ["price", "year_model", "km", "transmission", "condition", "distance", "adas", "inducao", "android_auto_sem_fio"].map((f) => ({ field: f, level: lvl }));
+  const base = { status: "aprovado", reasons: reasons(), price: 90000, km: 20000, year_model: 2025, distance: { km: 20 },
+    checks: { adas: { method: "anuncio" }, inducao: { method: "anuncio" }, android_auto_sem_fio: { method: "anuncio" } } };
+  const spec = { source: { quality: "secundária" }, tech: { city_g: 12, trunk_l: 469 } };
+  const a = scoreListing(base, DEFAULT_CRITERIA, spec).total;
+  const viaFicha = scoreListing({ ...base, checks: { adas: { method: "ficha" }, inducao: { method: "ficha" }, android_auto_sem_fio: { method: "ficha" } } }, DEFAULT_CRITERIA, spec).total;
+  const caro = scoreListing({ ...base, price: 99000, km: 34000 }, DEFAULT_CRITERIA, spec).total;
+  const desc = scoreListing({ ...base, status: "descartado" }, DEFAULT_CRITERIA, spec);
+  assert.ok(a > viaFicha && a > caro, `${a} ${viaFicha} ${caro}`);
+  assert.ok(a <= 100 && a >= 75, String(a));
+  assert.equal(desc.level, "baixa"); assert.ok(desc.total <= 39);
+  const list = [{ status: "descartado", score: { total: 39 } }, { status: "pendente", score: { total: 60 } }, { status: "aprovado", score: { total: 90 } }].sort(byAdherence);
+  assert.deepEqual(list.map((x) => x.score.total), [90, 60, 39]);
+});
+
+test("preço e km mínimos", () => {
+  const c = { ...DEFAULT_CRITERIA, min_price: 80000, min_km: 5000 };
+  assert.equal(classify({ ...base, price: 75000 }, allOk, c).status, DISCARDED);
+  assert.equal(classify({ ...base, km: 1000 }, allOk, c).status, DISCARDED);
+  assert.equal(classify(base, allOk, c).status, APPROVED);
+});

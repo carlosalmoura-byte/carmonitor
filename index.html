@@ -17,13 +17,14 @@
   <button class="ghost" id="routineBtn" title="Reprocessar agora">↻</button>
 </header>
 
+<div id="ptr" class="ptr" aria-hidden="true"><span id="ptrText">Puxe para atualizar</span></div>
 <main>
   <!-- ANÚNCIOS -->
   <section id="view-listings" class="view active">
     <div class="searchRow">
       <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
       <select id="sort" aria-label="Ordenar">
-        <option value="status">Status</option><option value="price">Menor preço</option><option value="km">Menor km</option>
+        <option value="score">Mais aderente</option><option value="price">Menor preço</option><option value="km">Menor km</option>
         <option value="distance">Mais perto</option><option value="recent">Recentes</option>
       </select>
     </div>
@@ -69,12 +70,22 @@
     <div class="panel subview active" id="sub-criteria">
       <h2>Critérios</h2>
       <form id="criteriaForm" autocomplete="off">
-        <label>Preço máximo<select name="max_price"></select></label>
+        <div class="row2">
+          <label>Preço mínimo<select name="min_price"></select></label>
+          <label>Preço máximo<select name="max_price"></select></label>
+          <label data-custom="min_price" hidden>Outro mínimo (R$)<input type="number" inputmode="numeric" name="min_price_custom" min="0" step="500"></label>
+          <label data-custom="max_price" hidden>Outro máximo (R$)<input type="number" inputmode="numeric" name="max_price_custom" min="0" step="500"></label>
+        </div>
         <div class="row2">
           <label>Ano-modelo de<select name="year_min"></select></label>
           <label>até<select name="year_max"></select></label>
         </div>
-        <label>Km máxima<select name="max_km"></select></label>
+        <div class="row2">
+          <label>Km mínima<select name="min_km"></select></label>
+          <label>Km máxima<select name="max_km"></select></label>
+          <label data-custom="min_km" hidden>Outra km mínima<input type="number" inputmode="numeric" name="min_km_custom" min="0" step="500"></label>
+          <label data-custom="max_km" hidden>Outra km máxima<input type="number" inputmode="numeric" name="max_km_custom" min="0" step="500"></label>
+        </div>
         <fieldset><legend>Câmbio</legend>
           <label class="chk"><input type="checkbox" name="tr" value="automatico"> Automático (inclui CVT/dupla embreagem)</label>
           <label class="chk"><input type="checkbox" name="tr" value="automatizado"> Automatizado</label>
@@ -215,6 +226,12 @@
 <div class="sheet" id="detailSheet" role="dialog" aria-modal="true" aria-label="Detalhes do anúncio">
   <div class="sheetHead"><span id="detailBadge"></span><button class="ghost" data-close>✕</button></div>
   <div id="detail"></div>
+</div>
+
+<!-- Aderência -->
+<div class="sheet" id="scoreSheet" role="dialog" aria-modal="true" aria-label="Aderência">
+  <div class="sheetHead"><h2>Aderência</h2><button class="ghost" data-close>✕</button></div>
+  <div id="scoreBody"></div>
 </div>
 
 <div id="toast" class="toast" role="status"></div>

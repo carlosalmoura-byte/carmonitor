@@ -1,7 +1,7 @@
 // Service worker: guarda o app no aparelho para abrir sem internet. Não intercepta chamadas externas.
-const VERSION = "carmonitor-v3";
+const VERSION = "carmonitor-v4";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest",
-  "core/catalog.js", "core/classify.js", "core/dedup.js", "core/distance.js", "core/engine.js", "core/equipment.js",
+  "core/catalog.js", "core/classify.js", "core/score.js", "core/dedup.js", "core/distance.js", "core/engine.js", "core/equipment.js",
   "core/parsing.js", "core/specs.js", "core/store.js", "core/textnorm.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png"];
 

@@ -6,6 +6,7 @@ import { ITEMS } from "./core/equipment.js";
 import { firstUrl } from "./core/parsing.js";
 import { SEED_SPECS, exclusionLabel, validateSpec } from "./core/specs.js";
 import { CATALOG, CITIES } from "./core/catalog.js";
+import { LEVEL_LABEL, byAdherence } from "./core/score.js";
 import { loadState, requestPersistence, saveState } from "./core/store.js";
 
 // ---------------------------------------------------------------- utilidades
@@ -66,6 +67,20 @@ function fillSelect(sel, values, current, fmt = String) {
   const vals = [...new Set([...values, ...(current != null && current !== "" ? [current] : [])])].sort((a, b) => a - b);
   sel.innerHTML = vals.map((v) => `<option value="${v}" ${String(v) === String(current) ? "selected" : ""}>${esc(fmt(v))}</option>`).join("");
 }
+/** Seleção com valores prontos + "Outro valor…" (abre campo para digitar). */
+function fillCombo(sel, values, current, fmt, emptyLabel) {
+  fillSelect(sel, values, current, fmt);
+  sel.insertAdjacentHTML("afterbegin", `<option value="" ${current == null ? "selected" : ""}>${esc(emptyLabel)}</option>`);
+  sel.insertAdjacentHTML("beforeend", `<option value="__other">Outro valor…</option>`);
+  const wrap = $(`[data-custom="${sel.name}"]`); if (wrap) { wrap.hidden = true; wrap.querySelector("input").value = current ?? ""; }
+  sel.onchange = () => { if (wrap) { wrap.hidden = sel.value !== "__other"; if (!wrap.hidden) wrap.querySelector("input").focus(); } };
+}
+function comboValue(form, name) {
+  const v = form.elements[name].value;
+  if (v === "__other") { const c = form.elements[name + "_custom"].value; return c === "" ? null : Number(c); }
+  return v === "" ? null : Number(v);
+}
+
 function updateTitle() {
   const c = new Set(S.settings.criteria.conditions || []);
   const used = c.has("usado") || c.has("seminovo");
@@ -127,12 +142,12 @@ function renderCards() {
   else if (ui.status === "favoritos") items = items.filter((l) => l.favorite);
   else if (ui.status) items = items.filter((l) => l.status === ui.status);
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
-  const order = { aprovado: 0, pendente: 1, descartado: 2 };
   const keyf = {
     price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
     recent: (l) => -new Date(l.first_seen).getTime(),
-  }[$("#sort").value] || ((l) => order[l.status] * 1e12 + (l.price ?? 1e11));
-  items.sort((a, b) => keyf(a) - keyf(b));
+  }[$("#sort").value];
+  items.sort(keyf ? (a, b) => keyf(a) - keyf(b) : byAdherence);
+  const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
   $("#unread").textContent = S.notifications.filter((n) => !n.read).length;
   const el = $("#cards");
   if (!items.length) {
@@ -153,8 +168,10 @@ function renderCards() {
       l.available === false ? `<span class="chip ausente">indisponível</span>` : "",
       stale(l) ? `<span class="chip pendente">reconferir</span>` : "",
     ].join("");
+    const sc = l.score || { total: 0, level: "baixa" };
     return `<article class="card st-${l.status}">
-      <div class="cardTop"><span class="badge ${l.status}">${STATUS[l.status]}</span><span class="small">${esc(l.source)}${l.source_id ? " · " + esc(l.source_id) : ""}
+      <div class="cardTop"><span><span class="rank">#${ranking.indexOf(l.id) + 1}</span> <span class="badge ${l.status}">${STATUS[l.status]}</span>
+        <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="Aderência ${sc.total} de 100. Toque para detalhes">🎯 ${sc.total}</button></span><span class="small">
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
       <h3>${esc(title(l))} ${l.year_model ? `<span class="small">${esc(l.year_fab ? l.year_fab + "/" : "")}${esc(l.year_model)}</span>` : ""}</h3>
       <div class="ver">${esc(l.version || "versão não informada")}</div>
@@ -174,6 +191,8 @@ function renderCards() {
 $("#cards").addEventListener("click", (e) => {
   const f = e.target.closest("[data-fav]");
   if (f) { toggleFav(+f.dataset.fav); return; }
+  const sb = e.target.closest("[data-score]");
+  if (sb) { openScore(+sb.dataset.score); return; }
   const b = e.target.closest("[data-open]"); if (b) openDetail(+b.dataset.open);
 });
 function toggleFav(id) {
@@ -303,7 +322,9 @@ function renderDetail(d) {
         <button type="submit" class="primary" style="width:100%">Registrar reconferência</button>
       </form></div>
 
+    <h3>Aderência <button class="scoreBtn ${d.score?.level || "baixa"}" id="dScore">🎯 ${d.score?.total ?? "—"} · ${LEVEL_LABEL[d.score?.level] || ""}</button></h3>
     <h3>Critérios</h3><ul class="reasons">${reasons}</ul>
+    <h3>Ficha técnica</h3>${techHtml(d)}
     <h3>Equipamentos obrigatórios</h3>${specInfo}${eq}
 
     <h3>Dados do anúncio</h3><div class="kv">${fields}</div>
@@ -345,6 +366,7 @@ function renderDetail(d) {
     </div>`;
 
   const reload = () => { renderDetail(byId(d.id) || d); renderCards(); };
+  $("#dScore").onclick = () => openScore(d.id);
   const el = $("#detail");
   $("#reconfForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button", f), async () => {
     const ev = E.reconfirm(S, d, { available: f.available.value === "1", price: f.price.value === "" ? null : +f.price.value, km: f.km.value === "" ? null : +f.km.value, note: f.note.value.trim() || null }, deps);
@@ -386,31 +408,93 @@ function renderDetail(d) {
   $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
 }
 
+// ---------------------------------------------------------------- aderência e ficha técnica
+const specOf = (l) => l.spec_id ? E.allSpecs(S).find((s) => s.id === l.spec_id) : null;
+function scoreHtml(l) {
+  const sc = l.score; if (!sc) return "<p class='small'>Sem nota ainda.</p>";
+  const pos = S.listings.filter((x) => !x.archived).sort(byAdherence).findIndex((x) => x.id === l.id) + 1;
+  const groups = ["Obrigatórios", "Preferências"].map((g) => {
+    const ps = sc.parts.filter((p) => p.group === g), got = ps.reduce((a, p) => a + p.pts, 0), max = ps.reduce((a, p) => a + p.max, 0);
+    return `<h3>${g} — ${got.toFixed(0)} de ${max.toFixed(0)}</h3><ul class="list">${ps.map((p) => `<li><span>${esc(p.label)}<span class="small">${esc(p.note || "")}</span>
+      <div class="bar" style="width:9rem"><i style="width:${(100 * p.pts / p.max).toFixed(0)}%"></i></div></span><b>${p.pts.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}/${p.max.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}</b></li>`).join("")}</ul>`;
+  }).join("");
+  return `<div class="actions left" style="align-items:center"><span class="scoreBig">${sc.total}</span><span><span class="scoreBtn ${sc.level}">${LEVEL_LABEL[sc.level]}</span><br>
+    <span class="small">#${pos} de ${S.listings.filter((x) => !x.archived).length} no ranking${l.status === "descartado" ? " · descartado (nota limitada a 39)" : ""}</span></span></div>
+    <p class="small">60 pontos vêm dos critérios obrigatórios (pendente vale metade; confirmado só pela ficha vale um pouco menos que confirmado no anúncio).
+    40 pontos vêm das preferências: mais barato, menos km, mais novo, mais perto, menor consumo e porta-malas maior.</p>${groups}`;
+}
+function openScore(id) {
+  const l = byId(id); if (!l) return;
+  $("#scoreBody").innerHTML = `<p><b>${esc(title(l))} ${esc(l.year_model || "")}</b><br><span class="small">${esc(l.version || "")} · ${brl(l.price)}</span></p>` + scoreHtml(l);
+  openSheet("#scoreSheet"); history.pushState({ sheet: 3 }, "");
+}
+const dec = (v) => v == null ? "—" : String(v).replace(".", ",");
+function techHtml(l) {
+  const sp = specOf(l), t = sp?.tech;
+  if (!t) return `<p class="small">Sem ficha técnica cadastrada para esta versão e ano-modelo.</p>`;
+  const autonomy = t.tank_l && t.road_g ? Math.round(t.tank_l * t.road_g) : null;
+  return `<div class="techGrid">
+    <div><div class="k">Carroceria</div>${esc(t.body)}</div><div><div class="k">Motor</div>${esc(t.engine)}</div>
+    <div><div class="k">Potência (gasolina / etanol)</div>${t.power_g} / ${t.power_e} cv</div><div><div class="k">Torque (gas. / etanol)</div>${dec(t.torque_g)} / ${dec(t.torque_e)} kgfm</div>
+    <div><div class="k">Consumo cidade (gas. / etanol)</div>${dec(t.city_g)} / ${dec(t.city_e)} km/l</div><div><div class="k">Consumo estrada (gas. / etanol)</div>${dec(t.road_g)} / ${dec(t.road_e)} km/l</div>
+    <div><div class="k">Porta-malas</div>${t.trunk_l} L</div><div><div class="k">Tanque · autonomia na estrada (gas.)</div>${t.tank_l} L · ~${num(autonomy)} km</div>
+    <div style="grid-column:1/-1"><div class="k">Câmbio</div>${esc(t.gearbox)}</div></div>
+    <p class="small">Fonte: <a href="${esc(safeUrl(t.source.url))}" target="_blank" rel="noopener">${esc(t.source.title)}</a> (${esc(t.source.quality)}). ${esc(t.note || "")} Consumo conforme a fonte; no dia a dia varia com trânsito e combustível.</p>`;
+}
+
 // ---------------------------------------------------------------- comparação
 $("#clearCmp").onclick = () => { ui.compare.clear(); saveCompare(); renderCompare(); renderCards(); };
 function renderCompare() {
   const el = $("#compareTable");
   const it = [...ui.compare].map(byId).filter(Boolean);
   if (!it.length) { el.innerHTML = `<div class="empty">Nenhum veículo selecionado.</div>`; return; }
-  const best = (f, fn = Math.min) => { const v = it.map(f).filter((x) => x != null); return v.length ? fn(...v) : null; };
-  const bp = best((x) => x.price), bk = best((x) => x.km), bd = best((x) => x.distance?.km), by = best((x) => x.year_model, Math.max);
-  const row = (label, f) => `<tr><th>${label}</th>${it.map((x) => `<td>${f(x)}</td>`).join("")}</tr>`;
-  const mark = (v, b, txt) => v != null && v === b && it.length > 1 ? `<span class="best">${txt}</span>` : txt;
-  el.innerHTML = `<table class="cmp"><tbody>
-    ${row("Veículo", (x) => `<b>${esc(title(x))}</b><br><span class="small">${esc(x.version || "")}</span>`)}
-    ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`)}
-    ${row("Preço", (x) => mark(x.price, bp, brl(x.price)))}
-    ${row("Ano-modelo", (x) => mark(x.year_model, by, esc(x.year_model ?? "—")))}
-    ${row("Quilometragem", (x) => mark(x.km, bk, num(x.km, " km")))}
-    ${row("Câmbio", (x) => esc(TR[x.transmission] || "—"))}
-    ${row("Local", (x) => esc(x.city ? `${x.city}/${x.state || "?"}` : "—"))}
-    ${row("Distância", (x) => mark(x.distance?.km, bd, esc(distText(x))))}
+  const T = (x) => specOf(x)?.tech || {};
+  const EQV = { confirmado: 2, pendente: 1, ausente: 0 };
+  // linha comparável: get(x) -> número; better: "max" | "min"
+  const row = (label, render, get = null, better = "max") => {
+    let cls = it.map(() => "");
+    if (get && it.length > 1) {
+      const vals = it.map(get), known = vals.filter((v) => v != null);
+      if (known.length > 1) {
+        const hi = Math.max(...known), lo = Math.min(...known);
+        if (hi !== lo) {
+          const win = better === "max" ? hi : lo, lose = better === "max" ? lo : hi;
+          cls = vals.map((v) => v === win ? "win" : v === lose ? "lose" : "");
+        }
+      }
+    }
+    return `<tr><th>${label}</th>${it.map((x, i) => `<td class="${cls[i]}">${render(x)}</td>`).join("")}</tr>`;
+  };
+  const wins = new Map(it.map((x) => [x.id, 0]));
+  let html = `<table class="cmp"><tbody>
+    ${row("Veículo", (x) => `<b>${esc(title(x))}</b> ${x.favorite ? "★" : ""}<br><span class="small">${esc(x.version || "")}</span>`)}
+    ${row("Aderência", (x) => `🎯 ${x.score?.total ?? "—"} <span class="small">${LEVEL_LABEL[x.score?.level] || ""}</span>`, (x) => x.score?.total)}
+    ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`, (x) => ({ aprovado: 2, pendente: 1, descartado: 0 })[x.status])}
+    ${row("Preço", (x) => brl(x.price), (x) => x.price, "min")}
+    ${row("Ano-modelo", (x) => esc(x.year_model ?? "—"), (x) => x.year_model)}
+    ${row("Quilometragem", (x) => num(x.km, " km"), (x) => x.km, "min")}
+    ${row("Distância", (x) => esc(distText(x)), (x) => x.distance?.km, "min")}
     ${Object.entries(ITEMS).map(([k, label]) => row(label, (x) => { const c = x.checks[k] || { state: "pendente" };
-      return `<span class="chip ${c.state}">${EQ_ICON[c.state]} ${esc(c.state)}</span>${c.method === "ficha" ? ` <span class="chip ficha">ficha</span>` : ""}${c.detail ? `<br><span class="small">${esc(c.detail)}</span>` : ""}`; })).join("")}
+      return `${EQ_ICON[c.state]} ${esc(c.state)}${c.method === "ficha" ? " (ficha)" : ""}${c.detail ? `<br><span class="small">${esc(c.detail)}</span>` : ""}`; },
+      (x) => (EQV[x.checks[k]?.state] ?? 1) * 2 - (x.checks[k]?.method === "ficha" ? 1 : 0))).join("")}
+    ${row("Carroceria", (x) => esc(T(x).body || "—"))}
+    ${row("Potência (etanol)", (x) => T(x).power_e ? `${T(x).power_e} cv` : "—", (x) => T(x).power_e)}
+    ${row("Torque (etanol)", (x) => T(x).torque_e ? `${dec(T(x).torque_e)} kgfm` : "—", (x) => T(x).torque_e)}
+    ${row("Consumo cidade (gasolina)", (x) => T(x).city_g ? `${dec(T(x).city_g)} km/l` : "—", (x) => T(x).city_g)}
+    ${row("Consumo estrada (gasolina)", (x) => T(x).road_g ? `${dec(T(x).road_g)} km/l` : "—", (x) => T(x).road_g)}
+    ${row("Porta-malas", (x) => T(x).trunk_l ? `${T(x).trunk_l} L` : "—", (x) => T(x).trunk_l)}
+    ${row("Autonomia na estrada", (x) => T(x).tank_l && T(x).road_g ? `~${num(T(x).tank_l * T(x).road_g)} km` : "—", (x) => T(x).tank_l && T(x).road_g ? T(x).tank_l * T(x).road_g : null)}
+    ${row("Câmbio", (x) => esc(T(x).gearbox || TR[x.transmission] || "—"))}
+    ${row("Local", (x) => esc(x.city ? `${x.city}/${x.state || "?"}` : "—"))}
     ${row("Disponível", (x) => x.available === false ? "Não" : x.available ? "Sim" : "—")}
-    ${row("Histórico", (x) => `${x.snapshots.length} medições`)}
     ${row("", (x) => `<a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a> · <a href="#" data-open="${x.id}">detalhes</a>`)}
   </tbody></table>`;
+  // placar de vitórias por carro
+  const tmp = document.createElement("div"); tmp.innerHTML = html;
+  $$("tr", tmp).forEach((tr) => $$("td", tr).forEach((td, i) => { if (td.classList.contains("win")) wins.set(it[i].id, wins.get(it[i].id) + 1); }));
+  const placar = `<tr><th>Quesitos vencidos</th>${it.map((x) => `<td><b>${wins.get(x.id)}</b></td>`).join("")}</tr>`;
+  html = html.replace("<tbody>", "<tbody>" + placar);
+  el.innerHTML = `<div class="cmpLegend"><span class="win" style="background:var(--ok-bg);color:var(--ok)">▲ venceu</span><span style="background:var(--bad-bg);color:var(--bad)">▼ perdeu</span><span class="small">sem cor = empate ou sem dado</span></div>` + html;
   $$("[data-open]", el).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
 }
 
@@ -429,9 +513,11 @@ $("#markRead").onclick = () => act(null, async () => { S.notifications.forEach((
 // ---------------------------------------------------------------- ajustes
 function renderSettings() {
   const c = S.settings.criteria, f = $("#criteriaForm");
-  fillSelect(f.max_price, OPTS.max_price, c.max_price, brl);
+  fillCombo(f.min_price, OPTS.max_price, c.min_price, brl, "Sem mínimo");
+  fillCombo(f.max_price, OPTS.max_price, c.max_price, brl, "Sem máximo");
   fillSelect(f.year_min, OPTS.year, c.year_min); fillSelect(f.year_max, OPTS.year, c.year_max);
-  fillSelect(f.max_km, OPTS.max_km, c.max_km, (v) => num(v, " km"));
+  fillCombo(f.min_km, [0, ...OPTS.max_km], c.min_km, (v) => num(v, " km"), "Sem mínimo");
+  fillCombo(f.max_km, OPTS.max_km, c.max_km, (v) => num(v, " km"), "Sem máximo");
   fillSelect(f.max_distance_km, OPTS.max_distance_km, c.max_distance_km, (v) => num(v, " km"));
   const cities = [...new Set([...CITIES, c.ref_location].filter(Boolean))];
   f.ref_city.innerHTML = cities.map((x) => `<option ${x === c.ref_location ? "selected" : ""}>${esc(x)}</option>`).join("") + `<option value="__other">Outra cidade…</option>`;
@@ -440,7 +526,7 @@ function renderSettings() {
   $$("input[name=cond]", f).forEach((i) => i.checked = c.conditions.includes(i.value));
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
   $("#wmFilters").innerHTML = `<ul style="margin:.2rem 0 0 1rem;padding:0">
-    <li>Preço até ${brl(c.max_price)} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km até ${num(c.max_km)}</li>
+    <li>Preço ${c.min_price != null ? `de ${brl(c.min_price)} ` : ""}${c.max_price != null ? `até ${brl(c.max_price)}` : ""} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km ${c.min_km != null ? `de ${num(c.min_km)} ` : ""}${c.max_km != null ? `até ${num(c.max_km)}` : ""}</li>
     <li>Câmbio: ${esc(c.transmissions.map((t) => TR_LABEL[t] || t).join(", ") || "qualquer")} · Região: ${esc(c.ref_location)}</li>
     <li>Os opcionais (ADAS, indução, Android Auto sem fio) são validados aqui, anúncio a anúncio.</li></ul>`;
   const n = S.settings.notify, nf = $("#notifyForm");
@@ -478,7 +564,10 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     const oldRef = S.settings.criteria.ref_location;
     const ref = f.ref_city.value === "__other" ? f.ref_other.value.trim() : f.ref_city.value;
     if (!ref) throw new Error("Informe a cidade de referência (ex.: Osasco, SP).");
-    Object.assign(S.settings.criteria, { max_price: n("max_price"), year_min: n("year_min"), year_max: n("year_max"), max_km: n("max_km"),
+    const minP = comboValue(f, "min_price"), maxP = comboValue(f, "max_price"), minK = comboValue(f, "min_km"), maxK = comboValue(f, "max_km");
+    if (minP != null && maxP != null && minP > maxP) throw new Error("Preço mínimo maior que o máximo.");
+    if (minK != null && maxK != null && minK > maxK) throw new Error("Km mínima maior que a máxima.");
+    Object.assign(S.settings.criteria, { min_price: minP, max_price: maxP, year_min: n("year_min"), year_max: n("year_max"), min_km: minK, max_km: maxK,
       max_distance_km: n("max_distance_km"), ref_location: ref,
       transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value) });
     S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
@@ -607,7 +696,28 @@ async function routine(force = false) {
   $("#routineMsg").innerHTML = `<div class="msg ok">Rotina: ${r.processados} processados · ${r.distancias_calculadas} rotas calculadas · ${r.novos_aprovados} novos aprovados · ${r.a_reconferir} a reconferir.</div>`;
   setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 8000);
 }
-$("#routineBtn").onclick = (e) => act(e.target, async () => { await syncResearch(true); await routine(true); });
+async function refreshAll() { await syncResearch(true); await routine(true); fillDistancesBg(); }
+$("#routineBtn").onclick = (e) => act(e.target, refreshAll);
+
+// puxar para atualizar (na lista de anúncios)
+(() => {
+  const ptr = $("#ptr"), txt = $("#ptrText"); let y0 = null, dy = 0, busyPtr = false;
+  const can = () => !busyPtr && window.scrollY <= 0 && $("#view-listings").classList.contains("active") && !$(".sheet.open");
+  window.addEventListener("touchstart", (e) => { y0 = can() ? e.touches[0].clientY : null; dy = 0; }, { passive: true });
+  window.addEventListener("touchmove", (e) => {
+    if (y0 == null) return; dy = e.touches[0].clientY - y0;
+    if (dy <= 0) { ptr.style.height = "0"; return; }
+    ptr.classList.add("pulling"); ptr.style.height = Math.min(dy * 0.5, 70) + "px";
+    txt.textContent = dy > 120 ? "Solte para atualizar" : "Puxe para atualizar";
+  }, { passive: true });
+  window.addEventListener("touchend", async () => {
+    if (y0 == null) return; y0 = null; ptr.classList.remove("pulling");
+    if (dy > 120) {
+      busyPtr = true; ptr.style.height = "44px"; txt.textContent = "Atualizando…";
+      try { await refreshAll(); persist(); } finally { busyPtr = false; ptr.style.height = "0"; }
+    } else ptr.style.height = "0";
+  });
+})();
 
 // ---------------------------------------------------------------- compartilhar (Android) e início
 function handleShare() {
@@ -623,6 +733,7 @@ function handleShare() {
 
 (async function init() {
   S = await loadState();
+  if (S.listings.some((l) => !l.score)) E.reclassifyAll(S, deps); // versões antigas: calcula a aderência
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
   saveCompare(); updateTitle(); renderCards(); handleShare();
   const h = location.hash.match(/listing=(\d+)/);

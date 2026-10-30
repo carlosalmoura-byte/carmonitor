@@ -4,6 +4,7 @@ import { duplicateGroups, normalizeUrl } from "./dedup.js";
 import { ABSENT, CONFIRMED, ITEMS, PENDING, detectEquipment, mergeDetections } from "./equipment.js";
 import { Parsed, deriveFields, extractFromText, parseUrl } from "./parsing.js";
 import { SEED_SPECS, SPEC_ABSENT, SPEC_CONFIRMED, SPEC_OPTIONAL, exclusionLabel, findExclusion, findSpec } from "./specs.js";
+import { scoreListing } from "./score.js";
 
 export const FIELDS = ["title", "make", "model", "version", "year_fab", "year_model", "price", "km", "transmission",
   "condition", "city", "state", "address"];
@@ -157,6 +158,8 @@ export function reclassify(state, l) {
   const ex = findExclusion(state.exclusions, l);
   const r = classify(l, l.checks, state.settings.criteria, ex ? { label: exclusionLabel(ex) } : null);
   l.status = r.status; l.reasons = r.reasons; l.excluded = !!ex;
+  const spec = l.spec_id ? allSpecs(state).find((s) => s.id === l.spec_id) : null;
+  l.score = scoreListing(l, state.settings.criteria, spec);
   return [old, r.status];
 }
 

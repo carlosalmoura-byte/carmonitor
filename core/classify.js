@@ -8,7 +8,7 @@ export const TR_LABEL = { automatico: "automático", automatizado: "automatizado
 export const BORDERLINE_FRACTION = 0.10;
 
 export const DEFAULT_CRITERIA = {
-  max_price: 100000, year_min: 2022, year_max: 2025, max_km: 35000,
+  min_price: null, max_price: 100000, year_min: 2022, year_max: 2025, min_km: null, max_km: 35000,
   transmissions: ["automatico"], conditions: ["usado", "seminovo"],
   ref_location: "Barueri, SP", max_distance_km: 60,
 };
@@ -38,6 +38,7 @@ export function classify(l, checks, criteria, exclusion = null) {
   if (conflicts.price) add("pending", "price", conflictMsg("price"));
   else if (price == null) add("pending", "price", "Preço não informado/verificado.");
   else if (c.max_price != null && price > c.max_price) add("fail", "price", `Preço ${brl(price)} acima do máximo ${brl(c.max_price)}.`);
+  else if (c.min_price != null && price < c.min_price) add("fail", "price", `Preço ${brl(price)} abaixo do mínimo ${brl(c.min_price)}.`);
   else add("ok", "price", `Preço ${brl(price)} dentro do limite.`);
 
   if (conflicts.year_model) add("pending", "year_model", conflictMsg("year_model"));
@@ -48,6 +49,7 @@ export function classify(l, checks, criteria, exclusion = null) {
   if (conflicts.km) add("pending", "km", conflictMsg("km"));
   else if (km == null) add("pending", "km", "Quilometragem não informada/verificada.");
   else if (c.max_km != null && km > c.max_km) add("fail", "km", `Quilometragem ${kmf(km)} acima do máximo ${kmf(c.max_km)}.`);
+  else if (c.min_km != null && km < c.min_km) add("fail", "km", `Quilometragem ${kmf(km)} abaixo do mínimo ${kmf(c.min_km)}.`);
   else add("ok", "km", `Quilometragem ${kmf(km)} dentro do limite.`);
 
   const allowedTr = c.transmissions || [];

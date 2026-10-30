@@ -165,3 +165,21 @@ main{padding-bottom:88px}
 .favBtn.on{color:#e0a100}
 .exclReason{display:block;font-size:.8rem;color:var(--muted)}
 [hidden]{display:none!important}
+
+/* aderência */
+.scoreBtn{border:0;border-radius:99px;padding:.15rem .55rem;font-size:.8rem;font-weight:700;display:inline-flex;gap:.25rem;align-items:center}
+.scoreBtn.excelente{background:var(--ok-bg);color:var(--ok)}.scoreBtn.boa{background:var(--info-bg);color:var(--info)}
+.scoreBtn.regular{background:var(--pend-bg);color:var(--pend)}.scoreBtn.baixa{background:var(--bad-bg);color:var(--bad)}
+.rank{font-weight:700;color:var(--muted);font-size:.8rem}
+.bar{height:6px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-top:.2rem}.bar i{display:block;height:100%;background:var(--accent)}
+.scoreBig{font-size:2.4rem;font-weight:800;line-height:1}
+/* comparação vencedor/perdedor */
+.cmp td.win{background:var(--ok-bg);color:var(--ok);font-weight:600}.cmp td.win::before{content:"▲ ";font-size:.75em}
+.cmp td.lose{background:var(--bad-bg);color:var(--bad)}.cmp td.lose::before{content:"▼ ";font-size:.75em}
+.cmpLegend{display:flex;gap:.8rem;font-size:.8rem;margin:.2rem 0 .6rem}
+.cmpLegend span{padding:.1rem .45rem;border-radius:6px}
+/* puxar para atualizar */
+.ptr{height:0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;color:var(--muted);font-size:.85rem;transition:height .15s}
+.ptr.pulling{transition:none}.ptr span{padding-bottom:.5rem}
+.techGrid{display:grid;grid-template-columns:1fr 1fr;gap:.3rem .8rem;font-size:.9rem}.techGrid .k{color:var(--muted);font-size:.8rem}
+@media (max-width:600px){.cmp th{width:96px;min-width:96px;font-size:.78rem}.cmp td{min-width:150px}}
