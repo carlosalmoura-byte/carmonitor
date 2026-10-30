@@ -41,7 +41,9 @@ export function upgradeState(s) {
 }
 
 const nowIso = (deps) => (deps?.now ? deps.now() : new Date()).toISOString();
-export const allSpecs = (state) => [...(state.custom_specs || []), ...SEED_SPECS.filter((s) => !(state.disabled_specs || []).includes(s.id))];
+export const allSpecs = (state) => [...(state.custom_specs || []),
+  ...[...SEED_SPECS, ...(state.remote_specs || []).filter((r) => !SEED_SPECS.some((s) => s.id === r.id))]
+    .filter((s) => !(state.disabled_specs || []).includes(s.id))];
 
 // ------------------------------------------------------------------ campos
 export function applyParsed(l, parsed) {

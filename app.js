@@ -783,7 +783,17 @@ async function fillDistancesBg() {
 }
 
 // ---------------------------------------------------------------- pesquisa publicada pelo Claude
+/** Fichas de versões pesquisadas e publicadas em data/fichas.json (sempre com fonte). */
+async function syncSpecs() {
+  try {
+    const r = await fetch("data/fichas.json", { cache: "no-store" }); if (!r.ok) return false;
+    const list = (await r.json()).filter((x) => validateSpec(x).length === 0);
+    if (JSON.stringify(list) === JSON.stringify(S.remote_specs || [])) return false;
+    S.remote_specs = list; E.reclassifyAll(S, deps); persist(); return true;
+  } catch { return false; }
+}
 async function syncResearch(showNone = false) {
+  await syncSpecs();
   let feed;
   try {
     const r = await fetch("data/anuncios.json", { cache: "no-store" });

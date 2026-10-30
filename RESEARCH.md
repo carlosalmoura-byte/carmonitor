@@ -39,16 +39,46 @@ processados os pedidos pendentes que existirem (`--issue N,M`) e use `--note "pe
   não puder ser aberta, **não** marque nada (deixe como estava).
 - Limite: cerca de 40 páginas de anúncio por pedido.
 
-## 3. Onde procurar
+## 3. Onde procurar (cobertura ampla)
 
-1. Para cada versão com ficha em `core/specs.js` (`SEED_SPECS`: marca, modelo, `version_includes`, anos) e para
-   outros modelos que caibam nos critérios, busque páginas de listagem do WebMotors em SP
-   (ex.: "webmotors Chevrolet Onix Plus Premier automático 2025 usado São Paulo").
-   Se `conditions` incluir `novo`, procure também páginas de carros 0 km.
-2. Abra as páginas de listagem e filtre pelos critérios (preço, ano-modelo, km, câmbio). Região: cidades a até
+O WebMotors não filtra por ADAS, carregador por indução nem Android Auto sem fio. Por isso a busca é **por modelo**,
+cobrindo todos os compactos e médios que podem caber no preço — não só os que já têm ficha.
+
+Modelos a verificar em toda pesquisa (versões mais equipadas de cada um; pule o que estiver em `exclusions`):
+
+| Marca | Modelos |
+|---|---|
+| Chevrolet | Onix, Onix Plus, Tracker, Montana |
+| Volkswagen | Polo, Virtus, T-Cross, Nivus, Tera |
+| Fiat | Argo, Cronos, Pulse, Fastback |
+| Hyundai | HB20, HB20S, Creta |
+| Renault | Kardian, Duster |
+| Jeep | Renegade, Compass |
+| Nissan | Kicks, Versa |
+| Honda | City, City Hatchback, WR-V, HR-V |
+| Toyota | Yaris, Yaris Sedan, Corolla Cross |
+| Peugeot / Citroën | 208, 2008 / C3, Basalt, C3 Aircross |
+| Caoa Chery / BYD / GWM | Tiggo 5x / Dolphin Mini, Dolphin / Ora 03 |
+
+Para cada modelo:
+1. Busque a página de listagem do WebMotors em SP (WebSearch, ex.: "webmotors Volkswagen Virtus Exclusive automático
+   usado São Paulo"; use também páginas por ano, ex. `/de.2023/ate.2023`). Se `conditions` incluir `novo`, procure
+   também carros 0 km.
+2. Abra a listagem e filtre pelos critérios (preço, ano-modelo, km, câmbio). Região: cidades a até
    `max_distance_km` por estrada de `ref_location` (Grande São Paulo; na dúvida, inclua — o app calcula a rota).
-3. Pule modelos/versões que batem com `exclusions`.
-4. Abra cada anúncio candidato e os links de `favorites`/`urls` que aparecerem nas listagens.
+3. Abra os anúncios candidatos (priorize os mais baratos e com menos km) e os links de `favorites`/`urls`.
+4. Distribua o limite de ~40 anúncios entre os modelos; anote no `--note` os modelos que ficaram sem verificação.
+
+### Fichas de versões novas (data/fichas.json)
+
+O app só confirma itens que o anúncio não cita quando existe ficha da **mesma versão e ano-modelo**. Ao encontrar
+versão/ano sem ficha (veja `core/specs.js` e `data/fichas.json`), pesquise a ficha (de preferência catálogo da
+montadora; senão imprensa especializada) e acrescente em `data/fichas.json` um objeto no mesmo formato de
+`SEED_SPECS` (id, make, model, version_includes, version_excludes, year_from, year_to, items com
+state "confirmado" | "opcional" | "ausente" e trecho citado em `quote`, nomes do ADAS em `names`, `source` com
+title, url e quality "oficial" | "concessionária" | "secundária"; `tech` opcional com potência, torque, consumo,
+porta-malas, tanque). **Nunca preencha item sem fonte**: o que a fonte não disser fica fora de `items`.
+Item que é opcional/pacote na versão = "opcional".
 
 ## 4. Formato de cada anúncio (texto que o app analisa)
 

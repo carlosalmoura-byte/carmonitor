@@ -347,3 +347,13 @@ test("acabamento e sugestões do mais amplo ao mais específico", () => {
   assert.equal(findExclusion([onix.ruleModel], ls[3]), null);
   assert.ok(ls.slice(0, 3).every((l) => findExclusion([onix.ruleMake], l)));                           // a marca toda
 });
+
+import { allSpecs } from "../core/engine.js";
+test("fichas publicadas em data/fichas.json entram na validação", async () => {
+  const s = newState();
+  s.remote_specs = [{ id: "vw-virtus-exclusive-2023", make: "volkswagen", model: "virtus", version_includes: ["exclusive"], version_excludes: [],
+    year_from: 2023, year_to: 2023, items: { inducao: { state: "confirmado", quote: "carregador por indução" } },
+    source: { title: "Catálogo VW", url: "https://exemplo.com", quality: "oficial" } }];
+  assert.ok(allSpecs(s).some((x) => x.id === "vw-virtus-exclusive-2023"));
+  assert.equal(findSpec(allSpecs(s), L("VOLKSWAGEN", "VIRTUS", "10 200 TSI EXCLUSIVE AUTOMATICO", 2023)).id, "vw-virtus-exclusive-2023");
+});
