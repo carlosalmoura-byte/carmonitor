@@ -92,6 +92,8 @@ export function classify(l, checks, criteria, exclusion = null) {
   }
 
   const levels = new Set(reasons.map((r) => r.level));
-  const status = levels.has("fail") ? DISCARDED : levels.has("pending") ? PENDING : APPROVED;
+  let status = levels.has("fail") ? DISCARDED : levels.has("pending") ? PENDING : APPROVED;
+  // aprovação manual: só vale para pendências (um item reprovado pelos critérios continua descartado)
+  if (l.user_approve && !l.user_discard && status === PENDING) { status = APPROVED; reasons.unshift({ level: "ok", field: "user", msg: "Aprovado por você (pendências conferidas por você)." }); }
   return { status, reasons };
 }

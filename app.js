@@ -104,6 +104,7 @@ function showView(v) {
   $$("#nav button").forEach((x) => x.classList.toggle("active", x.dataset.view === v));
   $$(".view").forEach((x) => x.classList.toggle("active", x.id === "view-" + v));
   $("#fab").style.display = v === "listings" ? "" : "none";
+  saveCompare();
   if (v === "compare") renderCompare();
   if (v === "alerts") renderAlerts();
   if (v === "settings") renderSettings();
@@ -233,8 +234,9 @@ function renderCards() {
       ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
-        ${l.user_discard ? `<button data-undiscard="${l.id}">↺ Voltar p/ análise</button>` : l.status !== "descartado" ? `<button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
-        <button class="${ui.compare.has(l.id) ? "primary" : ""}" data-cmpbtn="${l.id}">${ui.compare.has(l.id) ? "✓ Comparando" : "⇆ Comparar"}</button>
+        <label class="cmpFlag ${ui.compare.has(l.id) ? "on" : ""}"><input type="checkbox" data-cmpflag="${l.id}" ${ui.compare.has(l.id) ? "checked" : ""}> Comparar</label>
+        ${l.user_discard || l.user_approve ? `<button data-undiscard="${l.id}">↺ Desfazer decisão</button>`
+          : `${l.status === "pendente" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button>` : ""}${l.status !== "descartado" ? `<button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}`}
         <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
         <button data-open="${l.id}">Detalhes</button>
       </div></article>`;
@@ -266,14 +268,20 @@ $("#discardSheet").addEventListener("click", (e) => {
 $("#discardSheet").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target, l = byId(+f.dataset.id); if (!l) return;
   act(null, async () => {
-    l.user_discard = { reason: f.reason.value.trim(), at: new Date().toISOString() };
+    l.user_discard = { reason: f.reason.value.trim(), at: new Date().toISOString() }; delete l.user_approve;
     E.reclassify(S, l); closeSheet("#discardSheet"); renderCards(); if (ui.openId === l.id) renderDetail(l);
     toast("Descartado. Está na aba Descartados.");
   });
 });
 function undiscard(id) {
   const l = byId(id); if (!l) return;
-  act(null, async () => { delete l.user_discard; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Voltou para análise."); });
+  act(null, async () => { delete l.user_discard; delete l.user_approve; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Decisão desfeita: voltou à classificação automática."); });
+}
+function approve(id) {
+  const l = byId(id); if (!l) return;
+  const pend = (l.reasons || []).filter((r) => r.level === "pending").map((r) => "• " + r.msg).join("\n");
+  if (!confirm(`Aprovar este anúncio mesmo com itens pendentes?\n\n${pend || "(sem pendências)"}\n\nUse quando você mesmo já conferiu esses itens.`)) return;
+  act(null, async () => { l.user_approve = { at: new Date().toISOString() }; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Aprovado por você. Está na aba Aprovados."); });
 }
 $("#cards").addEventListener("click", (e) => {
   const dc = e.target.closest("[data-discard]");
@@ -282,8 +290,11 @@ $("#cards").addEventListener("click", (e) => {
   if (ud) { undiscard(+ud.dataset.undiscard); return; }
   const f = e.target.closest("[data-fav]");
   if (f) { toggleFav(+f.dataset.fav); return; }
-  const cb = e.target.closest("[data-cmpbtn]");
-  if (cb) { addToCompare(+cb.dataset.cmpbtn); return; }
+  const cf = e.target.closest("[data-cmpflag]");
+  if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
+  if (e.target.closest(".cmpFlag")) return;
+  const ap = e.target.closest("[data-approve]");
+  if (ap) { approve(+ap.dataset.approve); return; }
   const sb = e.target.closest("[data-score]");
   if (sb) { openScore(+sb.dataset.score); return; }
   const b = e.target.closest("[data-open]"); if (b) openDetail(+b.dataset.open);
@@ -310,8 +321,22 @@ function openExternal(url) {
   const w = window.open(url, "_blank");
   if (w) { try { w.opener = null; } catch { /* ok */ } } else location.href = url; // bloqueado: abre na mesma janela
 }
+function toggleCompare(id, input) {
+  if (ui.compare.has(id)) ui.compare.delete(id);
+  else if (ui.compare.size >= 5) { if (input) input.checked = false; return toast("Máximo de 5 veículos para comparar."); }
+  else ui.compare.add(id);
+  saveCompare();
+  input?.closest(".cmpFlag")?.classList.toggle("on", ui.compare.has(id));
+}
+$("#cmpBarGo").onclick = () => showView("compare");
+$("#cmpBarClear").onclick = () => { ui.compare.clear(); saveCompare(); renderCards(); };
 function saveCompare() {
   $("#cmpCount").textContent = ui.compare.size;
+  const bar = $("#cmpBar"), onList = $("#view-listings").classList.contains("active");
+  bar.hidden = !(ui.compare.size >= 1 && onList);
+  $("#cmpBarText").textContent = ui.compare.size === 1 ? "1 selecionado · escolha mais um para comparar" : `${ui.compare.size} selecionados`;
+  $("#cmpBarGo").disabled = ui.compare.size < 2;
+  $("#cmpBarGo").textContent = ui.compare.size >= 2 ? `⇆ Comparar ${ui.compare.size}` : "⇆ Comparar";
   try { localStorage.setItem("cmp", JSON.stringify([...ui.compare])); } catch { /* sem armazenamento */ }
 }
 

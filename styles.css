@@ -198,3 +198,14 @@ main{padding-bottom:88px}
 @keyframes slideL{from{transform:translateX(28px);opacity:.4}to{transform:none;opacity:1}}
 @keyframes slideR{from{transform:translateX(-28px);opacity:.4}to{transform:none;opacity:1}}
 .cards.slideL{animation:slideL .18s ease-out}.cards.slideR{animation:slideR .18s ease-out}
+
+.cmpFlag{display:inline-flex;align-items:center;gap:.35rem;margin:0;padding:.35rem .6rem;border:1px solid var(--line,#ccc);border-radius:8px;font-size:.88rem;cursor:pointer}
+.cmpFlag input{width:1.1rem;height:1.1rem;margin:0}
+.cmpFlag.on{border-color:var(--accent,#1f6f5c);font-weight:600}
+button.okBtn{color:var(--ok)}
+.cmpBar{position:fixed;left:.6rem;right:.6rem;bottom:calc(70px + env(safe-area-inset-bottom));z-index:12;display:flex;align-items:center;gap:.5rem;
+  background:var(--surface,#fff);border:1px solid var(--line,#ccc);border-radius:14px;padding:.5rem .6rem;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.cmpBar span{flex:1;font-size:.88rem}
+.cmpBar[hidden]{display:none!important}
+body:has(.cmpBar:not([hidden])) .fab{bottom:calc(136px + env(safe-area-inset-bottom))}
+@media (min-width:900px){ .cmpBar{left:calc(50% - 470px);right:calc(50% - 470px)} }
