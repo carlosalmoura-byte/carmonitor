@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-10-31T08:55:46.693Z",
- "novos": 2,
- "atualizados": 5,
+ "processed_at": "2026-10-31T15:55:50.216Z",
+ "novos": 6,
+ "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa agendada (31/10 6h): 7 anúncios reconferidos/novos; muitas páginas de anúncio não abriram (permissão não respondida), status delas mantido; sem verificação: Polo/Virtus/T-Cross/Creta/Nivus sem anúncio nos critérios na 1ª página; Tera, Argo, Cronos, Fastback, Tracker, Montana, City, WR-V, HR-V, Yaris, Corolla Cross, 208, 2008, C3, Basalt, Kicks, Versa, Renegade, Compass, Duster, Tiggo, BYD, GWM não verificados",
+ "note": "pesquisa agendada (31/10 13h): 6 anúncios novos (2 Tracker, 1 Peugeot 208, 3 Basalt); 24 páginas de anúncio pedidas, 18 não abriram (permissão não respondida) e os 18 anúncios já existentes não puderam ser reconferidos, status mantido; 2 links de 208 redirecionaram para a busca sem dizer vendido, não marcados; sem anúncio nos critérios na 1ª página: T-Cross, Fastback, Kicks, Cronos, City Touring, 2008; não verificados: Tera, Argo, Montana, WR-V, HR-V, Yaris, Corolla Cross, C3, C3 Aircross, Versa, Renegade, Compass, Duster, Creta, Nivus, Tiggo, BYD, GWM",
  "last_issue": null,
  "processed_issues": []
 }
