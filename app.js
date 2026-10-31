@@ -1051,39 +1051,58 @@ function inTime(d) {
   const m = Math.max(0, Math.round((d - Date.now()) / 60000));
   return m < 60 ? `em ${m} min` : `em ${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}`;
 }
+const dayWord = (d) => { const t = new Date(); t.setHours(0, 0, 0, 0); const x = new Date(d); x.setHours(0, 0, 0, 0);
+  const n = Math.round((x - t) / 864e5); return n === 0 ? "hoje" : n === 1 ? "amanhã" : n === -1 ? "ontem" : x.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }); };
+const when = (d) => `${dayWord(d)} às ${hhmm(d)}`;
 function researchState() {
   const req = S.meta.research_requested_at, done = lastStatus?.processed_at || S.meta.feed_generated_at;
   const fu = S.meta.filter_updated_at, used = lastStatus?.filter_used_at;
+  const run = lastStatus?.running && Date.now() - new Date(lastStatus.running.since) < 45 * 60000 ? lastStatus.running : null;
   const filterPending = !!(fu && lastStatus && used !== fu);
   const reqPending = !!(req && (!done || new Date(req) > new Date(done)));
-  const pending = filterPending || reqPending;
-  const sched = nextAt([5, 12], 46), check = nextAt([...Array(24).keys()], 41);
-  const next = pending && check < sched ? { at: check, kind: "pedido" } : { at: sched, kind: "agendada" };
-  return { done, fu, used, filterPending, reqPending, pending, next, sched, check, err: S.meta.filter_error };
+  const pending = !run && (filterPending || reqPending);
+  // automática: começa 5:46/12:46 e fica pronta ~6h/13h; pedidos: verificação aos :41, exceto 5:41/12:41 (a automática atende)
+  const schedStart = nextAt([5, 12], 46), schedReady = new Date(schedStart.getTime() + 14 * 60000);
+  const checkHours = [...Array(24).keys()].filter((h) => h !== 5 && h !== 12);
+  const check = nextAt(checkHours, 41);
+  const viaSched = schedStart <= check;
+  return { done, fu, used, run, filterPending, reqPending, pending, schedStart, schedReady, check, viaSched, err: S.meta.filter_error };
 }
 function renderResearchStatus() {
   const r = researchState();
-  const icon = r.err ? "⚠️" : r.pending ? "⏳" : "✅";
-  const nxt = `${r.next.kind === "pedido" ? "pesquisa com seu filtro" : "próxima"} ${hhmm(r.next.at)} (${inTime(r.next.at)})`;
-  $("#researchIcon").textContent = icon;
-  $("#researchStatus").textContent = r.err ? "Filtro não enviado — toque para ver" : r.done ? `Pesquisa de ${E.fmtDate(r.done).slice(0, 5)} ${E.fmtDate(r.done).slice(-5)} · ${nxt}` : `Nenhuma pesquisa ainda · ${nxt}`;
-  $("#researchPill").className = "researchPill " + (r.err ? "warn" : r.pending ? "pend" : "ok");
+  let icon, text, cls;
+  if (r.run) { icon = "🔄"; cls = "pend"; text = `Pesquisando agora${r.run.filter_at && r.run.filter_at === r.fu ? " com o seu filtro" : ""} (desde ${hhmm(new Date(r.run.since))})`; }
+  else if (r.err) { icon = "⚠️"; cls = "warn"; text = "Seu filtro não chegou à pesquisa · toque para ver"; }
+  else if (r.pending) { icon = "⏳"; cls = "pend"; const t = r.viaSched ? r.schedStart : r.check; text = `${r.filterPending ? "Filtro novo" : "Pedido recebido"}: pesquisa ${when(t)} (${inTime(t)})`; }
+  else { icon = "✅"; cls = "ok"; text = `${r.done ? `Atualizada ${when(new Date(r.done))}` : "Sem pesquisa ainda"} · próxima ${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h`; }
+  $("#researchIcon").textContent = icon; $("#researchStatus").textContent = text;
+  $("#researchPill").className = "researchPill " + cls;
   if ($("#researchSheet").classList.contains("open")) renderResearchSheet();
 }
 function renderResearchSheet() {
   const r = researchState(), st = lastStatus || {};
-  const row = (k, v) => `<div class="rrow"><span>${k}</span><b>${v}</b></div>`;
+  let head;
+  if (r.run) head = `🔄 <b>Pesquisando agora.</b> Começou ${when(new Date(r.run.since))}${r.run.filter_at === r.fu ? ", com o seu filtro atual" : ""}. Leva uns 15 minutos; depois puxe a lista para baixo.`;
+  else if (r.err) head = `⚠️ <b>Seu filtro não chegou à pesquisa.</b> Motivo: ${esc(r.err)}. Enquanto isso, a pesquisa usa o último filtro recebido.`;
+  else if (r.pending) { const t = r.viaSched ? r.schedStart : r.check;
+    head = `⏳ <b>${r.filterPending ? "Você mudou o filtro." : "Pedido de pesquisa recebido."}</b> A lista atual ainda é da pesquisa anterior. A nova pesquisa${r.filterPending ? ", com o filtro novo," : ""} começa ${when(t)} (${inTime(t)})${r.viaSched ? " — é a automática, que já usa o seu filtro" : ""}.`; }
+  else head = `✅ <b>Lista em dia.</b> A última pesquisa já usou o seu filtro atual.`;
+  const res = st.processed_at && st.processed_at === r.done
+    ? `${st.novos ? `${st.novos} anúncio(s) novo(s)` : "nenhum anúncio novo"}${st.atualizados ? `, ${st.atualizados} atualizado(s)` : ""}${st.sairam_do_ar ? `, ${st.sairam_do_ar} saíram do ar` : ""}` : "";
+  const filt = !r.fu ? "" : r.used === r.fu ? "com o seu filtro atual ✓" : "com um filtro antigo (antes da sua última mudança)";
+  const next = [];
+  if (r.pending && !r.viaSched) next.push(`<li><b>${when(r.check)}</b> — com o seu ${r.filterPending ? "filtro novo" : "pedido"} (${inTime(r.check)})</li>`);
+  next.push(`<li><b>${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h</b> — automática (${inTime(r.schedStart)})</li>`);
   $("#researchBody").innerHTML = `
-    ${r.err ? `<div class="msg warn">⚠ O filtro do app não foi enviado: ${esc(r.err)}. A pesquisa vai usar o último filtro recebido.</div>` : ""}
-    ${row("Última pesquisa", r.done ? esc(E.fmtDate(r.done)) : "—")}
-    ${st.processed_at === r.done && st.processed_at ? row("Resultado", `${st.novos} novo(s) · ${st.atualizados} atualizado(s) · ${st.sairam_do_ar} saíram do ar`) : ""}
-    ${row("Filtro usado", !r.fu ? "—" : r.used === r.fu ? "✓ o seu filtro atual" : "⚠ um filtro anterior")}
-    ${r.pending ? row("Pedido na fila", `${r.filterPending ? "filtro alterado" : "pedido manual"} · verificação às ${hhmm(r.check)} (${inTime(r.check)})`) : ""}
-    ${row("Próxima automática", `${hhmm(r.sched)} (${inTime(r.sched)}) · fica pronta em ~10 min`)}
-    <p class="small" style="margin-top:.7rem">As pesquisas automáticas rodam às 5:46 e 12:46 (prontas por volta das 6h e 13h). Quando você muda o filtro, a verificação de hora em hora (aos 41 min) roda uma pesquisa com ele. Depois, puxe a lista para baixo para carregar.</p>
-    ${st.note ? `<details><summary class="small">Observações da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
+    <div class="rhead ${r.err ? "warn" : r.pending || r.run ? "pend" : "ok"}">${head}</div>
+    <h3 class="rsub">Última pesquisa</h3>
+    <p>${r.done ? `${when(new Date(r.done))}${res ? ` — ${res}` : ""}.` : "Ainda não houve pesquisa."}${filt ? `<br><span class="small">Feita ${filt}.</span>` : ""}</p>
+    <h3 class="rsub">Próximas pesquisas</h3>
+    <ul class="rnext">${next.join("")}</ul>
+    <p class="small">Automáticas todo dia por volta das 6h e das 13h. Quando você muda o filtro, uma pesquisa extra roda na próxima hora cheia (aos 41 min) — a não ser que a automática venha antes.</p>
+    ${st.note ? `<details><summary class="small">Detalhes técnicos da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
 }
-$("#researchPill").onclick = () => { renderResearchSheet(); openSheet("#researchSheet"); history.pushState({ sheet: 5 }, ""); };
+$("#researchPill").onclick = () => { renderResearchStatus(); renderResearchSheet(); openSheet("#researchSheet"); history.pushState({ sheet: 5 }, ""); };
 setInterval(() => { if (document.visibilityState === "visible" && S) renderResearchStatus(); }, 30000);
 
 // ---------------------------------------------------------------- rotina ao abrir

@@ -240,3 +240,8 @@ details.sugg>summary{cursor:pointer}
 .rrow{display:flex;justify-content:space-between;gap:.8rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.88rem}
 .rrow span{color:var(--muted)}.rrow b{text-align:right;font-weight:600}
 .msg.warn{background:var(--bad-bg);color:var(--bad)}
+
+.rhead{padding:.7rem .8rem;border-radius:10px;font-size:.92rem;line-height:1.4;margin-bottom:.4rem}
+.rhead.ok{background:var(--ok-bg);color:var(--ok)}.rhead.pend{background:var(--pend-bg);color:var(--pend)}.rhead.warn{background:var(--bad-bg);color:var(--bad)}
+.rsub{font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:1rem 0 .3rem}
+.rnext{margin:.2rem 0 .6rem;padding-left:1.1rem;font-size:.92rem}.rnext li{margin:.25rem 0}

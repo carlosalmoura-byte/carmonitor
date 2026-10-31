@@ -47,6 +47,22 @@ e escreva no `--note` "filtro do app indisponível — critérios padrão" e pas
 Confira também os anúncios que **já estão** em `data/anuncios.json` contra o filtro atual. O app reclassifica
 sozinho (descarta o que não atende), então não apague nada; mas não traga anúncios novos fora do filtro.
 
+### Ao começar a pesquisar (avise o app)
+
+Assim que decidir que vai pesquisar, antes de abrir o WebMotors:
+
+```bash
+node tools/start-research.mjs pedido      # ou: agendada
+git add data/status.json && git commit -m "Pesquisa iniciada" && git pull --rebase origin main && git push origin main
+```
+
+O app mostra "Pesquisando agora". O `merge-feed` limpa essa marca ao publicar.
+
+### Pedido perto da pesquisa agendada
+
+Se a verificação de pedidos cair entre 5:30 e 5:59 ou entre 12:30 e 12:59 (horário de Brasília), **não pesquise**:
+a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
+
 ## 2. Regras (obrigatórias)
 
 - Os Termos de Uso da Webmotors proíbem raspagem automatizada. A pesquisa acontece **somente quando há pedido ou no horário agendado pelo usuário (6h e 13h)** e
