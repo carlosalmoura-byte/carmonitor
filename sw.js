@@ -1,5 +1,5 @@
 // Service worker: guarda o app no aparelho para abrir sem internet. Não intercepta chamadas externas.
-const VERSION = "carmonitor-v13";
+const VERSION = "carmonitor-v14";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "manifest.webmanifest",
   "core/catalog.js", "core/classify.js", "core/score.js", "core/dedup.js", "core/distance.js", "core/engine.js", "core/equipment.js",
   "core/parsing.js", "core/specs.js", "core/store.js", "core/textnorm.js",
@@ -16,12 +16,12 @@ self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== self.location.origin) return;
   // rede primeiro (sempre a versão mais nova do app e da pesquisa); cache só quando estiver sem internet
-  e.respondWith(fetch(e.request).then((res) => {
+  e.respondWith(fetch(e.request, { cache: "no-cache" }).then((res) => { // sempre revalida (evita misturar versões)
     if (res.ok && e.request.mode !== "navigate" && !url.pathname.includes("/data/")) {
       const copy = res.clone(); caches.open(VERSION).then((c) => c.put(e.request, copy));
     }
     return res;
-  }).catch(() => caches.match(e.request).then((hit) => hit || (e.request.mode === "navigate" ? caches.match("index.html") : Response.error()))));
+  }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || (e.request.mode === "navigate" ? caches.match("index.html") : Response.error()))));
 });
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
