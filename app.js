@@ -15,7 +15,10 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const brl = (v) => v == null ? "—" : "R$ " + Math.round(v).toLocaleString("pt-BR");
 const num = (v, suf = "") => v == null ? "—" : Math.round(v).toLocaleString("pt-BR") + suf;
-const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descartado" };
+const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descartado", atende: "Atende ✓" };
+/** Aba/rótulo exibidos: "aprovado" só quando VOCÊ aprovou; atender a tudo = "atende" (aguarda sua decisão, fica em Pendentes). */
+const shown = (l) => l.status === "descartado" ? "descartado" : l.user_approve ? "aprovado" : l.status === "aprovado" ? "atende" : "pendente";
+const tabOf = (l) => ({ atende: "pendente" })[shown(l)] || shown(l);
 const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
 const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
 const SELLER = { particular: "Particular", loja: "Loja", concessionaria: "Concessionária" };
@@ -194,11 +197,11 @@ function renderCards() {
   const q = $("#q").value.trim().toLowerCase();
   let items = S.listings.filter((l) => !l.archived);
   const counts = { aprovado: 0, pendente: 0, descartado: 0 };
-  items.forEach((l) => counts[l.status]++);
+  items.forEach((l) => counts[tabOf(l)]++);
   $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
   $("#c-descartado").textContent = counts.descartado;
   $("#c-fav").textContent = items.filter((l) => l.favorite).length;
-  items = ui.status === "favoritos" ? items.filter((l) => l.favorite) : items.filter((l) => l.status === ui.status);
+  items = ui.status === "favoritos" ? items.filter((l) => l.favorite) : items.filter((l) => tabOf(l) === ui.status);
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
   const keyf = {
     price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
@@ -244,7 +247,7 @@ function renderCards() {
     const cmpOn = ui.compare.has(l.id);
     const isNew = ui.since && l.first_seen && new Date(l.first_seen) > new Date(ui.since);
     return `<article class="card st-${l.status}" data-card="${l.id}">
-      <div class="cardTop"><span>${isNew ? `<span class="newTag">NOVO</span> ` : ""}<span class="badge ${l.status}">${STATUS[l.status]}</span>
+      <div class="cardTop"><span>${isNew ? `<span class="newTag">NOVO</span> ` : ""}<span class="badge ${shown(l)}">${STATUS[shown(l)]}</span>
         <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="${sc.total == null ? "Sem nota (descartado)" : `Nota ${sc.total} de 100`}. Toque para detalhes">🎯 ${sc.total ?? "—"}</button></span><span class="topIcons">
         <label class="cmpFlag ${cmpOn ? "on" : ""}" title="Marcar para comparar"><input type="checkbox" data-cmpflag="${l.id}" ${cmpOn ? "checked" : ""}> ⇆</label>
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
@@ -262,8 +265,7 @@ function renderCards() {
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
         ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
-          : l.status === "pendente" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>`
-          : l.status === "aprovado" ? `<button class="danger wide" data-discard="${l.id}">✕ Descartar</button>` : ""}
+          : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
       </div></article>`;
   }).join("");
@@ -325,7 +327,7 @@ function undiscard(id) {
 function approve(id) {
   const l = byId(id); if (!l) return;
   const pend = (l.reasons || []).filter((r) => r.level === "pending").map((r) => "• " + r.msg).join("\n");
-  if (!confirm(`Aprovar este anúncio mesmo com itens pendentes?\n\n${pend || "(sem pendências)"}\n\nUse quando você mesmo já conferiu esses itens.`)) return;
+  if (pend && !confirm(`Aprovar este anúncio mesmo com itens pendentes?\n\n${pend}\n\nUse quando você mesmo já conferiu esses itens.`)) return;
   act(null, async () => { l.user_approve = { at: new Date().toISOString() }; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l);
     toast("Aprovado. Está na aba Aprovados.", () => act(null, async () => { delete l.user_approve; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Aprovação desfeita."); })); });
 }
@@ -530,8 +532,9 @@ function decisionBox(d) {
     const fails = (d.reasons || []).filter((r) => r.level === "fail").map((r) => `<li>✕ ${esc(r.msg)}</li>`).join("");
     return `<div class="decide bad"><b>Por que foi descartado</b><ul>${fails}</ul>${undo ? `<div class="cardActions">${undo}</div>` : ""}</div>`;
   }
-  if (d.status === "aprovado") return `<div class="decide ok"><b>✓ Atende a todos os pré-requisitos.</b>${d.user_approve ? " <span class='small'>(aprovado por você)</span>" : ""}
-    <div class="cardActions">${undo || `<button class="danger wide" id="dDiscard">✕ Descartar</button>`}</div></div>`;
+  if (d.status === "aprovado" && d.user_approve) return `<div class="decide ok"><b>✓ Aprovado por você.</b><div class="cardActions">${undo}</div></div>`;
+  if (d.status === "aprovado") return `<div class="decide ok"><b>✓ Atende a todos os pré-requisitos.</b> Falta só a sua decisão.
+    <div class="cardActions"><button class="okBtn" id="dApprove">✓ Aprovar</button><button class="danger" id="dDiscard">✕ Descartar</button></div></div>`;
   const pend = pendingOf(d);
   const rows = pend.map((r) => r.field === "seller"
     ? `<li class="pq"><span>? Tipo de vendedor <span class="small">(abra o anúncio e veja)</span></span><span class="pqBtns">${Object.entries(SELLER).map(([v, t]) => `<button data-seller="${v}">${t}</button>`).join("")}</span></li>`
@@ -544,7 +547,7 @@ function decisionBox(d) {
     <div class="cardActions"><button class="okBtn" id="dApprove">✓ Aprovar</button><button class="danger" id="dDiscard">✕ Descartar</button></div></div>`;
 }
 function renderDetail(d) {
-  $("#detailBadge").innerHTML = `<span class="badge ${d.status}">${STATUS[d.status]}</span> <button class="favBtn ${d.favorite ? "on" : ""}" id="dFav" aria-label="Favorito">${d.favorite ? "★" : "☆"}</button>`;
+  $("#detailBadge").innerHTML = `<span class="badge ${shown(d)}">${STATUS[shown(d)]}</span> <button class="favBtn ${d.favorite ? "on" : ""}" id="dFav" aria-label="Favorito">${d.favorite ? "★" : "☆"}</button>`;
   $("#dFav").onclick = () => toggleFav(d.id);
   const reasons = d.reasons.map((r) => `<li class="${r.level}">${r.level === "ok" ? "✓" : r.level === "fail" ? "✕" : r.level === "info" ? "•" : "?"} ${esc(r.msg)}</li>`).join("");
   const eq = Object.entries(ITEMS).map(([k, label]) => {
@@ -797,7 +800,7 @@ function renderCompare() {
   let html = `<table class="cmp"><tbody>
     ${row("Veículo", (x) => `<b>${esc(title(x))}</b> ${x.favorite ? "★" : ""}<br><span class="small">${esc(x.version || "")}</span>`)}
     ${row("Nota", (x) => `🎯 ${x.score?.total ?? "—"} <span class="small">${LEVEL_LABEL[x.score?.level] || ""}</span>`, (x) => x.score?.total)}
-    ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`, (x) => ({ aprovado: 2, pendente: 1, descartado: 0 })[x.status])}
+    ${row("Status", (x) => `<span class="badge ${shown(x)}">${STATUS[shown(x)]}</span>`, (x) => ({ aprovado: 3, atende: 2, pendente: 1, descartado: 0 })[shown(x)])}
     ${row("Preço", (x) => brl(x.price), (x) => x.price, "min")}
     ${row("Em relação à FIPE", (x) => { const f = fipeDiscount(x); return f == null ? (x.below_fipe_tag ? "abaixo (selo)" : "—") : `${pct(f)} ${f >= 0 ? "abaixo" : "acima"}<br><span class="small">FIPE ${brl(x.fipe)}</span>`; }, (x) => fipeDiscount(x))}
     ${row("Ano-modelo", (x) => esc(x.year_model ?? "—"), (x) => x.year_model)}
@@ -1360,7 +1363,7 @@ function handleShare() {
   if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
   ui.since = S.meta.last_visit || null; S.meta.last_visit = new Date().toISOString(); persist(); // "NOVO" = chegou desde a última abertura
-  const hasApproved = S.listings.some((l) => !l.archived && l.status === "aprovado");
+  const hasApproved = S.listings.some((l) => !l.archived && shown(l) === "aprovado");
   saveCompare(); updateTitle(); selectTab(hasApproved ? "aprovado" : "pendente"); handleShare(); renderResearchStatus();
   restoreUi(); // voltou do WebMotors (ou o Android recarregou o app): reabre onde você estava
   const h = location.hash.match(/listing=(\d+)/);

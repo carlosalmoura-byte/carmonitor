@@ -294,3 +294,6 @@ details>summary{scroll-margin-top:4rem}
 .settingsNav{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem;overflow:visible}
 .settingsNav button{padding:.45rem .2rem;font-size:.85rem;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .chkRow{display:flex;flex-wrap:wrap;gap:.1rem 1rem}.chkRow label.chk{margin:.15rem 0}
+
+.badge.atende{background:var(--ok-bg);color:var(--ok);text-transform:none}
+.card.st-aprovado:not(:has(.badge.aprovado)){border-top-color:var(--ok)}

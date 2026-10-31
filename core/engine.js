@@ -193,7 +193,7 @@ export function handleNotifications(state, l, oldStatus, events, isNew, deps) {
   const p = state.settings.notify;
   if (l.excluded && !l.favorite) return;
   if (l.status === APPROVED && oldStatus !== APPROVED && p.new_approved)
-    notify(state, "novo_aprovado", "Nova oportunidade aprovada",
+    notify(state, "novo_aprovado", "Novo carro que atende a todos os critérios",
       `${listingName(l)} — ${l.price != null ? brl(l.price) : "—"} — ${l.km ?? "—"} km — ${l.city || "?"}/${l.state || "?"}`,
       `aprovado:${l.id}:${l.price}`, l.id, deps);
   const fd = l.price && l.fipe ? ((l.fipe - l.price) / l.fipe) * 100 : null;
