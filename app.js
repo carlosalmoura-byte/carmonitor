@@ -365,7 +365,28 @@ document.addEventListener("click", (e) => {
   const url = a.getAttribute("href"); if (!url || url === "#") return;
   openExternal(url);
 });
+// guarda onde você estava (aba, anúncio aberto, rolagem) para voltar ao mesmo ponto depois de ir ao WebMotors
+const UI_KEY = "uiState";
+function saveUi() {
+  try {
+    const view = $(".view.active")?.id?.replace("view-", "") || "listings";
+    localStorage.setItem(UI_KEY, JSON.stringify({ t: Date.now(), view, status: ui.status, openId: ui.openId,
+      y: window.scrollY, dy: $("#detailSheet").scrollTop }));
+  } catch { /* ok */ }
+}
+function restoreUi() {
+  let st = null; try { st = JSON.parse(localStorage.getItem(UI_KEY) || "null"); } catch { /* ok */ }
+  if (!st || Date.now() - st.t > 60 * 60000) return false; // só se foi há menos de 1 h
+  if (st.view && st.view !== "listings") showView(st.view);
+  if (st.status) selectTab(st.status);
+  setTimeout(() => window.scrollTo(0, st.y || 0), 50);
+  if (st.openId && byId(st.openId)) { openDetail(st.openId); setTimeout(() => { $("#detailSheet").scrollTop = st.dy || 0; }, 80); }
+  return true;
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveUi(); });
+window.addEventListener("pagehide", saveUi);
 function openExternal(url) {
+  saveUi();
   const w = window.open(url, "_blank");
   if (w) { try { w.opener = null; } catch { /* ok */ } } else location.href = url; // bloqueado: abre na mesma janela
 }
@@ -1299,6 +1320,7 @@ function handleShare() {
   ui.since = S.meta.last_visit || null; S.meta.last_visit = new Date().toISOString(); persist(); // "NOVO" = chegou desde a última abertura
   const hasApproved = S.listings.some((l) => !l.archived && l.status === "aprovado");
   saveCompare(); updateTitle(); selectTab(hasApproved ? "aprovado" : "pendente"); handleShare(); renderResearchStatus();
+  restoreUi(); // voltou do WebMotors (ou o Android recarregou o app): reabre onde você estava
   const h = location.hash.match(/listing=(\d+)/);
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();
