@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.webmotors.com.br)",
+      "WebFetch(domain:webmotors.com.br)",
+      "WebFetch(domain:garagem360.com.br)",
+      "WebFetch(domain:www.comprecar.com.br)",
+      "WebFetch(domain:cdn.group.renault.com)",
+      "WebFetch(domain:www.hyundai.com.br)",
+      "WebFetch(domain:hyundai.com.br)",
+      "WebFetch(domain:carroscomcamanzi.com.br)",
+      "WebFetch(domain:www.fichacompleta.com.br)",
+      "WebFetch(domain:veiculos.fipe.org.br)"
+    ]
+  }
+}
