@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T18:04:13.925Z",
+ "updated_at": "2026-10-31T20:57:52.979Z",
  "origem": "app CarMonitor",
  "criteria": {
   "min_price": null,
@@ -50,6 +50,12 @@
   {
    "make": "HYUNDAI",
    "model": "hb20s",
+   "version_includes": null,
+   "version_excludes": null
+  },
+  {
+   "make": "PEUGEOT",
+   "model": "208",
    "version_includes": null,
    "version_excludes": null
   }
