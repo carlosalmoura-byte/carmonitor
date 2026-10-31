@@ -26,7 +26,7 @@
     <div class="statusTabs" id="statusTabs">
       <button data-status="aprovado" class="active">Aprovados <span id="c-aprovado">0</span></button>
       <button data-status="pendente">Pendentes <span id="c-pendente">0</span></button>
-      <button data-status="favoritos">★ Favoritos <span id="c-fav">0</span></button>
+      <button data-status="favoritos">★ Favoritos<span id="c-fav">0</span></button>
       <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
     </div>
     <div class="searchRow tabSearch" id="tabSearch">
@@ -81,7 +81,7 @@
   <section id="view-settings" class="view">
     <div class="settingsNav" id="settingsNav">
       <button data-sub="criteria" class="active">Critérios</button>
-      <button data-sub="exclusions">Modelos ignorados</button>
+      <button data-sub="exclusions">Ignorados</button>
       <button data-sub="contact">Contato</button>
       <button data-sub="data">Avançado</button>
     </div>
@@ -226,9 +226,9 @@
 <span id="fab" hidden></span>
 <div class="cmpBar" id="cmpBar" hidden><span id="cmpBarText"></span><button class="ghost" id="cmpBarClear">Limpar</button><button class="primary" id="cmpBarGo">⇆ Comparar</button></div>
 
+<span id="cmpCount" hidden></span>
 <nav class="bottomNav" id="nav">
   <button data-view="listings" class="active"><span class="ic">▤</span>Anúncios</button>
-  <span id="cmpCount" hidden></span>
   <button data-view="alerts"><span class="ic">🔔</span>Alertas <span class="pill warn" id="unread">0</span></button>
   <button data-view="settings"><span class="ic">⚙</span>Ajustes</button>
 </nav>
@@ -270,6 +270,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=24"></script>
+<script type="module" src="app.js?v=26"></script>
 </body>
 </html>
