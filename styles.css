@@ -284,7 +284,9 @@ fieldset.scope legend{font-size:.8rem;color:var(--muted);padding:0 .3rem}
 .statusTabs,.settingsNav{scrollbar-width:none;-ms-overflow-style:none}
 .statusTabs::-webkit-scrollbar,.settingsNav::-webkit-scrollbar{display:none}
 .statusTabs{justify-content:space-between}
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
+html{overflow-anchor:none}
+details>summary{scroll-margin-top:4rem}
 /* 4 abas cabem na tela: rótulo em cima, contagem embaixo */
 .statusTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:.2rem;margin:0 0 .7rem;padding:0;overflow:visible}
 .statusTabs button{display:flex;flex-direction:column;align-items:center;gap:0;padding:.35rem .1rem;font-size:.84rem;white-space:nowrap;min-width:0}
