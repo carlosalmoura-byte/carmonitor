@@ -73,6 +73,11 @@ a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
 - Só marque `available: false` quando a página do anúncio indicar claramente que foi vendido/removido. Se a página
   não puder ser aberta, **não** marque nada (deixe como estava).
 - Limite: cerca de 40 páginas de anúncio por pedido.
+- **Tipo de vendedor:** no WebMotors, pessoa física aparece com um só nome (ex.: "Maximiliano") e sem o link
+  "Ver todos os carros deste vendedor" (/loja/); escreva `Vendedor: <nome> (Pessoa Física)`. Loja/concessionária tem
+  esse link; escreva `Vendedor: <nome> (Loja)`. Se `seller_types` não incluir "particular" e você **não conseguiu abrir**
+  a página do anúncio (só o cartão da listagem), **não inclua** o anúncio: sem a página não dá para saber o vendedor.
+- **FIPE:** prefira sempre o valor da página do anúncio; a Tabela Fipe da versão/ano é só o plano B.
 
 ## 3. Onde procurar (cobertura ampla)
 

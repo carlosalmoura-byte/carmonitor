@@ -1,58 +1,233 @@
 [
  {
-  "id": "vw-polo-highline-2023", "make": "volkswagen", "model": "polo",
-  "version_includes": ["highline"], "version_excludes": [], "year_from": 2023, "year_to": 2023,
+  "id": "vw-polo-highline-2023",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "highline"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
   "items": {
-   "inducao": { "state": "confirmado", "quote": "Carregamento de celular por indução" }
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregamento de celular por indução"
+   }
   },
-  "tech": { "body": "Hatch compacto", "engine": "1.0 TSI 170 (3 cil.)", "power_e": 116, "torque_g": 16.8, "torque_e": 16.8,
-   "gearbox": "Automático, 6 marchas", "city_g": 12.3, "road_g": 14.6, "city_e": 8.5, "road_e": 10.4,
-   "source": { "title": "Garagem360 — VW Polo Highline 2023/2024", "quality": "secundária", "url": "https://garagem360.com.br/?p=214852" } },
-  "source": { "title": "Polo 2023 — versões e equipamentos (concessionária) + Garagem360 Polo Highline 2023/2024", "quality": "concessionária",
-   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/09/Polo-2023-versoes-e-equipamentos.pdf" },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.0 TSI 170 (3 cil.)",
+   "power_e": 116,
+   "torque_g": 16.8,
+   "torque_e": 16.8,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 12.3,
+   "road_g": 14.6,
+   "city_e": 8.5,
+   "road_e": 10.4,
+   "source": {
+    "title": "Garagem360 — VW Polo Highline 2023/2024",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=214852"
+   }
+  },
+  "source": {
+   "title": "Polo 2023 — versões e equipamentos (concessionária) + Garagem360 Polo Highline 2023/2024",
+   "quality": "concessionária",
+   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/09/Polo-2023-versoes-e-equipamentos.pdf"
+  },
   "note": "Android Auto sem fio não comprovado para esta versão/ano (fontes citam só 'App-Connect'). Sem frenagem autônoma: a fonte cita apenas 'Alerta de frenagem de emergência'."
  },
  {
-  "id": "vw-virtus-highline-2023", "make": "volkswagen", "model": "virtus",
-  "version_includes": ["highline"], "version_excludes": [], "year_from": 2023, "year_to": 2023,
+  "id": "vw-virtus-highline-2023",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "highline"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
   "items": {
-   "inducao": { "state": "confirmado", "quote": "De série em todas as versões, o sedã ganhou carregador de celular por indução" },
-   "adas": { "state": "confirmado", "names": ["Frenagem autônoma de emergência (AEB)", "Controle adaptativo de velocidade (ACC)"],
-     "quote": "[AEB e ACC] são funções de série em todas as versões com câmbio automático" }
+   "inducao": {
+    "state": "confirmado",
+    "quote": "De série em todas as versões, o sedã ganhou carregador de celular por indução"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Controle adaptativo de velocidade (ACC)"
+    ],
+    "quote": "[AEB e ACC] são funções de série em todas as versões com câmbio automático"
+   }
   },
-  "tech": { "body": "Sedã compacto", "engine": "1.0 TSI 200 (3 cil.)", "power_g": 116, "power_e": 128, "torque_g": 20.4, "torque_e": 20.4,
-   "gearbox": "Automático, 6 marchas", "trunk_l": 521,
-   "source": { "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos", "quality": "secundária", "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos" } },
-  "source": { "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos", "quality": "secundária",
-   "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos" },
+  "tech": {
+   "body": "Sedã compacto",
+   "engine": "1.0 TSI 200 (3 cil.)",
+   "power_g": 116,
+   "power_e": 128,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "Automático, 6 marchas",
+   "trunk_l": 521,
+   "source": {
+    "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos",
+    "quality": "secundária",
+    "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
+   }
+  },
+  "source": {
+   "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos",
+   "quality": "secundária",
+   "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
+  },
   "note": "Android Auto sem fio não comprovado para esta versão/ano (fonte cita só 'VW Play')."
  },
  {
-  "id": "renault-kardian-techno-2025", "make": "renault", "model": "kardian",
-  "version_includes": ["techno"], "version_excludes": [], "year_from": 2025, "year_to": 2025,
+  "id": "renault-kardian-techno-2025",
+  "make": "renault",
+  "model": "kardian",
+  "version_includes": [
+   "techno"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
   "items": {
-   "inducao": { "state": "ausente", "quote": "carregador de smartphone por indução - - S (só na Première Edition)" },
-   "android_auto_sem_fio": { "state": "confirmado", "quote": "multimídia flutuante Display Link de 8” com Android Auto® e Apple CarPlay® sem fio" },
-   "adas": { "state": "confirmado", "names": ["Frenagem automática de emergência (AEBS)"], "quote": "frenagem automática de emergência (AEBS) - S S" }
+   "inducao": {
+    "state": "ausente",
+    "quote": "carregador de smartphone por indução - - S (só na Première Edition)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "multimídia flutuante Display Link de 8” com Android Auto® e Apple CarPlay® sem fio"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem automática de emergência (AEBS)"
+    ],
+    "quote": "frenagem automática de emergência (AEBS) - S S"
+   }
   },
-  "tech": { "body": "SUV compacto", "engine": "1.0 turbo TCe (3 cil.)", "power_g": 120, "power_e": 125, "torque_g": 20.4, "torque_e": 22.4,
-   "gearbox": "Automático EDC dupla embreagem, 6 marchas", "city_g": 13.1, "road_g": 13.9, "city_e": 9, "road_e": 9.7, "trunk_l": 410,
-   "source": { "title": "Garagem360 — Renault Kardian Techno 2025", "quality": "secundária", "url": "https://garagem360.com.br/renault-kardian-techno-2025/" } },
-  "source": { "title": "Catálogo oficial Renault Kardian", "quality": "oficial",
-   "url": "https://cdn.group.renault.com/ren/br/renault-new-cars/editorial/2025/catalogo/junho/RMA-001825H-AJ-CATALOGO-KARDIAN.pdf.asset.pdf/c6545f3254.pdf" }
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo TCe (3 cil.)",
+   "power_g": 120,
+   "power_e": 125,
+   "torque_g": 20.4,
+   "torque_e": 22.4,
+   "gearbox": "Automático EDC dupla embreagem, 6 marchas",
+   "city_g": 13.1,
+   "road_g": 13.9,
+   "city_e": 9,
+   "road_e": 9.7,
+   "trunk_l": 410,
+   "source": {
+    "title": "Garagem360 — Renault Kardian Techno 2025",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/renault-kardian-techno-2025/"
+   }
+  },
+  "source": {
+   "title": "Catálogo oficial Renault Kardian",
+   "quality": "oficial",
+   "url": "https://cdn.group.renault.com/ren/br/renault-new-cars/editorial/2025/catalogo/junho/RMA-001825H-AJ-CATALOGO-KARDIAN.pdf.asset.pdf/c6545f3254.pdf"
+  }
  },
  {
-  "id": "hyundai-hb20s-platinum-plus-2024", "make": "hyundai", "model": "hb20s",
-  "version_includes": ["platinum plus"], "version_excludes": [], "year_from": 2024, "year_to": 2024,
+  "id": "hyundai-hb20s-platinum-plus-2024",
+  "make": "hyundai",
+  "model": "hb20s",
+  "version_includes": [
+   "platinum plus"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
   "items": {
-   "inducao": { "state": "confirmado", "quote": "Carregador de celular por indução" },
-   "adas": { "state": "confirmado", "names": ["Frenagem automática de emergência", "Alerta de ponto cego", "Assistente de permanência na faixa"],
-     "quote": "Frenagem automática de emergência … Alerta de ponto cego … Assistente de permanência na faixa" }
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregador de celular por indução"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem automática de emergência",
+     "Alerta de ponto cego",
+     "Assistente de permanência na faixa"
+    ],
+    "quote": "Frenagem automática de emergência … Alerta de ponto cego … Assistente de permanência na faixa"
+   }
   },
-  "tech": { "body": "Sedã compacto", "engine": "1.0 turbo TGDI (3 cil.)", "power_g": 120, "power_e": 120, "torque_g": 17.5, "torque_e": 17.5,
-   "gearbox": "Automático, 6 marchas", "trunk_l": 475,
-   "source": { "title": "WebMotors — Hyundai HB20S 2024 (versões e ficha técnica)", "quality": "secundária", "url": "https://www.webmotors.com.br/hyundai/hb20s/2024" } },
-  "source": { "title": "WebMotors — Hyundai HB20S 2024 (versões e ficha técnica)", "quality": "secundária", "url": "https://www.webmotors.com.br/hyundai/hb20s/2024" },
+  "tech": {
+   "body": "Sedã compacto",
+   "engine": "1.0 turbo TGDI (3 cil.)",
+   "power_g": 120,
+   "power_e": 120,
+   "torque_g": 17.5,
+   "torque_e": 17.5,
+   "gearbox": "Automático, 6 marchas",
+   "trunk_l": 475,
+   "source": {
+    "title": "WebMotors — Hyundai HB20S 2024 (versões e ficha técnica)",
+    "quality": "secundária",
+    "url": "https://www.webmotors.com.br/hyundai/hb20s/2024"
+   }
+  },
+  "source": {
+   "title": "WebMotors — Hyundai HB20S 2024 (versões e ficha técnica)",
+   "quality": "secundária",
+   "url": "https://www.webmotors.com.br/hyundai/hb20s/2024"
+  },
   "note": "Android Auto sem fio não comprovado para o HB20S 2024 (a página cita só 'Apple CarPlay + Google Android Auto'; a confirmação encontrada é do HB20 hatch)."
+ },
+ {
+  "id": "fiat-pulse-impetus-2023",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "impetus"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "a partir da versão Audace … carregador de smartphone por indução (Impetus é a versão acima da Audace)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "apple car play e android auto wireless (itens de série de todas as versões, linha 2023)"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 12,
+   "road_g": 14.6,
+   "city_e": 8.5,
+   "road_e": 10.2,
+   "trunk_l": 370,
+   "source": {
+    "title": "Delta Fiat — Fiat Pulse 2023: preço, consumo, itens e ficha técnica",
+    "quality": "concessionária",
+    "url": "https://blog.deltafiat.com.br/fiat-pulse-2023/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse 2023 (linha 2023) + Delta Fiat (concessionária) — Pulse 2023",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/fiat-pulse-2023/"
+  },
+  "note": "ADAS (frenagem autônoma) não comprovado para o ano-modelo 2023 nestas fontes."
  }
 ]
