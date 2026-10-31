@@ -871,7 +871,10 @@ $("#ghForm").addEventListener("submit", (e) => {
       const r = await fetch(`https://api.github.com/repos/${REPO}`, { headers: { Authorization: `Bearer ${t}`, Accept: "application/vnd.github+json" } });
       if (!r.ok) throw new Error(`Token recusado pelo GitHub (${r.status}). Confira se ele dá acesso ao repositório.`);
     }
-    S.settings.github_token = t; toast(t ? "Token salvo neste aparelho. Pedidos agora vão direto." : "Token removido.");
+    S.settings.github_token = t;
+    if (!t) return toast("Token removido.");
+    await ensureFilterPublished();
+    toast(S.meta.filter_error ? `Token salvo, mas o filtro não foi enviado: ${S.meta.filter_error}.` : "Token salvo e filtro enviado. A pesquisa vai usar o seu filtro.");
   });
 });
 $("#contactForm").addEventListener("submit", (e) => {
