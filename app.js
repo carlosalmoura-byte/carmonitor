@@ -66,6 +66,8 @@ const byId = (id) => S.listings.find((l) => l.id === id);
 
 async function systemNotify(n) {
   if (!S?.settings.notify.system || !("Notification" in window) || Notification.permission !== "granted") return;
+  await new Promise((r) => setTimeout(r, 20000)); // espera a distância/classificação assentar
+  if (!alertRelevant(n)) return; // não avisa sobre anúncio que saiu dos seus critérios
   try {
     const reg = await navigator.serviceWorker?.getRegistration();
     const opts = { body: n.message, icon: "icons/icon-192.png", tag: n.dedupe, data: { listing: n.listing_id } };
@@ -203,7 +205,7 @@ function renderCards() {
   const dupCount = (l) => l.duplicate_group ? S.listings.filter((o) => !o.archived && o.duplicate_group === l.duplicate_group).length - 1 : 0;
   items = items.filter((l) => !l.duplicate_group || best.get(l.duplicate_group) === l);
   const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
-  $("#unread").textContent = S.notifications.filter((n) => !n.read).length;
+  $("#unread").textContent = S.notifications.filter((n) => !n.read && alertRelevant(n)).length;
   const el = $("#cards");
   if (!items.length) {
     el.innerHTML = `<div class="empty">${S.listings.length ? "Nada neste filtro." :
@@ -736,13 +738,21 @@ function renderCompare() {
 }
 
 // ---------------------------------------------------------------- alertas
+/** Alerta só vale se o anúncio ainda se enquadra nos seus critérios (não descartado). Favoritos sempre contam. */
+function alertRelevant(n) {
+  if (!n.listing_id) return true;
+  const l = byId(n.listing_id);
+  if (!l || l.archived) return false;
+  return l.status !== "descartado" || l.favorite || n.kind === "favorito_indisponivel";
+}
 function renderAlerts() {
-  const items = S.notifications;
+  const items = S.notifications.filter(alertRelevant), hidden = S.notifications.length - items.length;
   $("#alertsList").innerHTML = items.length ? items.map((n) => `
     <div class="alert ${n.read ? "read" : "unread"}"><span class="dot"></span><div>
       <div><b>${esc(n.title)}</b> <span class="small">${esc(E.fmtDate(n.at))}</span></div><pre>${esc(n.message)}</pre>
       ${n.listing_id && byId(n.listing_id) ? `<a href="#" data-open="${n.listing_id}">abrir anúncio</a>` : ""}</div></div>`).join("")
-    : `<div class="empty">Nenhum alerta ainda.</div>`;
+    : `<div class="empty">Nenhum alerta${hidden ? " de anúncios dentro dos seus critérios" : " ainda"}.</div>`;
+  if (hidden) $("#alertsList").insertAdjacentHTML("beforeend", `<p class="small" style="margin-top:.6rem">${hidden} alerta(s) de anúncios que não se enquadram mais nos seus critérios (descartados ou removidos) estão ocultos.</p>`);
   $$("[data-open]", $("#alertsList")).forEach((a) => a.onclick = (e) => { e.preventDefault(); openDetail(+a.dataset.open); });
 }
 $("#markRead").onclick = () => act(null, async () => { S.notifications.forEach((n) => n.read = true); renderAlerts(); renderCards(); });
