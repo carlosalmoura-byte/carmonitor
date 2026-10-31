@@ -630,7 +630,6 @@ $("#criteriaForm").ref_city.addEventListener("change", (e) => {
 });
 let critSnapshot = null;
 $("#criteriaForm").addEventListener("submit", (e) => {
-  critSnapshot ??= { ...S.settings.criteria };
   e.preventDefault(); const f = e.target, n = (k) => f.elements[k].value === "" ? null : Number(f.elements[k].value);
   if (n("year_min") && n("year_max") && n("year_min") > n("year_max")) return toast("Ano mínimo maior que o máximo.");
   act($("button[type=submit]", f), async () => {
@@ -651,12 +650,8 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")
       l.distance = { km: null, status: "nao_verificada", precision: null, note: "Aguardando cálculo da rota a partir da nova cidade." };
     E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast("Critérios salvos e anúncios reclassificados.");
-    const before = JSON.stringify(critSnapshot);
     critSnapshot = { ...S.settings.criteria };
-    if (JSON.stringify(critSnapshot) !== before) {
-      if (S.settings.github_token) await sendResearchRequest("filtros");
-      else if (confirm("Filtros alterados. Pedir uma nova pesquisa com eles agora?\n(Abre o GitHub com o pedido pronto; toque em “Submit new issue”.)")) await sendResearchRequest("filtros");
-    }
+    await filterChanged();
     if (refChanged) fillDistancesBg();
   });
 });
@@ -688,7 +683,7 @@ $("#exclSuggest").addEventListener("click", (e) => {
   const reason = prompt(`Ignorar ${rule.label.toLowerCase()}?\n${affected} anúncio(s) irão para Descartados.\n\nMotivo (opcional):`, "");
   if (reason === null) return; // cancelou
   rule.reason = reason.trim();
-  act(null, async () => { S.exclusions.push(rule); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast(`Ignorado: ${affected} anúncio(s) descartados.`); });
+  act(null, async () => { S.exclusions.push(rule); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast(`Ignorado: ${affected} anúncio(s) descartados.`); filterChanged(); });
 });
 
 const cap = (s) => String(s || "").split(/(\s+|-)/).map((w) => /\d/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join("");
@@ -718,10 +713,10 @@ $("#exclForm").addEventListener("submit", (e) => {
     : { make, model: modelName, version_includes: ver };
   rule.label = `${cap(make)} ${entry ? entry[0] : cap(modelName)}${ver ? " — " + ver : ""}`.toUpperCase();
   rule.reason = f.reason.value.trim();
-  act(null, async () => { S.exclusions.push(rule); f.reset(); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Modelo ignorado."); });
+  act(null, async () => { S.exclusions.push(rule); f.reset(); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Modelo ignorado."); filterChanged(); });
 });
 $("#exclList").addEventListener("click", (e) => { const b = e.target.closest("[data-delexcl]"); if (!b) return;
-  act(null, async () => { S.exclusions.splice(+b.dataset.delexcl, 1); E.reclassifyAll(S, deps); renderSettings(); renderCards(); }); });
+  act(null, async () => { S.exclusions.splice(+b.dataset.delexcl, 1); E.reclassifyAll(S, deps); renderSettings(); renderCards(); filterChanged(); }); });
 $("#specList").addEventListener("click", (e) => {
   const t = e.target.closest("[data-togglespec]"), d = e.target.closest("[data-delspec]");
   if (t) act(null, async () => { const id = t.dataset.togglespec; S.disabled_specs = S.disabled_specs.includes(id) ? S.disabled_specs.filter((x) => x !== id) : [...S.disabled_specs, id];
@@ -834,18 +829,21 @@ const REPO = (() => {
   const h = location.hostname, seg = location.pathname.split("/").filter(Boolean)[0];
   return h.endsWith(".github.io") && seg ? `${h.split(".")[0]}/${seg}` : "carlosalmoura-byte/carmonitor";
 })();
-function researchRequest(reason = "manual") {
+/** Filtro atual do app (critérios + modelos ignorados) — é o que a pesquisa deve usar. */
+function filterPayload() {
   const c = S.settings.criteria;
+  return {
+    criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
+      transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km,
+      adas_required: !!c.adas_required },
+    exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
+  };
+}
+function researchRequest(reason = "manual") {
   const active = S.listings.filter((l) => !l.archived);
   const fav = active.filter((l) => l.favorite).map((l) => l.url);
   const others = active.filter((l) => !l.favorite && l.available !== false).map((l) => l.url).slice(0, 25);
-  const payload = {
-    reason,
-    criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
-      transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km },
-    exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
-    favorites: fav, urls: others,
-  };
+  const payload = { reason, ...filterPayload(), favorites: fav, urls: others };
   const when = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
   const why = reason === "filtros" ? "filtros alterados" : "pedido manual";
   return { title: `Atualizar pesquisa — ${when} (${why})`,
@@ -870,6 +868,56 @@ async function sendResearchRequest(reason = "manual") {
   openExternal(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`);
   return false;
 }
+/** Publica o filtro do app em data/filtro.json no repositório (a pesquisa lê esse arquivo antes de rodar).
+ *  Retorna "igual" | "publicado"; lança erro com a causa se não conseguir. */
+const b64 = (str) => btoa(unescape(encodeURIComponent(str)));
+const unb64 = (str) => decodeURIComponent(escape(atob(str.replace(/\s/g, ""))));
+async function publishFilter() {
+  const token = S.settings.github_token;
+  if (!token) throw new Error("sem token do GitHub (Ajustes → Dados e rotas)");
+  const api = `https://api.github.com/repos/${REPO}/contents/data/filtro.json`;
+  const h = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
+  const cur = filterPayload();
+  let sha = null;
+  const g = await fetch(`${api}?ref=main`, { headers: h, cache: "no-store" });
+  if (g.ok) {
+    const j = await g.json(); sha = j.sha;
+    try {
+      const pub = JSON.parse(unb64(j.content));
+      if (JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions }) === JSON.stringify(cur)) {
+        S.meta.filter_updated_at = pub.updated_at; S.meta.filter_error = null; return "igual";
+      }
+    } catch { /* arquivo inválido: regrava */ }
+  } else if (g.status !== 404) throw new Error(g.status === 401 ? "token inválido ou expirado" : `GitHub respondeu ${g.status} ao ler o filtro`);
+  const updated_at = new Date().toISOString();
+  const doc = { updated_at, origem: "app CarMonitor", ...cur };
+  const r = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Filtro do app atualizado (${updated_at})`, content: b64(JSON.stringify(doc, null, 1) + "\n"), branch: "main", ...(sha ? { sha } : {}) }) });
+  if (!r.ok) throw new Error(r.status === 403 || r.status === 404
+    ? "o token não tem permissão para gravar arquivos (dê “Contents: Read and write” ao token no GitHub)"
+    : r.status === 401 ? "token inválido ou expirado" : `GitHub respondeu ${r.status} ao gravar o filtro`);
+  S.meta.filter_updated_at = updated_at; S.meta.filter_error = null; return "publicado";
+}
+/** Filtro mudou no app: publica para a pesquisa usar e pede nova pesquisa. Sem token/permissão, cai no pedido por issue. */
+async function filterChanged() {
+  try {
+    const r = await publishFilter();
+    if (r === "publicado") { S.meta.research_requested_at = new Date().toISOString(); toast("Filtro enviado. A pesquisa com ele roda em até ~1 h."); }
+  } catch (e) {
+    S.meta.filter_error = e.message;
+    if (confirm(`Não consegui enviar o filtro sozinho (${e.message}).\nAbrir o GitHub com o pedido de pesquisa pronto?`)) await sendResearchRequest("filtros");
+  }
+  persist(); renderResearchStatus();
+}
+/** Ao abrir o app: garante que o filtro publicado é o mesmo do aparelho. */
+async function ensureFilterPublished() {
+  if (!S.settings.github_token) { S.meta.filter_error = "sem token do GitHub"; renderResearchStatus(); return; }
+  try {
+    const r = await publishFilter();
+    if (r === "publicado") S.meta.research_requested_at = new Date().toISOString();
+  } catch (e) { S.meta.filter_error = e.message; }
+  persist(); renderResearchStatus();
+}
 $("#researchBtn").onclick = () => {
   if (!S.settings.github_token && !confirm("Vou abrir o GitHub com o pedido pronto. Toque em “Submit new issue” para enviar.\n(Para enviar sem esse passo, configure o token em Ajustes → Dados e rotas.)")) return;
   sendResearchRequest("manual");
@@ -885,6 +933,10 @@ function renderResearchStatus() {
   if (req && (!done || new Date(req) > new Date(done))) t = `Pedido enviado em ${E.fmtDate(req)} · aguardando (até ~1 h). Puxe a lista para baixo para conferir.`;
   else if (done) t = `Última pesquisa: ${E.fmtDate(done)}${lastStatus && lastStatus.processed_at === done ? ` · ${lastStatus.novos} novo(s), ${lastStatus.atualizados} atualizado(s)` : ""}. Automáticas às 6h e 13h.`;
   else t = "Nenhuma pesquisa ainda.";
+  const fu = S.meta.filter_updated_at, used = lastStatus?.filter_used_at;
+  if (S.meta.filter_error) t += ` ⚠ Filtro do app não enviado: ${S.meta.filter_error}.`;
+  else if (fu && used && used === fu) t += " ✓ Feita com o seu filtro atual.";
+  else if (fu && lastStatus && used !== fu) t += " ⚠ A última pesquisa não usou o seu filtro atual; a próxima vai usar.";
   $("#researchStatus").textContent = t;
 }
 
@@ -943,7 +995,7 @@ function handleShare() {
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
-  syncResearch(false).then(() => routine(false)).then(() => fillDistancesBg()).catch((e) => console.warn(e));
+  syncResearch(false).then(() => ensureFilterPublished()).then(() => routine(false)).then(() => fillDistancesBg()).catch((e) => console.warn(e));
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") syncResearch(false).then(() => routine(false)).catch(() => {});
   });

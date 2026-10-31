@@ -38,7 +38,8 @@ feed.nota = "Transcrição dos dados exibidos nas páginas do WebMotors no momen
 fs.writeFileSync(feedPath, JSON.stringify(feed, null, 1));
 const status = fs.existsSync(statusPath) ? JSON.parse(fs.readFileSync(statusPath, "utf8")) : {};
 const issues = String(arg("--issue") || "").split(",").map(Number).filter(Boolean); // ex.: --issue 7,6
-Object.assign(status, { processed_at: now, novos, atualizados, sairam_do_ar: fora, note: arg("--note") || null,
+const filtro = fs.existsSync("data/filtro.json") ? JSON.parse(fs.readFileSync("data/filtro.json", "utf8")) : null;
+Object.assign(status, { filter_used_at: rest.includes("--sem-filtro") ? null : filtro?.updated_at ?? null, processed_at: now, novos, atualizados, sairam_do_ar: fora, note: arg("--note") || null,
   last_issue: issues.length ? Math.max(...issues) : status.last_issue ?? null,
   processed_issues: [...new Set([...(status.processed_issues || []), ...issues])] });
 fs.writeFileSync(statusPath, JSON.stringify(status, null, 1));

@@ -5,28 +5,47 @@ O usuário pede uma nova pesquisa pelo botão **Atualizar pesquisa** do app, que
 com o título começando por `Atualizar pesquisa` e um bloco JSON com os critérios. Este documento descreve como
 atender esse pedido.
 
-## 1. Existe pedido pendente?
+## 1. Qual filtro usar e existe pedido pendente?
+
+**Regra principal: nunca pesquise sem antes ler o filtro que está no app.** O app grava o filtro atual do usuário
+(critérios + modelos ignorados) em `data/filtro.json` neste repositório sempre que é aberto ou que o filtro muda.
+Comece sempre por:
 
 ```bash
+git pull --rebase origin main          # traz o filtro mais recente gravado pelo app
+cat data/filtro.json                   # filtro a usar (campo updated_at = quando foi salvo no app)
+cat data/status.json                   # filter_used_at = filtro usado na última pesquisa
 curl -s "https://api.github.com/repos/carlosalmoura-byte/carmonitor/issues?state=open&per_page=20"
 ```
 
-Pedido pendente = issue aberta cujo título começa com `Atualizar pesquisa` e cujo número **não** está em
-`processed_issues` de `data/status.json`. Se não houver pedido pendente, **pare aqui sem fazer nada**
-(não pesquise o WebMotors sem pedido). Se houver vários, atenda só o mais recente e registre todos como processados.
+`data/filtro.json` tem `criteria` (min_price, max_price, year_min, year_max, min_km, max_km, transmissions,
+conditions, seller_types, ref_location, max_distance_km, adas_required) e `exclusions` (modelos ignorados).
+**Use exatamente esses critérios** — inclusive `seller_types`: se "particular" não estiver na lista, não traga
+anúncio de pessoa física; se o tipo de vendedor não aparecer na página, o anúncio pode entrar (o app deixa
+pendente), mas registre o nome do vendedor sempre que a página mostrar.
 
-O corpo da issue tem um bloco ```json com:
-`criteria` (min_price, max_price, year_min, year_max, min_km, max_km, transmissions, conditions, seller_types,
-ref_location, max_distance_km), `exclusions` (modelos ignorados), `urls` (anúncios que já estão no app) e
-`favorites` (links favoritos — dê prioridade a reconferi-los).
+Pedido pendente =
+- `data/filtro.json` com `updated_at` diferente de `filter_used_at` em `data/status.json` (o usuário mudou o filtro); **ou**
+- issue aberta cujo título começa com `Atualizar pesquisa` e cujo número **não** está em `processed_issues`.
+
+Sem pedido pendente: **pare aqui sem fazer nada** (fora do modo agendado). Com issue pendente, os critérios continuam
+sendo os de `data/filtro.json` se ele for mais recente que a issue; senão, os do bloco ```json da issue
+(`criteria`, `exclusions`, `urls` = anúncios já no app, `favorites` = links favoritos — reconfira-os primeiro).
+Registre todas as issues pendentes como processadas (`--issue N,M`).
 
 ### Modo agendado (6h e 13h)
 
 As execuções agendadas das 6h e 13h (horário de Brasília) pesquisam **mesmo sem pedido pendente**, a pedido do
-usuário. Critérios: use o bloco JSON da issue "Atualizar pesquisa" **mais recente** (aberta ou fechada, processada
-ou não). Se não existir nenhuma, use: preço até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; câmbio automático;
-usados/seminovos; particular, loja e concessionária; Barueri, SP, até 60 km por estrada. Registre também como
-processados os pedidos pendentes que existirem (`--issue N,M`) e use `--note "pesquisa agendada"`.
+usuário, sempre com os critérios de `data/filtro.json`. Só se esse arquivo não existir, use o bloco JSON da issue
+"Atualizar pesquisa" mais recente; e só se também não houver issue, use o padrão (até R$ 100.000; ano-modelo
+2022–2025; até 35.000 km; automático; usados/seminovos; particular, loja e concessionária; Barueri, SP, até 60 km)
+e escreva no `--note` "filtro do app indisponível — critérios padrão" e passe `--sem-filtro`. Use
+`--note "pesquisa agendada"` nos demais casos.
+
+### Antes de publicar: reaplique o filtro em tudo
+
+Confira também os anúncios que **já estão** em `data/anuncios.json` contra o filtro atual. O app reclassifica
+sozinho (descarta o que não atende), então não apague nada; mas não traga anúncios novos fora do filtro.
 
 ## 2. Regras (obrigatórias)
 
@@ -115,8 +134,9 @@ Grave um arquivo JSON (fora do repositório, ex.: no diretório temporário) com
 
 ```bash
 node tools/merge-feed.mjs /caminho/novos.json --issue <número> --note "<resumo curto>"
-git fetch origin main && git rebase origin/main
-git add data && git commit -m "Pesquisa atualizada a pedido (issue #<número>)" && git push origin main
+git add data && git commit -m "Pesquisa atualizada (issue #<número>)"
+git pull --rebase origin main && git push origin main   # o app pode ter gravado data/filtro.json no meio tempo
 ```
 
-Se houver mais de um pedido pendente, passe todos: `--issue 7,6`. O app importa o resultado sozinho na próxima abertura ou ao puxar a lista para baixo.
+Se houver mais de um pedido pendente, passe todos: `--issue 7,6`. O app importa o resultado sozinho na próxima abertura ou ao puxar a lista para baixo. O `merge-feed` grava em
+`status.json` o `filter_used_at` (o `updated_at` de `data/filtro.json`), e o app mostra se a pesquisa usou o filtro atual.
