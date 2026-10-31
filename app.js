@@ -232,6 +232,7 @@ function renderCards() {
       l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",
       ...(l.features || []).map((k) => `<span class="chip confirmado">${FEATURE_LABEL[k] || k}</span>`),
       l.whatsapp ? `<span class="chip info">aceita WhatsApp</span>` : "",
+      !l.seller_type && l.status === "pendente" ? `<span class="chip pendente">vendedor a verificar</span>` : "",
       l.auction ? `<span class="chip ausente">passou por leilão</span>` : "",
       l.armored ? `<span class="chip ausente">blindado</span>` : "",
       dupCount(l) ? `<span class="chip info">+${dupCount(l)} anúncio(s) do mesmo carro</span>` : "",
@@ -472,7 +473,9 @@ function decisionBox(d) {
   if (d.status === "aprovado") return `<div class="decide ok"><b>✓ Atende a todos os pré-requisitos.</b>${d.user_approve ? " <span class='small'>(aprovado por você)</span>" : ""}
     <div class="cardActions">${undo || `<button class="danger wide" id="dDiscard">✕ Descartar</button>`}</div></div>`;
   const pend = pendingOf(d);
-  const rows = pend.map((r) => ITEMS[r.field]
+  const rows = pend.map((r) => r.field === "seller"
+    ? `<li class="pq"><span>? Tipo de vendedor <span class="small">(abra o anúncio e veja)</span></span><span class="pqBtns">${Object.entries(SELLER).map(([v, t]) => `<button data-seller="${v}">${t}</button>`).join("")}</span></li>`
+    : ITEMS[r.field]
     ? `<li class="pq"><span>? ${esc(ITEMS[r.field])}</span><span class="pqBtns"><button class="okBtn" data-quick="${r.field}:confirmado">✓ Tem</button><button class="danger" data-quick="${r.field}:ausente">✕ Não tem</button></span></li>`
     : `<li class="pq"><span>? ${esc(r.msg)}</span></li>`).join("");
   const hasQ = pend.some((r) => QUESTIONS[r.field]);
@@ -621,6 +624,12 @@ function renderDetail(d) {
         E.setManualCheck(d, item, { state: "auto", source: "", evidence: "", detail: null }, deps); E.refresh(S, d, deps); reload(); toast("Desfeito."); }));
     });
   });
+  $$("[data-seller]", $("#detail")).forEach((b) => b.onclick = () => act(null, async () => {
+    const prev = d.seller_type;
+    await E.editFields(S, d, { seller_type: b.dataset.seller }, deps); reload();
+    toast(`Vendedor: ${SELLER[b.dataset.seller]}.${d.status === "descartado" ? " Descartado pelo seu filtro." : ""}`, () => act(null, async () => {
+      await E.editFields(S, d, { seller_type: prev ?? null }, deps); reload(); toast("Desfeito."); }));
+  }));
   const ask = $("#dAsk");
   if (ask) ask.onclick = () => { $("#dMsg").value = askMessage(d); act(null, async () => { d.contact_draft = $("#dMsg").value; });
     $("#dContact").scrollIntoView({ behavior: "smooth", block: "start" }); toast("Mensagem com as perguntas pronta. Informe o telefone e toque em WhatsApp."); };

@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-10-31T18:13:42.229Z",
- "novos": 0,
+ "processed_at": "2026-10-31T18:19:36.898Z",
+ "novos": 5,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa a pedido (filtro do app de 31/10 18:04: só loja/concessionária, sem leilão, sem blindado; Onix, HB20, HB20S e Kardian ignorados): 0 anúncios novos. Páginas de anúncio do WebMotors não abriram (permissão não respondida em execução sem usuário); como o filtro exclui pessoa física, anúncios vistos só no cartão da listagem não podem entrar, e os existentes não foram reconferidos (status mantido). Listagens lidas sem anúncio nos critérios: Barueri (geral, pág. 1), Nivus Highline, Fastback Impetus, Kicks Exclusive, City EXL, T-Cross Highline. Quase: Fastback Impetus 2022/2023 R$ 99.990 com 35.900 km (81267400). Não verificados: demais modelos.",
+ "note": "pesquisa manual (Claude, 31/10 15h20) com o filtro do app de 18:04: 5 anúncios (Pulse Audace, 208 GT, Nivus Comfortline e Polo Comfortline só pelo cartão da listagem — vendedor a verificar; Basalt Shine aberto, pessoa física). Páginas de anúncio não abriram na maioria; listas lidas: Barueri, Polo, Virtus, Nivus, Tera, Tracker, Pulse, Fastback, 208, Basalt.",
  "last_issue": null,
  "processed_issues": [],
  "filter_used_at": "2026-10-31T18:04:13.925Z"

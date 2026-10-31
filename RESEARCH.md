@@ -78,8 +78,12 @@ a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
   fora da lista ou de cor evitada.
 - **Tipo de vendedor:** no WebMotors, pessoa física aparece com um só nome (ex.: "Maximiliano") e sem o link
   "Ver todos os carros deste vendedor" (/loja/); escreva `Vendedor: <nome> (Pessoa Física)`. Loja/concessionária tem
-  esse link; escreva `Vendedor: <nome> (Loja)`. Se `seller_types` não incluir "particular" e você **não conseguiu abrir**
-  a página do anúncio (só o cartão da listagem), **não inclua** o anúncio: sem a página não dá para saber o vendedor.
+  esse link; escreva `Vendedor: <nome> (Loja)`. Se `seller_types` não incluir "particular", não traga anúncio cuja
+  página mostre pessoa física.
+- **Anúncio visto só no cartão da listagem (página não abriu):** pode entrar, desde que o cartão atenda aos critérios
+  de preço, ano, km, câmbio e região. Transcreva só o que o cartão mostra, com `Vendedor: (não verificado)` e a linha
+  `Origem: cartão da listagem (página do anúncio não abriu)`; FIPE pela Tabela Fipe da versão/ano. O app deixa o
+  anúncio pendente com "vendedor a verificar" e o usuário confirma com um toque.
 - **FIPE:** prefira sempre o valor da página do anúncio; a Tabela Fipe da versão/ano é só o plano B.
 
 ## 3. Onde procurar (cobertura ampla)

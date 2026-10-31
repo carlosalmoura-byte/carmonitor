@@ -229,5 +229,50 @@
    "url": "https://garagem360.com.br/fiat-pulse-2023/"
   },
   "note": "ADAS (frenagem autônoma) não comprovado para o ano-modelo 2023 nestas fontes."
+ },
+ {
+  "id": "fiat-pulse-audace-2024",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "audace"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregador do Celular por Indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "central multimídia de 8,4\" com Apple CarPlay e Android Auto sem fio"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 12.1,
+   "road_g": 14.4,
+   "city_e": 8.4,
+   "road_e": 10.2,
+   "source": {
+    "title": "Garagem360 — Fiat Pulse Audace 2024",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/fiat-pulse-audace-2024/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse Audace 2024: ficha técnica e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/fiat-pulse-audace-2024/"
+  },
+  "note": "Sem frenagem autônoma na Audace (só na Impetus)."
  }
 ]
