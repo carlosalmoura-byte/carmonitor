@@ -1,15 +1,12 @@
 {
- "processed_at": "2026-10-31T18:19:36.898Z",
- "novos": 5,
+ "processed_at": "2026-10-31T18:48:56.210Z",
+ "novos": 0,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa manual (Claude, 31/10 15h20) com o filtro do app de 18:04: 5 anúncios (Pulse Audace, 208 GT, Nivus Comfortline e Polo Comfortline só pelo cartão da listagem — vendedor a verificar; Basalt Shine aberto, pessoa física). Páginas de anúncio não abriram na maioria; listas lidas: Barueri, Polo, Virtus, Nivus, Tera, Tracker, Pulse, Fastback, 208, Basalt.",
- "last_issue": null,
- "processed_issues": [],
- "filter_used_at": "2026-10-31T18:04:13.925Z",
- "running": {
-  "since": "2026-10-31T18:42:43.746Z",
-  "kind": "pedido",
-  "filter_at": "2026-10-31T18:04:13.925Z"
- }
+ "note": "pedido: aviso 'Problema no anúncio' #1 (Nivus Comfortline 80926451, não abre). A página do anúncio também não abriu nesta verificação e o anúncio não apareceu na 1ª página da listagem nacional do Nivus Comfortline 2024+ (1.301 resultados) — sem confirmação de venda, mantido como estava (vendedor a verificar). Nenhum anúncio novo dentro do filtro nessa listagem.",
+ "last_issue": 1,
+ "processed_issues": [
+  1
+ ],
+ "filter_used_at": "2026-10-31T18:04:13.925Z"
 }
