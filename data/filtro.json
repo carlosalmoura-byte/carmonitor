@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T20:57:52.979Z",
+ "updated_at": "2026-10-31T21:01:58.875Z",
  "origem": "app CarMonitor",
  "criteria": {
   "min_price": null,
@@ -9,7 +9,8 @@
   "min_km": null,
   "max_km": 35000,
   "transmissions": [
-   "automatico"
+   "automatico",
+   "automatizado"
   ],
   "conditions": [
    "usado",
