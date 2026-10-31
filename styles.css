@@ -254,3 +254,22 @@ details.sugg>summary{cursor:pointer}
 .fipeLine.none .fipeTag{background:var(--surface2);color:var(--muted)}
 
 .scoreBtn.nd{background:var(--surface2);color:var(--muted)}
+
+/* revisão de UX */
+.addBtn{margin-left:auto;font-size:.85rem;padding:.3rem .6rem}
+.card{cursor:pointer}
+.newTag{background:var(--accent);color:var(--accent-ink);font-size:.7rem;font-weight:800;padding:.12rem .45rem;border-radius:6px;letter-spacing:.04em}
+.toast{display:flex;align-items:center;gap:.8rem}
+.toastBtn{background:none;border:0;color:var(--accent);font-weight:700;padding:.2rem .3rem;font:inherit;font-weight:700}
+.decide{border-radius:10px;padding:.7rem .8rem;margin:.6rem 0;font-size:.92rem}
+.decide ul{margin:.4rem 0 .5rem;padding-left:0;list-style:none}.decide li{margin:.3rem 0}
+.decide.ok{background:var(--ok-bg)}.decide.bad{background:var(--bad-bg)}.decide.pend{background:var(--pend-bg)}
+.decide .cardActions{margin-top:.5rem}
+.pq{display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pqBtns{display:flex;gap:.35rem}.pqBtns button{padding:.25rem .55rem;font-size:.85rem}
+#dAsk{width:100%;margin:.2rem 0}
+fieldset.scope{border:1px solid var(--line);border-radius:10px;margin:.6rem 0;padding:.4rem .7rem}
+fieldset.scope legend{font-size:.8rem;color:var(--muted);padding:0 .3rem}
+.stickySave{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom));padding:.5rem 0;background:linear-gradient(transparent,var(--surface) 35%);z-index:5}
+#alertCfg{margin-bottom:.8rem}
+.toast.show{pointer-events:auto}

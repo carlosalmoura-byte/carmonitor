@@ -38,15 +38,18 @@ const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA se
 const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
 
 let S = null;                        // estado (persistido no IndexedDB)
-const ui = { status: "", compare: new Set(), openId: null };
+const ui = { status: "aprovado", compare: new Set(), openId: null, since: null };
 const deps = {
   distance: makeDistance(),
   onNotify: (n) => systemNotify(n),
 };
 
-function toast(msg) {
-  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 3400);
+function toast(msg, action = null, label = "Desfazer", ms = 3400) {
+  const t = $("#toast"); t.textContent = msg;
+  if (action) { const b = document.createElement("button"); b.className = "toastBtn"; b.textContent = label;
+    b.onclick = () => { t.classList.remove("show"); action(); }; t.append(b); ms = Math.max(ms, 5500); }
+  t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), ms);
 }
 let saveTimer = null;
 function persist() {
@@ -110,11 +113,11 @@ $("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[
 function showView(v) {
   $$("#nav button").forEach((x) => x.classList.toggle("active", x.dataset.view === v));
   $$(".view").forEach((x) => x.classList.toggle("active", x.id === "view-" + v));
-  $("#fab").style.display = v === "listings" ? "" : "none";
   saveCompare();
   if (v === "compare") renderCompare();
   if (v === "alerts") renderAlerts();
   if (v === "settings") renderSettings();
+  if (v === "alerts") fillNotify();
   window.scrollTo(0, 0);
 }
 $("#settingsNav").addEventListener("click", (e) => {
@@ -184,17 +187,9 @@ function renderCards() {
   const counts = { aprovado: 0, pendente: 0, descartado: 0 };
   items.forEach((l) => counts[l.status]++);
   $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
-  const live = items.filter((l) => l.status !== "descartado"); // descartados só aparecem na aba Descartados
-  $("#c-descartado").textContent = counts.descartado; $("#c-all").textContent = live.length;
-  $("#c-reconferir").textContent = live.filter(stale).length;
+  $("#c-descartado").textContent = counts.descartado;
   $("#c-fav").textContent = items.filter((l) => l.favorite).length;
-  $("#c-fipe").textContent = live.filter(isBelowFipe).length;
-  if (ui.status === "descartado") items = items.filter((l) => l.status === "descartado");
-  else if (ui.status === "favoritos") items = items.filter((l) => l.favorite);
-  else if (ui.status === "reconferir") items = live.filter(stale);
-  else if (ui.status === "fipe") items = live.filter(isBelowFipe);
-  else if (ui.status) items = live.filter((l) => l.status === ui.status);
-  else items = live;
+  items = ui.status === "favoritos" ? items.filter((l) => l.favorite) : items.filter((l) => l.status === ui.status);
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
   const keyf = {
     price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
@@ -202,12 +197,17 @@ function renderCards() {
     fipe: (l) => -(fipeDiscount(l) ?? (l.below_fipe_tag ? 0.01 : -100)),
   }[$("#sort").value];
   items.sort(keyf ? (a, b) => keyf(a) - keyf(b) : byAdherence);
+  // mesmo carro anunciado mais de uma vez: um cartão só (o de menor preço), com o número de anúncios iguais
+  const best = new Map();
+  for (const l of items) if (l.duplicate_group) { const b = best.get(l.duplicate_group); if (!b || (l.price ?? 1e12) < (b.price ?? 1e12)) best.set(l.duplicate_group, l); }
+  const dupCount = (l) => l.duplicate_group ? S.listings.filter((o) => !o.archived && o.duplicate_group === l.duplicate_group).length - 1 : 0;
+  items = items.filter((l) => !l.duplicate_group || best.get(l.duplicate_group) === l);
   const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
   $("#unread").textContent = S.notifications.filter((n) => !n.read).length;
   const el = $("#cards");
   if (!items.length) {
     el.innerHTML = `<div class="empty">${S.listings.length ? "Nada neste filtro." :
-      "Nenhum anúncio ainda.<br>No app ou site do WebMotors, abra um anúncio e use <b>Compartilhar → CarMonitor</b>, ou toque em <b>+</b>."}</div>`;
+      "Nenhum anúncio ainda. A pesquisa automática traz os anúncios por volta das 6h e das 13h."}</div>`;
     return;
   }
   el.innerHTML = items.map((l) => {
@@ -221,15 +221,16 @@ function renderCards() {
     }).join("");
     const extra = [
       l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",
-      l.duplicate_group ? `<span class="chip info">possível duplicata</span>` : "",
+      dupCount(l) ? `<span class="chip info">+${dupCount(l)} anúncio(s) do mesmo carro</span>` : "",
       l.available === false ? `<span class="chip ausente">indisponível</span>` : "",
       stale(l) ? `<span class="chip pendente">reconferir</span>` : "",
       l.unavailable_since ? `<span class="chip ausente">saiu do ar em ${esc(E.fmtDate(l.unavailable_since).slice(0, 10))}</span>` : "",
     ].join("");
     const sc = l.score || { total: 0, level: "baixa" };
     const cmpOn = ui.compare.has(l.id);
-    return `<article class="card st-${l.status}">
-      <div class="cardTop"><span><span class="rank">#${ranking.indexOf(l.id) + 1}</span> <span class="badge ${l.status}">${STATUS[l.status]}</span>
+    const isNew = ui.since && l.first_seen && new Date(l.first_seen) > new Date(ui.since);
+    return `<article class="card st-${l.status}" data-card="${l.id}">
+      <div class="cardTop"><span>${isNew ? `<span class="newTag">NOVO</span> ` : ""}<span class="badge ${l.status}">${STATUS[l.status]}</span>
         <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="${sc.total == null ? "Sem nota (descartado)" : `Nota ${sc.total} de 100`}. Toque para detalhes">🎯 ${sc.total ?? "—"}</button></span><span class="topIcons">
         <label class="cmpFlag ${cmpOn ? "on" : ""}" title="Marcar para comparar"><input type="checkbox" data-cmpflag="${l.id}" ${cmpOn ? "checked" : ""}> ⇆</label>
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
@@ -248,8 +249,7 @@ function renderCards() {
         ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
           : l.status === "pendente" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>`
           : l.status === "aprovado" ? `<button class="danger wide" data-discard="${l.id}">✕ Descartar</button>` : ""}
-        <button data-open="${l.id}">Detalhes</button>
-        <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
+        <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
       </div></article>`;
   }).join("");
 }
@@ -261,6 +261,7 @@ function whyBox(l) {
   const more = fails.length > 2 ? ` <span class="small">+${fails.length - 2} motivo(s)</span>` : "";
   return `<div class="why">✕ ${fails.slice(0, 2).map(esc).join("<br>✕ ")}${more}</div>`;
 }
+const prettyVer = (v) => cap(String(v || "").replace(/^(\d)(\d)\b/, "$1.$2").toLowerCase());
 const DISCARD_REASONS = ["Vendedor particular", "Preço alto", "Km alta", "Não gostei do modelo/versão", "Cor", "Longe demais", "Estado do carro / fotos", "Já foi vendido"];
 function openDiscard(id) {
   const l = byId(id); if (!l) return;
@@ -268,6 +269,11 @@ function openDiscard(id) {
     <p class="small">Por que descartar? (opcional)</p>
     <div class="chips">${DISCARD_REASONS.map((r) => `<button type="button" class="chipBtn" data-reason="${esc(r)}">${esc(r)}</button>`).join("")}</div>
     <form id="discardForm" data-id="${id}"><label>Motivo<input name="reason" maxlength="120" placeholder="Escolha acima ou escreva"></label>
+    <fieldset class="scope"><legend>Descartar</legend>
+      <label class="chk"><input type="radio" name="scope" value="one" checked> Só este anúncio</label>
+      ${l.model && l.version ? `<label class="chk"><input type="radio" name="scope" value="version"> Todos os ${esc(cap(l.model))} ${esc(prettyVer(l.version))} <span class="small">(ignorar a versão)</span></label>` : ""}
+      ${l.model ? `<label class="chk"><input type="radio" name="scope" value="model"> Todos os ${esc(cap(l.make || ""))} ${esc(cap(l.model))} <span class="small">(ignorar o modelo)</span></label>` : ""}
+    </fieldset>
     <div class="cardActions"><button class="danger" type="submit">✕ Descartar</button><button type="button" class="ghost" data-close>Cancelar</button></div></form>`;
   openSheet("#discardSheet"); history.pushState({ sheet: 4 }, "");
 }
@@ -278,10 +284,23 @@ $("#discardSheet").addEventListener("click", (e) => {
 });
 $("#discardSheet").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target, l = byId(+f.dataset.id); if (!l) return;
+  const scope = f.scope?.value || "one", reason = f.reason.value.trim();
   act(null, async () => {
-    l.user_discard = { reason: f.reason.value.trim(), at: new Date().toISOString() }; delete l.user_approve;
-    E.reclassify(S, l); closeSheet("#discardSheet"); renderCards(); if (ui.openId === l.id) renderDetail(l);
-    toast("Descartado. Está na aba Descartados.");
+    closeSheet("#discardSheet");
+    if (scope === "one") {
+      const prev = { d: l.user_discard, a: l.user_approve };
+      l.user_discard = { reason, at: new Date().toISOString() }; delete l.user_approve;
+      E.reclassify(S, l); renderCards(); if (ui.openId === l.id) renderDetail(l);
+      toast("Descartado.", () => act(null, async () => { l.user_discard = prev.d; if (prev.a) l.user_approve = prev.a; if (!prev.d) delete l.user_discard;
+        E.reclassify(S, l); renderCards(); if (ui.openId === l.id) renderDetail(l); toast("Descarte desfeito."); }));
+    } else {
+      const rule = { make: l.make || "", model: l.model, version_includes: scope === "version" ? l.version : "", reason,
+        label: (scope === "version" ? `${cap(l.make || "")} ${cap(l.model)} — só ${prettyVer(l.version)}` : `${cap(l.make || "")} ${cap(l.model)} (todas as versões)`).toUpperCase() };
+      const n = S.listings.filter((x) => !x.archived && findExcl([rule], x)).length;
+      S.exclusions.push(rule); E.reclassifyAll(S, deps); renderCards(); if (ui.openId === l.id) renderDetail(l); filterChanged();
+      toast(`${n} anúncio(s) descartado(s); modelo adicionado aos ignorados.`, () => act(null, async () => {
+        S.exclusions = S.exclusions.filter((r) => r !== rule); E.reclassifyAll(S, deps); renderCards(); filterChanged(); toast("Desfeito."); }));
+    }
   });
 });
 function undiscard(id) {
@@ -292,7 +311,8 @@ function approve(id) {
   const l = byId(id); if (!l) return;
   const pend = (l.reasons || []).filter((r) => r.level === "pending").map((r) => "• " + r.msg).join("\n");
   if (!confirm(`Aprovar este anúncio mesmo com itens pendentes?\n\n${pend || "(sem pendências)"}\n\nUse quando você mesmo já conferiu esses itens.`)) return;
-  act(null, async () => { l.user_approve = { at: new Date().toISOString() }; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Aprovado por você. Está na aba Aprovados."); });
+  act(null, async () => { l.user_approve = { at: new Date().toISOString() }; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l);
+    toast("Aprovado. Está na aba Aprovados.", () => act(null, async () => { delete l.user_approve; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Aprovação desfeita."); })); });
 }
 $("#cards").addEventListener("click", (e) => {
   const dc = e.target.closest("[data-discard]");
@@ -308,7 +328,9 @@ $("#cards").addEventListener("click", (e) => {
   if (ap) { approve(+ap.dataset.approve); return; }
   const sb = e.target.closest("[data-score]");
   if (sb) { openScore(+sb.dataset.score); return; }
-  const b = e.target.closest("[data-open]"); if (b) openDetail(+b.dataset.open);
+  const b = e.target.closest("[data-open]"); if (b) { openDetail(+b.dataset.open); return; }
+  if (e.target.closest("button, a, label, input, select")) return;
+  const card = e.target.closest("[data-card]"); if (card) openDetail(+card.dataset.card); // tocar no cartão abre o detalhe
 });
 function toggleFav(id) {
   const l = byId(id); if (!l) return;
@@ -352,7 +374,7 @@ function saveCompare() {
 }
 
 // ---------------------------------------------------------------- importar
-$("#fab").onclick = () => openImport();
+$("#addBtn").onclick = () => openImport();
 function openImport(url = "", text = "") {
   const f = $("#importForm"); f.url.value = url; f.text.value = text; $("#importResult").innerHTML = "";
   openSheet("#importSheet");
@@ -411,13 +433,41 @@ function openDetail(id) {
   $("#detailSheet").scrollTop = 0;
 }
 
+const QUESTIONS = {
+  inducao: "O carro tem carregador de celular por indução (sem fio)?",
+  android_auto_sem_fio: "O Android Auto conecta sem fio (sem cabo)?",
+  adas: "Tem frenagem automática de emergência ou outros assistentes de condução?",
+  distance: "Qual o endereço onde o carro está?", price: "Qual o valor final?", km: "Qual a quilometragem atual?",
+  year_model: "Qual o ano de fabricação e o ano-modelo?", transmission: "O câmbio é automático?",
+};
+const pendingOf = (d) => (d.reasons || []).filter((r) => r.level === "pending");
+function askMessage(d) {
+  const qs = pendingOf(d).map((r) => QUESTIONS[r.field]).filter(Boolean);
+  const base = E.contactMessage(S, d);
+  return qs.length ? `${base}\n\nAntes de agendar, pode me confirmar:\n${qs.map((q) => `- ${q}`).join("\n")}` : base;
+}
+/** Bloco de decisão no topo do detalhe: o que falta, por que foi descartado, e as ações. */
+function decisionBox(d) {
+  const undo = d.user_discard || d.user_approve ? `<button id="dUndo">↺ Desfazer ${d.user_approve ? "aprovação" : "descarte"}</button>` : "";
+  if (d.status === "descartado") {
+    const fails = (d.reasons || []).filter((r) => r.level === "fail").map((r) => `<li>✕ ${esc(r.msg)}</li>`).join("");
+    return `<div class="decide bad"><b>Por que foi descartado</b><ul>${fails}</ul>${undo ? `<div class="cardActions">${undo}</div>` : ""}</div>`;
+  }
+  if (d.status === "aprovado") return `<div class="decide ok"><b>✓ Atende a todos os pré-requisitos.</b>${d.user_approve ? " <span class='small'>(aprovado por você)</span>" : ""}
+    <div class="cardActions">${undo || `<button class="danger wide" id="dDiscard">✕ Descartar</button>`}</div></div>`;
+  const pend = pendingOf(d);
+  const rows = pend.map((r) => ITEMS[r.field]
+    ? `<li class="pq"><span>? ${esc(ITEMS[r.field])}</span><span class="pqBtns"><button class="okBtn" data-quick="${r.field}:confirmado">✓ Tem</button><button class="danger" data-quick="${r.field}:ausente">✕ Não tem</button></span></li>`
+    : `<li class="pq"><span>? ${esc(r.msg)}</span></li>`).join("");
+  const hasQ = pend.some((r) => QUESTIONS[r.field]);
+  return `<div class="decide pend"><b>Falta confirmar</b><ul class="pqList">${rows}</ul>
+    ${hasQ ? `<button class="wide" id="dAsk">💬 Perguntar ao vendedor</button>` : ""}
+    <div class="cardActions"><button class="okBtn" id="dApprove">✓ Aprovar</button><button class="danger" id="dDiscard">✕ Descartar</button></div></div>`;
+}
 function renderDetail(d) {
   $("#detailBadge").innerHTML = `<span class="badge ${d.status}">${STATUS[d.status]}</span> <button class="favBtn ${d.favorite ? "on" : ""}" id="dFav" aria-label="Favorito">${d.favorite ? "★" : "☆"}</button>`;
   $("#dFav").onclick = () => toggleFav(d.id);
   const reasons = d.reasons.map((r) => `<li class="${r.level}">${r.level === "ok" ? "✓" : r.level === "fail" ? "✕" : r.level === "info" ? "•" : "?"} ${esc(r.msg)}</li>`).join("");
-  const fd = fipeDiscount(d);
-  const fipeLine = d.fipe ? `<p class="${fd > 0 ? "msg ok" : "small"}">FIPE exibida no anúncio: <b>${brl(d.fipe)}</b> — preço ${fd > 0 ? `${pct(fd)} abaixo` : fd < 0 ? `${pct(fd)} acima` : "igual"} da FIPE${fd >= 5 ? " · possível oportunidade" : ""}.</p>`
-    : d.below_fipe_tag ? `<p class="msg ok">O WebMotors marcou este anúncio como <b>abaixo da FIPE</b>.</p>` : "";
   const eq = Object.entries(ITEMS).map(([k, label]) => {
     const c = d.checks[k] || { state: "pendente" };
     const how = c.method === "ficha" ? `<span class="chip ficha">pela ficha da versão</span>` : c.method === "manual" ? `<span class="chip info">validação sua</span>` : "";
@@ -449,30 +499,20 @@ function renderDetail(d) {
 
   $("#detail").innerHTML = `
     <h2 style="margin:.2rem 0 .3rem">${esc(title(d))} ${esc(d.year_model || "")}</h2>
-    <div><span class="price">${brl(d.price)}</span></div>${fipeLine}
-    <div class="small">${esc(d.version || "")}</div>
+    <div><span class="price">${brl(d.price)}</span></div>${fipeLine(d)}
+    <div class="small">${esc(d.version || "")} · ${num(d.km, " km")} · ${esc(d.city || "")} · ${esc(d.seller || "vendedor não identificado")}${d.seller_type ? ` (${SELLER[d.seller_type]})` : ""}</div>
     ${d.unavailable_since ? `<div class="msg err">Este anúncio saiu do ar em ${esc(E.fmtDate(d.unavailable_since))}. O histórico fica guardado até você excluir.</div>` : ""}
-    <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio ↗</a></p>
-    <p class="small">Cadastrado ${esc(E.fmtDate(d.first_seen))} · Última confirmação ${esc(E.fmtDate(d.last_checked))} · Última alteração ${esc(E.fmtDate(d.last_changed))}</p>
-
-    <div class="reconfirm"><b>Reconferir</b> ${stale(d) ? `<span class="chip pendente">pendente</span>` : ""}
-      <p class="small">Abra o anúncio, confira e registre. Vai para o histórico e gera alertas (ex.: queda de preço).</p>
-      <form id="reconfForm">
-        <div class="row2">
-          <label>Situação<select name="available"><option value="1">Disponível</option><option value="0">Vendido / removido</option></select></label>
-          <label>Preço atual (R$)<input type="number" inputmode="numeric" name="price" value="${esc(d.price ?? "")}"></label>
-          <label>Km atual<input type="number" inputmode="numeric" name="km" value="${esc(d.km ?? "")}"></label>
-          <label>Observação<input name="note"></label>
-        </div>
-        <button type="submit" class="primary" style="width:100%">Registrar reconferência</button>
-      </form></div>
+    ${decisionBox(d)}
+    <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio no WebMotors ↗</a></p>
 
     <h3>Nota <button class="scoreBtn ${d.score?.level || "baixa"}" id="dScore">🎯 ${d.score?.total ?? "—"} · ${LEVEL_LABEL[d.score?.level] || ""}</button></h3>
-    <h3>Critérios</h3><ul class="reasons">${reasons}</ul>
     <h3>Ficha técnica</h3>${techHtml(d)}
-    <h3>Equipamentos obrigatórios</h3>${specInfo}${eq}
+    <details class="fold"><summary>Equipamentos — fontes e validação</summary>${specInfo}${eq}</details>
+    <details class="fold"><summary>Todos os critérios</summary><ul class="reasons">${reasons}</ul></details>
 
-    <h3>Dados do anúncio</h3><div class="kv">${fields}</div>
+    <details class="fold"><summary>Dados do anúncio e ferramentas</summary>
+    <p class="small">Cadastrado ${esc(E.fmtDate(d.first_seen))} · Última confirmação ${esc(E.fmtDate(d.last_checked))} · Última alteração ${esc(E.fmtDate(d.last_changed))}</p>
+    <div class="kv">${fields}</div>
     <details><summary>Corrigir dados</summary>
       <form id="fieldsForm" class="row2" style="margin-top:.5rem">
         ${FIELD_LABELS.map(([k, label]) => k === "transmission"
@@ -501,8 +541,20 @@ function renderDetail(d) {
     <form id="textForm"><textarea name="text" rows="5" placeholder="Cole o texto do anúncio (selecionar tudo → copiar)"></textarea>
       <div class="actions"><button type="button" id="dPaste">Colar</button><button class="primary" type="submit">Analisar texto</button></div></form>
     ${texts}
+    <div class="reconfirm"><b>Reconferir</b> ${stale(d) ? `<span class="chip pendente">pendente</span>` : ""}
+      <p class="small">Abra o anúncio, confira e registre. Vai para o histórico e gera alertas (ex.: queda de preço).</p>
+      <form id="reconfForm">
+        <div class="row2">
+          <label>Situação<select name="available"><option value="1">Disponível</option><option value="0">Vendido / removido</option></select></label>
+          <label>Preço atual (R$)<input type="number" inputmode="numeric" name="price" value="${esc(d.price ?? "")}"></label>
+          <label>Km atual<input type="number" inputmode="numeric" name="km" value="${esc(d.km ?? "")}"></label>
+          <label>Observação<input name="note"></label>
+        </div>
+        <button type="submit" class="primary" style="width:100%">Registrar reconferência</button>
+      </form></div>
+    </details>
 
-    <h3>Contatar vendedor</h3>
+    <h3 id="dContact">Contatar vendedor</h3>
     <div class="reconfirm">
       <p class="small" style="margin-top:0">${esc(d.seller || "Vendedor não identificado")}${d.seller_type ? ` · ${SELLER[d.seller_type]}` : ""}.
         O WebMotors não mostra WhatsApp e só libera o telefone com login: toque em <b>Abrir anúncio</b> → <b>Ver telefone</b> e cole o número abaixo.</p>
@@ -521,7 +573,6 @@ function renderDetail(d) {
     <h3>Mais ações</h3>
     <div class="actions left">
       <button id="dCompare">⇆ Comparar</button>
-      <button id="dExclude">Ignorar este modelo</button>
       <button class="ghost" id="dArchive">${d.archived ? "Desarquivar" : "Arquivar"}</button>
       <button class="ghost danger" id="dDelete">Excluir</button>
     </div>`;
@@ -540,6 +591,21 @@ function renderDetail(d) {
     openExternal(link); reload();
   };
   $("#dScore").onclick = () => openScore(d.id);
+  $$("[data-quick]", $("#detail")).forEach((b) => b.onclick = () => {
+    const [item, state] = b.dataset.quick.split(":");
+    act(null, async () => {
+      E.setManualCheck(d, item, { state, source: "Confirmado por você", evidence: `Marcado no app em ${new Date().toLocaleDateString("pt-BR")} (vendedor, visita ou fotos)`, detail: null }, deps);
+      E.refresh(S, d, deps); reload();
+      toast(`${ITEMS[item]}: ${state === "confirmado" ? "tem" : "não tem"}.`, () => act(null, async () => {
+        E.setManualCheck(d, item, { state: "auto", source: "", evidence: "", detail: null }, deps); E.refresh(S, d, deps); reload(); toast("Desfeito."); }));
+    });
+  });
+  const ask = $("#dAsk");
+  if (ask) ask.onclick = () => { $("#dMsg").value = askMessage(d); act(null, async () => { d.contact_draft = $("#dMsg").value; });
+    $("#dContact").scrollIntoView({ behavior: "smooth", block: "start" }); toast("Mensagem com as perguntas pronta. Informe o telefone e toque em WhatsApp."); };
+  const da = $("#dApprove"); if (da) da.onclick = () => approve(d.id);
+  const dd = $("#dDiscard"); if (dd) dd.onclick = () => openDiscard(d.id);
+  const du = $("#dUndo"); if (du) du.onclick = () => undiscard(d.id);
   $("#dCompare").onclick = () => addToCompare(d.id);
   const el = $("#detail");
   $("#reconfForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button", f), async () => {
@@ -562,14 +628,6 @@ function renderDetail(d) {
   $("#dArchive").onclick = () => act(null, async () => { d.archived = !d.archived; E.recomputeDuplicates(S); reload(); });
   $("#dDelete").onclick = () => { if (confirm("Excluir este anúncio e todo o histórico?")) act(null, async () => {
     S.listings = S.listings.filter((x) => x.id !== d.id); ui.compare.delete(d.id); saveCompare(); E.recomputeDuplicates(S); closeSheet("#detailSheet"); renderCards(); }); };
-  $("#dExclude").onclick = () => {
-    if (!d.model) return toast("Informe o modelo do anúncio primeiro.");
-    const withVersion = d.version && confirm(`Ignorar só a versão “${d.version}”?\nOK = só esta versão · Cancelar = todas as versões de ${title(d)}`);
-    const reason = (prompt("Motivo (opcional):") || "").trim();
-    act(null, async () => {
-      S.exclusions.push({ make: d.make || "", model: d.model, version_includes: withVersion ? d.version : "", reason });
-      E.reclassifyAll(S, deps); toast("Modelo adicionado à lista de ignorados."); reload(); });
-  };
   const ns = $("#dNewSpec");
   if (ns) ns.onclick = (e) => { e.preventDefault(); closeSheet("#detailSheet"); showView("settings");
     $("#settingsNav [data-sub=specs]").click(); const f = $("#specForm"); $("#specDetails").open = true;
@@ -707,16 +765,19 @@ function renderSettings() {
   const cf = $("#contactForm"); cf.my_car.value = S.settings.my_car || ""; cf.template.value = S.settings.contact_template || "";
   f.adas_required.checked = !!c.adas_required;
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
-  $("#wmFilters").innerHTML = `<ul style="margin:.2rem 0 0 1rem;padding:0">
-    <li>Preço ${c.min_price != null ? `de ${brl(c.min_price)} ` : ""}${c.max_price != null ? `até ${brl(c.max_price)}` : ""} · Ano-modelo ${esc(c.year_min)} a ${esc(c.year_max)} · Km ${c.min_km != null ? `de ${num(c.min_km)} ` : ""}${c.max_km != null ? `até ${num(c.max_km)}` : ""}</li>
-    <li>Câmbio: ${esc(c.transmissions.map((t) => TR_LABEL[t] || t).join(", ") || "qualquer")} · Região: ${esc(c.ref_location)}</li>
-    <li>Os opcionais (ADAS, indução, Android Auto sem fio) são validados aqui, anúncio a anúncio.</li></ul>`;
+  fillNotify();
+  $("#specCount").textContent = `(${E.allSpecs(S).length})`;
+  renderSettingsRest();
+}
+function fillNotify() {
   const n = S.settings.notify, nf = $("#notifyForm");
   for (const k of ["new_approved", "new_pending", "price_drop", "include_discarded", "unavailable", "review_digest", "system"]) nf.elements[k].checked = !!n[k];
   fillSelect(nf.price_drop_min_pct, OPTS.price_drop_min_pct, n.price_drop_min_pct, (v) => v ? `${String(v).replace(".", ",")}%` : "qualquer");
   fillSelect(nf.price_drop_min_abs, OPTS.price_drop_min_abs, n.price_drop_min_abs, (v) => v ? brl(v) : "qualquer");
   fillSelect(nf.stale_days, OPTS.stale_days, S.settings.stale_days, (v) => v === 1 ? "1 dia" : `${v} dias`);
   fillSelect(nf.routine_hours, OPTS.routine_hours, S.settings.routine_hours, (v) => v === 1 ? "1 hora" : `${v} horas`);
+}
+function renderSettingsRest() {
   $("#ghForm").token.value = S.settings.github_token || "";
   const df = $("#distForm2"); df.provider.value = S.settings.distance.provider; df.ors_key.value = S.settings.distance.ors_key || "";
   renderIgnoreSuggestions();
@@ -944,6 +1005,7 @@ async function syncResearch(showNone = false) {
   const when = feed.generated_at ? E.fmtDate(feed.generated_at) : "—";
   if (res.novos || res.atualizados || res.indisponiveis)
     $("#routineMsg").innerHTML = `<div class="msg ok">Pesquisa do Claude (${esc(when)}): ${res.novos} novo(s), ${res.atualizados} atualizado(s)${res.indisponiveis ? `, ${res.indisponiveis} indisponível(is)` : ""}.</div>`;
+  if (res.novos || res.atualizados || res.indisponiveis) setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 6000);
   else if (showNone) toast(`Pesquisa de ${when} já importada.`);
 }
 
@@ -1085,6 +1147,8 @@ function renderResearchStatus() {
   else if (r.err) { icon = "⚠️"; cls = "warn"; text = "Seu filtro não chegou à pesquisa · toque para ver"; }
   else if (r.pending) { icon = "⏳"; cls = "pend"; const t = r.viaSched ? r.schedStart : r.check; text = `${r.filterPending ? "Filtro novo" : "Pedido recebido"}: pesquisa ${when(t)} (${inTime(t)})`; }
   else { icon = "✅"; cls = "ok"; text = `${r.done ? `Atualizada ${when(new Date(r.done))}` : "Sem pesquisa ainda"} · próxima ${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h`; }
+  const nNew = ui.since ? S.listings.filter((l) => !l.archived && l.status !== "descartado" && l.first_seen && new Date(l.first_seen) > new Date(ui.since)).length : 0;
+  if (nNew && !r.err) text = `${nNew} novo(s) · ` + text;
   $("#researchIcon").textContent = icon; $("#researchStatus").textContent = text;
   $("#researchPill").className = "researchPill " + cls;
   if ($("#researchSheet").classList.contains("open")) renderResearchSheet();
@@ -1182,7 +1246,9 @@ function handleShare() {
   for (const l of S.listings) if (!("seller" in l)) { l.seller = null; l.seller_type = null; E.reparseTexts(l); migrate = true; }
   if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
-  saveCompare(); updateTitle(); selectTab(ui.status); handleShare(); renderResearchStatus();
+  ui.since = S.meta.last_visit || null; S.meta.last_visit = new Date().toISOString(); persist(); // "NOVO" = chegou desde a última abertura
+  const hasApproved = S.listings.some((l) => !l.archived && l.status === "aprovado");
+  saveCompare(); updateTitle(); selectTab(hasApproved ? "aprovado" : "pendente"); handleShare(); renderResearchStatus();
   const h = location.hash.match(/listing=(\d+)/);
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();

@@ -14,7 +14,8 @@
 <body>
 <header class="top">
   <div class="brand"><span class="logo">◐</span> CarMonitor <small id="brandSub">seminovos</small></div>
-  <button id="routineBtn" hidden aria-hidden="true"></button><!-- compatibilidade com versão antiga em cache -->
+  <button id="routineBtn" hidden aria-hidden="true"></button>
+  <button class="ghost addBtn" id="addBtn" aria-label="Adicionar anúncio manualmente">＋ Anúncio</button>
 </header>
 
 <div id="ptr" class="ptr" aria-hidden="true"><span id="ptrText">Puxe para atualizar</span></div>
@@ -23,13 +24,10 @@
   <section id="view-listings" class="view active">
     <button class="researchPill" id="researchPill" aria-haspopup="dialog"><span id="researchIcon">⏳</span><span id="researchStatus"></span><span class="rpMore">›</span></button>
     <div class="statusTabs" id="statusTabs">
-      <button data-status="" class="active">Em análise <span id="c-all">0</span></button>
-      <button data-status="aprovado">Aprovados <span id="c-aprovado">0</span></button>
+      <button data-status="aprovado" class="active">Aprovados <span id="c-aprovado">0</span></button>
       <button data-status="pendente">Pendentes <span id="c-pendente">0</span></button>
-      <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
-      <button data-status="reconferir">A reconferir <span id="c-reconferir">0</span></button>
-      <button data-status="fipe">💰 Abaixo da FIPE <span id="c-fipe">0</span></button>
       <button data-status="favoritos">★ Favoritos <span id="c-fav">0</span></button>
+      <button data-status="descartado">Descartados <span id="c-descartado">0</span></button>
     </div>
     <div class="searchRow tabSearch" id="tabSearch">
       <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
@@ -46,7 +44,7 @@
   <section id="view-compare" class="view">
     <div class="panel">
       <div class="head"><h2>Comparação lado a lado</h2><button class="ghost" id="clearCmp">Limpar</button></div>
-      <p class="hint">Até 5 veículos. Para incluir outro, toque em <b>⇆ Comparar</b> no anúncio. <button class="ghost" onclick="document.querySelector('#nav [data-view=listings]').click()">+ Adicionar outro</button></p>
+      <p class="hint">Até 5 veículos. Para incluir outro, marque ⇆ no cartão do anúncio. <button class="ghost" onclick="document.querySelector('#nav [data-view=listings]').click()">← Voltar aos anúncios</button></p>
       <div class="tableWrap" id="compareTable"></div>
     </div>
   </section>
@@ -55,6 +53,26 @@
   <section id="view-alerts" class="view">
     <div class="panel">
       <div class="head"><h2>Alertas</h2><button class="ghost" id="markRead">Marcar como lidos</button></div>
+      <details class="fold" id="alertCfg"><summary>⚙ Configurar alertas</summary>
+      <form id="notifyForm">
+        <label class="chk"><input type="checkbox" name="new_approved"> Nova oportunidade aprovada</label>
+        <label class="chk"><input type="checkbox" name="new_pending"> Novo anúncio pendente de validação</label>
+        <label class="chk"><input type="checkbox" name="price_drop"> Redução de preço</label>
+        <div class="row2">
+          <label>Queda mínima (%)<select name="price_drop_min_pct"></select></label>
+          <label>ou mínima (R$)<select name="price_drop_min_abs"></select></label>
+        </div>
+        <label class="chk"><input type="checkbox" name="include_discarded"> Incluir quedas de preço de descartados</label>
+        <label class="chk"><input type="checkbox" name="unavailable"> Anúncio ficou indisponível</label>
+        <label class="chk"><input type="checkbox" name="review_digest"> Lembrete de anúncios a reconferir</label>
+        <label class="chk"><input type="checkbox" name="system"> Também mostrar como notificação do Android</label>
+        <div class="row2">
+          <label>Pedir reconferência após<select name="stale_days"></select></label>
+          <label>Reprocessar ao abrir a cada<select name="routine_hours"></select></label>
+        </div>
+        <button class="primary" type="submit" style="width:100%">Salvar</button>
+      </form>
+      </details>
       <div id="alertsList"></div>
     </div>
   </section>
@@ -64,10 +82,8 @@
     <div class="settingsNav" id="settingsNav">
       <button data-sub="criteria" class="active">Critérios</button>
       <button data-sub="exclusions">Modelos ignorados</button>
-      <button data-sub="specs">Fichas</button>
-      <button data-sub="notify">Alertas</button>
       <button data-sub="contact">Contato</button>
-      <button data-sub="data">Dados e rotas</button>
+      <button data-sub="data">Avançado</button>
     </div>
 
     <div class="panel subview active" id="sub-criteria">
@@ -115,12 +131,8 @@
           <label class="chk"><input type="checkbox" name="accept_specs"> Aceitar a ficha da mesma versão e ano-modelo quando o anúncio não disser</label>
           <label class="chk"><input type="checkbox" name="only_official_specs"> Só fichas de fonte oficial da montadora</label>
         </fieldset>
-        <button class="primary" type="submit" style="width:100%">Salvar e reclassificar</button>
+        <div class="stickySave"><button class="primary" type="submit" style="width:100%">Salvar filtro</button></div>
       </form>
-      <h3>Buscar no WebMotors</h3>
-      <p class="hint">Aplique estes filtros no site ou no app do WebMotors e use <b>Compartilhar → CarMonitor</b> em cada anúncio.</p>
-      <div id="wmFilters" class="small"></div>
-      <a class="btn ghost" style="width:100%;margin-top:.5rem" href="https://www.webmotors.com.br/carros-usados/sp-barueri" target="_blank" rel="noopener">Abrir WebMotors ↗</a>
     </div>
 
     <div class="panel subview" id="sub-exclusions">
@@ -146,11 +158,34 @@
       </details>
     </div>
 
-    <div class="panel subview" id="sub-specs">
-      <h2>Fichas por versão</h2>
+    <div class="panel subview" id="sub-contact">
+      <h2>Mensagem padrão para o vendedor</h2>
+      <form id="contactForm">
+        <label>Meu carro (para avaliação na troca)<input name="my_car"></label>
+        <label>Mensagem<textarea name="template" rows="8"></textarea></label>
+        <p class="hint">Campos que o app preenche sozinho: {carro} {ano} {preco} {km} {link} {meu_carro}. Em cada anúncio você ainda pode editar antes de enviar.</p>
+        <div class="actions"><button type="button" class="ghost" id="contactReset">Restaurar padrão</button><button class="primary" type="submit">Salvar</button></div>
+      </form>
+    </div>
+
+    <div class="panel subview" id="sub-data">
+      <h2>Pesquisa automática</h2>
+      <p class="hint">A pesquisa roda sozinha por volta das 6h e das 13h. Quando você muda o filtro, o app envia o filtro e uma pesquisa extra roda na hora seguinte.
+        O token do GitHub (com permissão <b>Contents</b> e <b>Issues: Read and write</b> no repositório carmonitor) é o que permite esse envio automático.</p>
+      <form id="ghForm">
+        <label>Token do GitHub<input name="token" type="password" autocomplete="off" placeholder="github_pat_… — fica salvo só neste aparelho"></label>
+        <button class="primary" type="submit">Salvar token</button>
+      </form>
+      <h2 style="margin-top:1.2rem">Seus dados</h2>
+      <p class="hint" id="storageInfo">Tudo fica salvo só neste aparelho. Faça cópias de segurança de vez em quando.</p>
+      <div class="actions left">
+        <button id="exportBtn">Exportar cópia (.json)</button>
+        <label class="btn" style="margin:0;color:var(--ink)">Importar cópia<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+      </div>
+      <details class="fold"><summary>Fichas por versão <span class="small" id="specCount"></span></summary>
       <p class="hint">Valem só para a mesma marca, modelo, versão e ano-modelo. Item “opcional” nunca confirma. Toda ficha exige a fonte.</p>
       <ul class="list" id="specList"></ul>
-      <details id="specDetails"><summary>Adicionar ficha</summary>
+      <details id="specDetails"><summary class="small">Cadastrar ficha manualmente</summary>
         <form id="specForm">
           <div class="row2">
             <label>Marca<input name="make" required></label><label>Modelo<input name="model" required></label>
@@ -171,42 +206,9 @@
           <button class="primary" type="submit">Salvar ficha</button>
         </form>
       </details>
-    </div>
-
-    <div class="panel subview" id="sub-notify">
-      <h2>Alertas</h2>
-      <form id="notifyForm">
-        <label class="chk"><input type="checkbox" name="new_approved"> Nova oportunidade aprovada</label>
-        <label class="chk"><input type="checkbox" name="new_pending"> Novo anúncio pendente de validação</label>
-        <label class="chk"><input type="checkbox" name="price_drop"> Redução de preço</label>
-        <div class="row2">
-          <label>Queda mínima (%)<select name="price_drop_min_pct"></select></label>
-          <label>ou mínima (R$)<select name="price_drop_min_abs"></select></label>
-        </div>
-        <label class="chk"><input type="checkbox" name="include_discarded"> Incluir quedas de preço de descartados</label>
-        <label class="chk"><input type="checkbox" name="unavailable"> Anúncio ficou indisponível</label>
-        <label class="chk"><input type="checkbox" name="review_digest"> Lembrete de anúncios a reconferir</label>
-        <label class="chk"><input type="checkbox" name="system"> Também mostrar como notificação do Android</label>
-        <div class="row2">
-          <label>Pedir reconferência após<select name="stale_days"></select></label>
-          <label>Reprocessar ao abrir a cada<select name="routine_hours"></select></label>
-        </div>
-        <button class="primary" type="submit" style="width:100%">Salvar</button>
-      </form>
-    </div>
-
-    <div class="panel subview" id="sub-contact">
-      <h2>Mensagem padrão para o vendedor</h2>
-      <form id="contactForm">
-        <label>Meu carro (para avaliação na troca)<input name="my_car"></label>
-        <label>Mensagem<textarea name="template" rows="8"></textarea></label>
-        <p class="hint">Campos que o app preenche sozinho: {carro} {ano} {preco} {km} {link} {meu_carro}. Em cada anúncio você ainda pode editar antes de enviar.</p>
-        <div class="actions"><button type="button" class="ghost" id="contactReset">Restaurar padrão</button><button class="primary" type="submit">Salvar</button></div>
-      </form>
-    </div>
-
-    <div class="panel subview" id="sub-data">
-      <h2>Distância por estrada</h2>
+    
+      </details>
+      <details class="fold"><summary>Cálculo de distância</summary>
       <form id="distForm2">
         <label>Serviço de rotas<select name="provider">
           <option value="osrm">OSRM + OpenStreetMap (gratuito, uso leve)</option>
@@ -215,31 +217,18 @@
         <label>Chave do OpenRouteService<input name="ors_key" type="password" autocomplete="off" placeholder="fica salva só neste aparelho"></label>
         <button class="primary" type="submit">Salvar</button>
       </form>
-      <h2 style="margin-top:1.2rem">Pesquisa automática</h2>
-      <p class="hint">A pesquisa roda sozinha às 6h e às 13h. Ao salvar filtros novos, o app pede uma pesquisa extra.
-        Com um token do GitHub (opcional), esse pedido vai direto, sem abrir o GitHub.</p>
-      <form id="ghForm">
-        <label>Token do GitHub (só Issues do repositório carmonitor)<input name="token" type="password" autocomplete="off" placeholder="github_pat_… — fica salvo só neste aparelho"></label>
-        <button class="primary" type="submit">Salvar token</button>
-      </form>
-      <h2 style="margin-top:1.2rem">Seus dados</h2>
-      <p class="hint" id="storageInfo">Tudo fica salvo só neste aparelho. Faça cópias de segurança de vez em quando.</p>
-      <div class="actions left">
-        <button id="exportBtn">Exportar cópia (.json)</button>
-        <label class="btn" style="margin:0;color:var(--ink)">Importar cópia<input type="file" id="importFile" accept="application/json,.json" hidden></label>
-      </div>
-      <h3>Rotinas recentes</h3>
-      <div class="tableWrap" id="routines"></div>
+      </details>
+      <div id="routines" hidden></div>
     </div>
   </section>
 </main>
 
-<button class="fab primary" id="fab" aria-label="Adicionar anúncio">+</button>
+<span id="fab" hidden></span>
 <div class="cmpBar" id="cmpBar" hidden><span id="cmpBarText"></span><button class="ghost" id="cmpBarClear">Limpar</button><button class="primary" id="cmpBarGo">⇆ Comparar</button></div>
 
 <nav class="bottomNav" id="nav">
   <button data-view="listings" class="active"><span class="ic">▤</span>Anúncios</button>
-  <button data-view="compare"><span class="ic">⇆</span>Comparar <span class="pill" id="cmpCount">0</span></button>
+  <span id="cmpCount" hidden></span>
   <button data-view="alerts"><span class="ic">🔔</span>Alertas <span class="pill warn" id="unread">0</span></button>
   <button data-view="settings"><span class="ic">⚙</span>Ajustes</button>
 </nav>
@@ -281,6 +270,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=23"></script>
+<script type="module" src="app.js?v=24"></script>
 </body>
 </html>
