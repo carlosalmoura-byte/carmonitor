@@ -256,6 +256,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "central multimídia de 8,4\" com Apple CarPlay e Android Auto sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "a frenagem autônoma de emergência (AEB) aparece apenas na versão Impetus, não na Audace"
    }
   },
   "tech": {
@@ -281,7 +285,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/fiat-pulse-audace-2024/"
   },
-  "note": "Sem frenagem autônoma na Audace (só na Impetus)."
+  "note": "Sem ADAS na Audace 2024: a frenagem autônoma é só da Impetus."
  },
  {
   "id": "peugeot-208-gt-2025",
