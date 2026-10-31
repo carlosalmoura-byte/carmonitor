@@ -40,6 +40,10 @@ const isBelowFipe = (l) => (fipeDiscount(l) ?? 0) > 0 || (fipeDiscount(l) == nul
 const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA sem fio" };
 const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
 
+// mostra erros na tela (ajuda a diagnosticar no celular)
+window.addEventListener("error", (e) => { try { toast(`Erro no app: ${e.message}`); } catch { /* ok */ } });
+window.addEventListener("unhandledrejection", (e) => { const m = String(e.reason?.message || e.reason || "");
+  if (/fetch|network|load failed|abort/i.test(m)) return; try { toast(`Erro no app: ${m}`); } catch { /* ok */ } });
 let S = null;                        // estado (persistido no IndexedDB)
 const ui = { status: "aprovado", compare: new Set(), openId: null, since: null };
 const deps = {
@@ -569,11 +573,11 @@ function renderDetail(d) {
     <h3 id="dContact">Contatar vendedor</h3>
     <div class="reconfirm">
       <p class="small" style="margin-top:0">${esc(d.seller || "Vendedor não identificado")}${d.seller_type ? ` · ${SELLER[d.seller_type]}` : ""}.
-        O WebMotors não mostra WhatsApp e só libera o telefone com login: toque em <b>Abrir anúncio</b> → <b>Ver telefone</b> e cole o número abaixo.</p>
+        Sem o telefone, o botão abaixo <b>copia a mensagem e abre o anúncio</b>: no WebMotors toque em <b>WhatsApp</b> ou <b>Mensagem</b> e cole. Com o telefone (no anúncio: <b>Ver telefone</b>), abre direto o WhatsApp do vendedor.</p>
       <label>Telefone / WhatsApp do vendedor<input name="phone" id="dPhone" inputmode="tel" placeholder="(11) 9xxxx-xxxx" value="${esc(d.seller_phone || "")}"></label>
       <label>Mensagem (pode editar)<textarea id="dMsg" rows="7">${esc(d.contact_draft || E.contactMessage(S, d))}</textarea></label>
       <div class="actions left">
-        <button class="primary" id="dWhats">WhatsApp</button><button id="dCopyMsg">Copiar mensagem</button>
+        <button class="primary" id="dWhats">${d.seller_phone ? "Enviar pelo WhatsApp" : "Copiar mensagem e abrir anúncio"}</button><button id="dCopyMsg">Copiar mensagem</button>
         <button id="dShareMsg">Compartilhar…</button><button class="ghost" id="dResetMsg">Mensagem padrão</button>
       </div>
       <p class="small">${d.contacted_at ? `Contato registrado em ${esc(E.fmtDate(d.contacted_at))}.` : "Ao enviar pelo WhatsApp, o contato fica registrado aqui."}</p>
@@ -591,14 +595,19 @@ function renderDetail(d) {
 
   const reload = () => { renderDetail(byId(d.id) || d); renderCards(); };
   const msg = () => $("#dMsg").value.trim();
-  $("#dPhone").onchange = () => act(null, async () => { d.seller_phone = $("#dPhone").value.trim(); });
+  $("#dPhone").onchange = () => act(null, async () => { d.seller_phone = $("#dPhone").value.trim(); $("#dWhats").textContent = d.seller_phone ? "Enviar pelo WhatsApp" : "Copiar mensagem e abrir anúncio"; });
   $("#dMsg").onchange = () => act(null, async () => { d.contact_draft = $("#dMsg").value; });
   $("#dResetMsg").onclick = () => act(null, async () => { delete d.contact_draft; $("#dMsg").value = E.contactMessage(S, d); });
   $("#dCopyMsg").onclick = async () => { try { await navigator.clipboard.writeText(msg()); toast("Mensagem copiada. Cole no chat do WebMotors ou no WhatsApp."); } catch { toast("Não consegui copiar; selecione o texto e copie."); } };
   $("#dShareMsg").onclick = async () => { try { await navigator.share({ text: msg() }); } catch { /* cancelado */ } };
   $("#dWhats").onclick = () => {
     const link = E.whatsappLink($("#dPhone").value, msg());
-    if (!link) { $("#dPhone").focus(); return toast("Informe o telefone do vendedor com DDD."); }
+    if (!link) { // sem telefone: copia a mensagem e abre o anúncio para usar o WhatsApp/chat do próprio WebMotors
+      const done = () => { d.contacted_at = new Date().toISOString(); persist(); openExternal(d.url); };
+      (navigator.clipboard?.writeText(msg()) || Promise.reject()).then(() => { toast("Mensagem copiada. No anúncio, toque em WhatsApp ou Mensagem e cole."); done(); })
+        .catch(() => { toast("Não consegui copiar sozinho: use “Copiar mensagem” e depois abra o anúncio."); });
+      return;
+    }
     d.seller_phone = $("#dPhone").value.trim(); d.contacted_at = new Date().toISOString(); persist();
     openExternal(link); reload();
   };
