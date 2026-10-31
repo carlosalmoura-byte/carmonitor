@@ -20,12 +20,19 @@ const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
 const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
 const SELLER = { particular: "Particular", loja: "Loja", concessionaria: "Concessionária" };
 const pct = (v) => Math.abs(v).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
-function fipeChip(l) {
+/** Posição do preço em relação à FIPE — sempre exibida no cartão. */
+function fipeInfo(l) {
   const fd = fipeDiscount(l);
-  if (fd != null && fd > 0) return `<span class="chip confirmado" title="FIPE exibida no anúncio: ${brl(l.fipe)}">💰 ${pct(fd)} abaixo da FIPE</span>`;
-  if (fd == null && l.below_fipe_tag) return `<span class="chip confirmado" title="Selo do WebMotors">💰 abaixo da FIPE</span>`;
-  return "";
+  if (fd == null) return l.below_fipe_tag ? { cls: "below", text: "abaixo da FIPE (selo)", val: "" } : { cls: "none", text: "FIPE não informada", val: "" };
+  const val = brl(l.fipe);
+  if (Math.abs(fd) < 1) return { cls: "at", text: "no valor da FIPE", val };
+  return fd > 0 ? { cls: "below", text: `${pct(fd)} abaixo da FIPE`, val } : { cls: "above", text: `${pct(fd)} acima da FIPE`, val };
 }
+function fipeLine(l) {
+  const f = fipeInfo(l), icon = { below: "▼", above: "▲", at: "＝", none: "?" }[f.cls];
+  return `<div class="fipeLine ${f.cls}"><span class="fipeTag">${icon} ${esc(f.text)}</span>${f.val ? `<span class="small">FIPE ${f.val}${l.price && l.fipe ? ` · ${l.price < l.fipe ? "−" : "+"}${brl(Math.abs(l.price - l.fipe))}` : ""}</span>` : ""}</div>`;
+}
+function fipeChip() { return ""; } // posição na FIPE agora fica em linha própria (fipeLine)
 const isBelowFipe = (l) => (fipeDiscount(l) ?? 0) > 0 || (fipeDiscount(l) == null && !!l.below_fipe_tag);
 const SHORT = { adas: "ADAS", inducao: "Indução", android_auto_sem_fio: "AA sem fio" };
 const safeUrl = (u) => /^https?:\/\//i.test(u || "") ? u : "#";
@@ -229,6 +236,7 @@ function renderCards() {
       <h3>${esc(title(l))} ${l.year_model ? `<span class="small">${esc(l.year_fab ? l.year_fab + "/" : "")}${esc(l.year_model)}</span>` : ""}</h3>
       <div class="ver">${esc(l.version || "versão não informada")}</div>
       <div><span class="price">${brl(l.price)}</span>${delta}</div>
+      ${fipeLine(l)}
       <div class="facts">
         <div><span>Km</span> ${num(l.km)}</div><div><span>Câmbio</span> ${esc(TR[l.transmission] || "—")}</div>
         <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> <span data-dist="${l.id}">${esc(distText(l))}</span></div>
