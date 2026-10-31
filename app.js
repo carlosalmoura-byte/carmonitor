@@ -222,7 +222,9 @@ function renderCards() {
     recent: (l) => -new Date(l.first_seen).getTime(),
     fipe: (l) => -(fipeDiscount(l) ?? (l.below_fipe_tag ? 0.01 : -100)),
   }[$("#sort").value];
-  items.sort(keyf ? (a, b) => keyf(a) - keyf(b) : byAdherence);
+  // "Maior nota": só pela nota (sem nota por último); empate → atende a tudo antes de pendente
+  const byScore = (a, b) => ((b.score?.total ?? -1) - (a.score?.total ?? -1)) || byAdherence(a, b);
+  items.sort(keyf ? (a, b) => keyf(a) - keyf(b) : byScore);
   // mesmo carro anunciado mais de uma vez: um cartão só (o de menor preço), com o número de anúncios iguais
   const best = new Map();
   for (const l of items) if (l.duplicate_group) { const b = best.get(l.duplicate_group); if (!b || (l.price ?? 1e12) < (b.price ?? 1e12)) best.set(l.duplicate_group, l); }
