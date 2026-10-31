@@ -118,8 +118,33 @@ export function extractFromText(text, source = "texto_colado", p = new Parsed())
   m = text.match(/(?:^|\n)\s*(?:Vendedor|Anunciante|Loja)\s*:\s*([^\n]{2,80})/i);
   if (m && !/n[ãa]o verificado/i.test(m[1])) p.put("seller", m[1].trim(), source);
   if (UNAVAILABLE.some((r) => r.test(n))) p.put("available", false, source);
+  // campos do WebMotors (linhas rotuladas da transcrição)
+  const yesNo = (re) => { const x = text.match(re); return x ? /^\s*(sim|yes|s)\b/i.test(x[1]) ? true : /^\s*(n[ãa]o|no|n)\b/i.test(x[1]) ? false : null : null; };
+  let v = yesNo(/(?:^|\n)\s*(?:Leil[ãa]o|Passagem por leil[ãa]o)\s*:\s*([^\n]+)/i); if (v != null) p.put("auction", v, source);
+  m = text.match(/(?:^|\n)\s*(?:Blindado|Blindagem)\s*:\s*([^\n]+)/i);
+  if (m) { const t = normalize(m[1]); if (/^(sim|blindado)/.test(t)) p.put("armored", true, source); else if (/^(nao|sem)/.test(t)) p.put("armored", false, source); }
+  else if (/sem blindagem/.test(n)) p.put("armored", false, source);
+  m = text.match(/(?:^|\n)\s*Carroceria\s*:\s*([^\n]+)/i); if (m && bodyKind(m[1])) p.put("body", bodyKind(m[1]), source);
+  m = text.match(/(?:^|\n)\s*Cor\s*:\s*([^\n;]+)/i); if (m) p.put("color", m[1].trim().toLowerCase(), source);
+  m = text.match(/(?:^|\n)\s*Final (?:da|de) placa\s*:\s*(\d)/i); if (m) p.put("plate_end", +m[1], source);
+  m = text.match(/(?:^|\n)\s*Caracter[íi]sticas\s*:\s*([^\n]+)/i); if (m) p.put("features", featureKeys(m[1]), source);
+  m = text.match(/(?:^|\n)\s*WhatsApp\s*:\s*([^\n]+)/i); if (m) p.put("whatsapp", /^\s*sim/i.test(m[1]), source);
   return p;
 }
+
+/** Carroceria normalizada: hatch | sedan | suv | picape | outro. */
+export function bodyKind(s) {
+  const t = normalize(s || "");
+  if (!t.trim()) return null;
+  if (/hatch/.test(t)) return "hatch";
+  if (/seda|sedan/.test(t)) return "sedan";
+  if (/suv|utilitario esportivo|crossover/.test(t)) return "suv";
+  if (/picape|pick.?up|cabine/.test(t)) return "picape";
+  return "outro";
+}
+const FEATURE_RX = { unico_dono: /unico dono/, revisoes_concessionaria: /revis\w* (feitas? )?(na|em) concession|revisoes na concessionaria|todas as revisoes/,
+  garantia_fabrica: /garantia (de )?fabrica/, ipva_pago: /ipva pago/, licenciado: /licenciado/ };
+export function featureKeys(s) { const t = normalize(s || ""); return Object.keys(FEATURE_RX).filter((k) => FEATURE_RX[k].test(t)); }
 
 const DEALER_BRANDS = /\b(chevrolet|gm|jeep|nissan|renault|hyundai|fiat|volkswagen|vw|toyota|honda|ford|peugeot|citro[eë]n|caoa|chery|byd|gwm|kia|mitsubishi|ram|bmw|audi|mercedes|volvo|jac|land rover|porsche|suzuki|subaru|mini|dodge)\b/i;
 /** Tipo de vendedor a partir do nome: particular | concessionaria | loja (derivado, editável). */

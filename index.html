@@ -122,6 +122,30 @@
           <label class="chk"><input type="checkbox" name="seller" value="concessionaria"> Concessionária</label>
           <p class="hint" style="margin:.2rem 0">O tipo é deduzido do nome do vendedor no anúncio e pode ser corrigido em cada anúncio.</p>
         </fieldset>
+        <fieldset><legend>Carroceria</legend>
+          <div class="chkRow">
+          <label class="chk"><input type="checkbox" name="body" value="hatch"> Hatch</label>
+          <label class="chk"><input type="checkbox" name="body" value="sedan"> Sedã</label>
+          <label class="chk"><input type="checkbox" name="body" value="suv"> SUV</label>
+          <label class="chk"><input type="checkbox" name="body" value="picape"> Picape</label></div>
+          <p class="hint" style="margin:.2rem 0">Nenhuma marcada = qualquer carroceria.</p>
+        </fieldset>
+        <fieldset><legend>Histórico do carro</legend>
+          <label class="chk"><input type="checkbox" name="no_auction"> Excluir carros com passagem por leilão</label>
+          <label class="chk"><input type="checkbox" name="no_armored"> Excluir carros blindados</label>
+        </fieldset>
+        <fieldset><legend>Cores a evitar (opcional)</legend>
+          <div class="chkRow"><label class="chk"><input type="checkbox" name="avoid_color" value="preto"> Preto</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="branco"> Branco</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="prata"> Prata</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="cinza"> Cinza</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="vermelho"> Vermelho</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="azul"> Azul</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="marrom"> Marrom</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="bege"> Bege</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="verde"> Verde</label>
+          <label class="chk"><input type="checkbox" name="avoid_color" value="amarelo"> Amarelo</label></div>
+        </fieldset>
         <label>Cidade de referência<select name="ref_city"></select></label>
         <label id="refOtherWrap" hidden>Outra cidade (Cidade, UF)<input type="text" name="ref_other" placeholder="ex.: Osasco, SP"></label>
         <label>Distância máxima por estrada<select name="max_distance_km"></select></label>
@@ -270,6 +294,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=27"></script>
+<script type="module" src="app.js?v=28"></script>
 </body>
 </html>

@@ -19,6 +19,9 @@ const STATUS = { aprovado: "Aprovado", pendente: "Pendente", descartado: "Descar
 const EQ_ICON = { confirmado: "✓", pendente: "?", ausente: "✕" };
 const TR = { automatico: "Automático", automatizado: "Automatizado", manual: "Manual" };
 const SELLER = { particular: "Particular", loja: "Loja", concessionaria: "Concessionária" };
+const RODIZIO = { 1: "segunda", 2: "segunda", 3: "terça", 4: "terça", 5: "quarta", 6: "quarta", 7: "quinta", 8: "quinta", 9: "sexta", 0: "sexta" };
+const FEATURE_LABEL = { unico_dono: "único dono", revisoes_concessionaria: "revisões na concessionária", garantia_fabrica: "garantia de fábrica", ipva_pago: "IPVA pago", licenciado: "licenciado" };
+const BODY = { hatch: "Hatch", sedan: "Sedã", suv: "SUV", picape: "Picape", outro: "Outra" };
 const pct = (v) => Math.abs(v).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
 /** Posição do preço em relação à FIPE — sempre exibida no cartão. */
 function fipeInfo(l) {
@@ -223,6 +226,10 @@ function renderCards() {
     }).join("");
     const extra = [
       l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",
+      ...(l.features || []).map((k) => `<span class="chip confirmado">${FEATURE_LABEL[k] || k}</span>`),
+      l.whatsapp ? `<span class="chip info">aceita WhatsApp</span>` : "",
+      l.auction ? `<span class="chip ausente">passou por leilão</span>` : "",
+      l.armored ? `<span class="chip ausente">blindado</span>` : "",
       dupCount(l) ? `<span class="chip info">+${dupCount(l)} anúncio(s) do mesmo carro</span>` : "",
       l.available === false ? `<span class="chip ausente">indisponível</span>` : "",
       stale(l) ? `<span class="chip pendente">reconferir</span>` : "",
@@ -244,6 +251,7 @@ function renderCards() {
         <div><span>Km</span> ${num(l.km)}</div><div><span>Câmbio</span> ${esc(TR[l.transmission] || "—")}</div>
         <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> <span data-dist="${l.id}">${esc(distText(l))}</span></div>
         <div style="grid-column:1/-1"><span>Vendedor</span> ${esc(l.seller || "—")}${l.seller_type ? ` · ${SELLER[l.seller_type]}` : ""}</div>
+        ${l.plate_end != null ? `<div style="grid-column:1/-1"><span>Placa final ${l.plate_end}</span> · rodízio SP: ${RODIZIO[l.plate_end]}</div>` : ""}
       </div>
       ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
@@ -413,8 +421,10 @@ $("#importResult").addEventListener("click", (e) => {
 // ---------------------------------------------------------------- detalhe
 const FIELD_LABELS = [["make", "Marca"], ["model", "Modelo"], ["version", "Versão"], ["year_fab", "Ano fabricação"],
   ["year_model", "Ano-modelo"], ["price", "Preço"], ["km", "Quilometragem"], ["transmission", "Câmbio"],
-  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"], ["fipe", "Valor FIPE"]];
-const fmtField = (k, v) => v == null || v === "" ? "—" : k === "seller_type" ? (SELLER[v] || v) : k === "price" || k === "fipe" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
+  ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"], ["fipe", "Valor FIPE"],
+  ["body", "Carroceria"], ["color", "Cor"], ["plate_end", "Final da placa"], ["auction", "Passagem por leilão"], ["armored", "Blindado"]];
+const FIELD_EDIT = FIELD_LABELS.filter(([k]) => !["body", "color", "plate_end", "auction", "armored"].includes(k)); // estes vêm só da pesquisa
+const fmtField = (k, v) => v == null || v === "" ? "—" : k === "auction" || k === "armored" ? (v === true || v === "true" ? "sim" : "não") : k === "body" ? (BODY[v] || v) : k === "seller_type" ? (SELLER[v] || v) : k === "price" || k === "fipe" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
 
 function chart(snaps) {
   const pts = snaps.filter((s) => s.price != null);
@@ -517,7 +527,7 @@ function renderDetail(d) {
     <div class="kv">${fields}</div>
     <details><summary>Corrigir dados</summary>
       <form id="fieldsForm" class="row2" style="margin-top:.5rem">
-        ${FIELD_LABELS.map(([k, label]) => k === "transmission"
+        ${FIELD_EDIT.map(([k, label]) => k === "transmission"
           ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(TR).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
           : k === "seller_type"
           ? `<label>${label}<select name="${k}"><option value=""></option>${Object.entries(SELLER).map(([v, t]) => `<option value="${v}" ${d[k] === v ? "selected" : ""}>${t}</option>`).join("")}</select></label>`
@@ -616,7 +626,7 @@ function renderDetail(d) {
     toast(ev.length ? "Reconferido: " + ev.map((x) => L[x.type] || x.type).join(", ") : "Reconferido, sem alterações."); reload(); }); };
   $("#fieldsForm").onsubmit = (e) => {
     e.preventDefault(); const f = e.target, body = {};
-    for (const [k] of FIELD_LABELS) { const v = f.elements[k].value.trim(), cur = d[k] == null ? "" : String(d[k]); if (v !== cur) body[k] = v === "" ? null : v; }
+    for (const [k] of FIELD_EDIT) { const v = f.elements[k].value.trim(), cur = d[k] == null ? "" : String(d[k]); if (v !== cur) body[k] = v === "" ? null : v; }
     if (!Object.keys(body).length) return toast("Nenhuma alteração.");
     act($("button[type=submit]", f), async () => { await E.editFields(S, d, body, deps); toast("Dados corrigidos (marcados como informados por você)."); reload(); });
   };
@@ -772,6 +782,9 @@ function renderSettings() {
   $$("input[name=tr]", f).forEach((i) => i.checked = c.transmissions.includes(i.value));
   $$("input[name=cond]", f).forEach((i) => i.checked = c.conditions.includes(i.value));
   $$("input[name=seller]", f).forEach((i) => i.checked = (c.seller_types || []).includes(i.value));
+  $$("input[name=body]", f).forEach((i) => i.checked = (c.body_types || []).includes(i.value));
+  $$("input[name=avoid_color]", f).forEach((i) => i.checked = (c.avoid_colors || []).includes(i.value));
+  f.no_auction.checked = c.no_auction !== false; f.no_armored.checked = c.no_armored !== false;
   const cf = $("#contactForm"); cf.my_car.value = S.settings.my_car || ""; cf.template.value = S.settings.contact_template || "";
   f.adas_required.checked = !!c.adas_required;
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
@@ -829,7 +842,9 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     Object.assign(S.settings.criteria, { min_price: minP, max_price: maxP, year_min: n("year_min"), year_max: n("year_max"), min_km: minK, max_km: maxK,
       max_distance_km: n("max_distance_km"), ref_location: ref,
       transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value),
-      seller_types: $$("input[name=seller]:checked", f).map((i) => i.value) });
+      seller_types: $$("input[name=seller]:checked", f).map((i) => i.value),
+      body_types: $$("input[name=body]:checked", f).map((i) => i.value), avoid_colors: $$("input[name=avoid_color]:checked", f).map((i) => i.value),
+      no_auction: f.no_auction.checked, no_armored: f.no_armored.checked });
     if (!S.settings.criteria.seller_types.length) S.settings.criteria.seller_types = ["particular", "loja", "concessionaria"];
     S.settings.criteria.adas_required = f.adas_required.checked;
     S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
@@ -1030,7 +1045,8 @@ function filterPayload() {
   return {
     criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
       transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km,
-      adas_required: !!c.adas_required },
+      adas_required: !!c.adas_required, no_auction: c.no_auction !== false, no_armored: c.no_armored !== false,
+      body_types: c.body_types || [], avoid_colors: c.avoid_colors || [] },
     exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
   };
 }

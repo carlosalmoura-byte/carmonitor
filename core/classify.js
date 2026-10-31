@@ -11,7 +11,9 @@ export const DEFAULT_CRITERIA = {
   min_price: null, max_price: 100000, year_min: 2022, year_max: 2025, min_km: null, max_km: 35000,
   transmissions: ["automatico"], conditions: ["usado", "seminovo"], seller_types: ["particular", "loja", "concessionaria"], adas_required: false,
   ref_location: "Barueri, SP", max_distance_km: 60,
+  no_auction: true, no_armored: true, body_types: [], avoid_colors: [],
 };
+export const BODY_LABEL = { hatch: "Hatch", sedan: "Sedã", suv: "SUV", picape: "Picape", outro: "Outra" };
 
 export const brl = (v) => "R$ " + Math.round(v).toLocaleString("pt-BR");
 export const kmf = (v) => Math.round(v).toLocaleString("pt-BR") + " km";
@@ -78,6 +80,25 @@ export function classify(l, checks, criteria, exclusion = null) {
     add("pending", "distance", `Distância ${kmf(d.km)} calculada pelo centro da cidade, limítrofe ao máximo ${kmf(maxD)}; confirme o endereço.`);
   else if (maxD != null && d.km > maxD) add("fail", "distance", `Distância por estrada ${kmf(d.km)} acima de ${kmf(maxD)}.`);
   else add("ok", "distance", `Distância por estrada ${kmf(d.km)}.`);
+
+  // histórico e carroceria (dados do WebMotors; não informado não trava a aprovação, exceto carroceria quando você restringe)
+  if (c.no_auction !== false) {
+    if (l.auction === true) add("fail", "auction", "Passou por leilão.");
+    else if (l.auction === false) add("ok", "auction", "Sem passagem por leilão.");
+    else add("info", "auction", "Leilão: não informado no anúncio.");
+  }
+  if (c.no_armored !== false) {
+    if (l.armored === true) add("fail", "armored", "Carro blindado.");
+    else if (l.armored === false) add("ok", "armored", "Não blindado.");
+  }
+  const body = l.body || l.body_ficha, bt = c.body_types || [];
+  if (bt.length) {
+    if (!body) add("pending", "body", "Carroceria não identificada.");
+    else if (!bt.includes(body)) add("fail", "body", `Carroceria ${BODY_LABEL[body] || body} não aceita.`);
+    else add("ok", "body", `Carroceria ${BODY_LABEL[body]}${!l.body ? " (pela ficha)" : ""}.`);
+  }
+  const avoid = (c.avoid_colors || []).map((x) => x.toLowerCase());
+  if (avoid.length && l.color && avoid.some((x) => l.color.toLowerCase().includes(x))) add("fail", "color", `Cor ${l.color} está entre as que você evita.`);
 
   for (const [item, label] of Object.entries(ITEMS)) {
     const ch = checks[item] || {};

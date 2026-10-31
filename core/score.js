@@ -2,7 +2,8 @@
 // Pré-requisitos (preço máx., ano, km máx., câmbio, tipo, vendedor, distância, indução, Android Auto sem fio)
 // não pontuam: eles decidem a aba (aprovado / pendente / descartado). Descartado não tem nota.
 // Pendências não mudam a nota (ficam na aba Pendentes e nas etiquetas do cartão).
-// Pesos: preço x FIPE 30 · km 20 · ADAS 15 (se desejável) · ano-modelo 15 · preço 10 · consumo 5 · porta-malas 5.
+// Pesos (normalizados para 100): preço x FIPE 30 · km 20 · ADAS 15 (se desejável) · ano-modelo 15 · preço 10 ·
+// único dono 5 · revisões na concessionária 5 · garantia de fábrica 5 · consumo 5 · porta-malas 5.
 import { DISCARDED } from "./classify.js";
 
 const clamp = (v) => Math.max(0, Math.min(1, v));
@@ -26,6 +27,10 @@ export function scoreListing(l, criteria, spec = null, now = new Date()) {
   add("Ano-modelo (mais novo é melhor)", 15, age == null ? null : 1 - age / 4, age == null ? "sem ano" : age <= 0 ? "do ano" : `${age} ano(s) de uso`);
   const maxP = c.max_price ?? (l.price || 1), minP = c.min_price ?? Math.round(maxP * 0.7);
   add("Preço (mais barato é melhor)", 10, l.price == null ? null : (maxP - l.price) / Math.max(1, maxP - minP), l.price == null ? "sem preço" : null);
+  const f = l.features || [];
+  add("Único dono", 5, f.includes("unico_dono") ? 1 : 0, f.includes("unico_dono") ? "sim" : "não informado");
+  add("Revisões na concessionária", 5, f.includes("revisoes_concessionaria") ? 1 : 0, f.includes("revisoes_concessionaria") ? "sim" : "não informado");
+  add("Garantia de fábrica", 5, f.includes("garantia_fabrica") ? 1 : 0, f.includes("garantia_fabrica") ? "sim" : "não informado");
   add("Consumo na cidade (gasolina)", 5, t?.city_g ? (t.city_g - 9) / 5 : null, t?.city_g ? `${fmt1(t.city_g)} km/l` : "sem ficha técnica");
   add("Porta-malas", 5, t?.trunk_l ? (t.trunk_l - 250) / 250 : null, t?.trunk_l ? `${t.trunk_l} L` : "sem ficha técnica");
   const max = parts.reduce((a, p) => a + p.max, 0);

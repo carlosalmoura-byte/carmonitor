@@ -73,6 +73,9 @@ a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
 - Só marque `available: false` quando a página do anúncio indicar claramente que foi vendido/removido. Se a página
   não puder ser aberta, **não** marque nada (deixe como estava).
 - Limite: cerca de 40 páginas de anúncio por pedido.
+- **Leilão, blindagem, carroceria e cores:** respeite `no_auction`, `no_armored`, `body_types` (vazio = qualquer) e
+  `avoid_colors` de `data/filtro.json` — não traga anúncio que a página mostre como de leilão, blindado, de carroceria
+  fora da lista ou de cor evitada.
 - **Tipo de vendedor:** no WebMotors, pessoa física aparece com um só nome (ex.: "Maximiliano") e sem o link
   "Ver todos os carros deste vendedor" (/loja/); escreva `Vendedor: <nome> (Pessoa Física)`. Loja/concessionária tem
   esse link; escreva `Vendedor: <nome> (Loja)`. Se `seller_types` não incluir "particular" e você **não conseguiu abrir**
@@ -80,6 +83,16 @@ a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
 - **FIPE:** prefira sempre o valor da página do anúncio; a Tabela Fipe da versão/ano é só o plano B.
 
 ## 3. Onde procurar (cobertura ampla)
+
+**Primeiro, a busca filtrada do WebMotors (preferencial).** O WebMotors permite filtrar numa busca só por: cidade
+(`ref_location`) com raio de alcance, preço, ano, km, câmbio (Automática, CVT), anunciante (Loja, Concessionária —
+conforme `seller_types`), "Leilão: sem passagem por leilão" (se `no_auction`), blindagem (se `no_armored`) e opcionais.
+Procure com WebSearch a página de listagem do WebMotors para a cidade de referência (ex.: "webmotors carros usados
+Barueri SP") e abra as páginas de resultado; prefira esta lista à busca modelo a modelo, porque ela mostra todos os
+anúncios da região que passam nos filtros. Use raio de ~50 km em linha reta (≈ `max_distance_km` por estrada).
+Abra os anúncios priorizando: selo "Abaixo da Fipe", menor km, carroceria em `body_types` (se houver) e modelos que não
+estejam em `exclusions`. Se a busca filtrada não estiver acessível, use a busca por modelo abaixo.
+
 
 O WebMotors não filtra por ADAS, carregador por indução nem Android Auto sem fio. Por isso a busca é **por modelo**,
 cobrindo todos os compactos e médios que podem caber no preço — não só os que já têm ficha.
@@ -138,6 +151,13 @@ Cidade: <Cidade> - <UF>
 Vendedor: <nome do vendedor, com "(Pessoa Física)" quando a página indicar>
 FIPE: R$ <valor> (<fonte>, <mês de referência>)   ← OBRIGATÓRIO em todo anúncio apresentado
 Selo: Abaixo da Fipe   (só se a página/listagem mostrar esse selo)
+Carroceria: <Hatchback | Sedã | SUV | Picape>   (como na página)
+Cor: <cor>
+Final de placa: <dígito>
+Leilão: <Sim | Não>        (só se a página informar; "sem passagem por leilão" = Não)
+Blindado: <Sim | Não>      (só se a página informar)
+Características: <lista como na página, separada por ; — ex.: Único dono; IPVA pago; Licenciado; Todas as revisões feitas pela concessionária; Garantia de fábrica>
+WhatsApp: Sim              (só se o anúncio oferecer contato por WhatsApp)
 Itens de veículo: <lista separada por ; exatamente como na página>
 <trechos da descrição do vendedor que citem equipamentos, se houver>
 ```

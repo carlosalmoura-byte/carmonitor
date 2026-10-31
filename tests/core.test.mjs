@@ -383,3 +383,23 @@ test("FIPE: extrai do texto, não confunde com o preço e calcula o desconto", (
   const exp = scoreListing({ ...base, status: "aprovado", reasons: [], price: 88800, fipe: 85000 }, DEFAULT_CRITERIA).total;
   assert.ok(cheap > exp);
 });
+
+// ------------------------------------------------------------ leilão, blindagem, carroceria, cores e características
+test("leilão/blindagem/carroceria/cor e características", () => {
+  const ok = { ...allOk };
+  const st = (extra, crit = {}) => classify({ ...base, ...extra }, ok, { ...DEFAULT_CRITERIA, ...crit }).status;
+  assert.equal(st({ auction: true }), DISCARDED);
+  assert.equal(st({ auction: null }), APPROVED); // não informado não trava
+  assert.equal(st({ auction: true }, { no_auction: false }), APPROVED);
+  assert.equal(st({ armored: true }), DISCARDED);
+  assert.equal(st({ body: "hatch" }, { body_types: ["suv"] }), DISCARDED);
+  assert.equal(st({ body: null, body_ficha: "suv" }, { body_types: ["suv"] }), APPROVED);
+  assert.equal(st({ body: null }, { body_types: ["suv"] }), ST_PENDING);
+  assert.equal(st({ color: "prata" }, { avoid_colors: ["prata"] }), DISCARDED);
+  const p = extractFromText("Características: Único dono; Garantia de fábrica\nFinal de placa: 3\nLeilão: Não\nCarroceria: Sedã");
+  assert.deepEqual(p.fields.features, ["unico_dono", "garantia_fabrica"]); assert.equal(p.fields.plate_end, 3);
+  assert.equal(p.fields.auction, false); assert.equal(p.fields.body, "sedan");
+  const s0 = scoreListing({ ...base, status: "aprovado", reasons: [] }, DEFAULT_CRITERIA).total;
+  const s1 = scoreListing({ ...base, status: "aprovado", reasons: [], features: ["unico_dono", "revisoes_concessionaria", "garantia_fabrica"] }, DEFAULT_CRITERIA).total;
+  assert.ok(s1 > s0, `${s1} > ${s0}`);
+});
