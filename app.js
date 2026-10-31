@@ -199,15 +199,56 @@ function renderCards() {
         <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> <span data-dist="${l.id}">${esc(distText(l))}</span></div>
         <div style="grid-column:1/-1"><span>Vendedor</span> ${esc(l.seller || "—")}${l.seller_type ? ` · ${SELLER[l.seller_type]}` : ""}</div>
       </div>
+      ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
+        ${l.user_discard ? `<button data-undiscard="${l.id}">↺ Voltar p/ análise</button>` : l.status !== "descartado" ? `<button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
         <button class="${ui.compare.has(l.id) ? "primary" : ""}" data-cmpbtn="${l.id}">${ui.compare.has(l.id) ? "✓ Comparando" : "⇆ Comparar"}</button>
         <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
         <button data-open="${l.id}">Detalhes</button>
       </div></article>`;
   }).join("");
 }
+/** Motivo do descarte em destaque no cartão (os motivos de reprovação, em ordem). */
+function whyBox(l) {
+  if (l.status !== "descartado") return "";
+  const fails = (l.reasons || []).filter((r) => r.level === "fail").map((r) => r.msg);
+  if (!fails.length) return "";
+  const more = fails.length > 2 ? ` <span class="small">+${fails.length - 2} motivo(s)</span>` : "";
+  return `<div class="why">✕ ${fails.slice(0, 2).map(esc).join("<br>✕ ")}${more}</div>`;
+}
+const DISCARD_REASONS = ["Vendedor particular", "Preço alto", "Km alta", "Não gostei do modelo/versão", "Cor", "Longe demais", "Estado do carro / fotos", "Já foi vendido"];
+function openDiscard(id) {
+  const l = byId(id); if (!l) return;
+  $("#discardBody").innerHTML = `<p><b>${esc(title(l))} ${esc(l.year_model || "")}</b><br><span class="small">${esc(l.version || "")} · ${brl(l.price)}</span></p>
+    <p class="small">Por que descartar? (opcional)</p>
+    <div class="chips">${DISCARD_REASONS.map((r) => `<button type="button" class="chipBtn" data-reason="${esc(r)}">${esc(r)}</button>`).join("")}</div>
+    <form id="discardForm" data-id="${id}"><label>Motivo<input name="reason" maxlength="120" placeholder="Escolha acima ou escreva"></label>
+    <div class="cardActions"><button class="danger" type="submit">✕ Descartar</button><button type="button" class="ghost" data-close>Cancelar</button></div></form>`;
+  openSheet("#discardSheet"); history.pushState({ sheet: 4 }, "");
+}
+$("#discardSheet").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-reason]"); if (!b) return;
+  const inp = $("#discardForm").reason;
+  inp.value = inp.value && !inp.value.includes(b.dataset.reason) ? `${inp.value}; ${b.dataset.reason}` : b.dataset.reason;
+});
+$("#discardSheet").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target, l = byId(+f.dataset.id); if (!l) return;
+  act(null, async () => {
+    l.user_discard = { reason: f.reason.value.trim(), at: new Date().toISOString() };
+    E.reclassify(S, l); closeSheet("#discardSheet"); renderCards(); if (ui.openId === l.id) renderDetail(l);
+    toast("Descartado. Está na aba Descartados.");
+  });
+});
+function undiscard(id) {
+  const l = byId(id); if (!l) return;
+  act(null, async () => { delete l.user_discard; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Voltou para análise."); });
+}
 $("#cards").addEventListener("click", (e) => {
+  const dc = e.target.closest("[data-discard]");
+  if (dc) { openDiscard(+dc.dataset.discard); return; }
+  const ud = e.target.closest("[data-undiscard]");
+  if (ud) { undiscard(+ud.dataset.undiscard); return; }
   const f = e.target.closest("[data-fav]");
   if (f) { toggleFav(+f.dataset.fav); return; }
   const cb = e.target.closest("[data-cmpbtn]");

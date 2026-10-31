@@ -190,3 +190,7 @@ main{padding-bottom:88px}
 .sugg .lvl{display:block;font-size:.72rem;color:var(--muted);margin-top:.35rem}
 .researchBar{display:flex;gap:.6rem;align-items:center;justify-content:space-between;margin-bottom:.6rem}.researchBar .small{flex:1}
 .reasons .info{color:var(--muted)}
+
+.why{background:var(--bad-bg);border-left:3px solid var(--bad);color:var(--bad);padding:.4rem .55rem;border-radius:6px;font-size:.86rem;margin:.35rem 0;line-height:1.35}
+.chipBtn{font-size:.82rem;padding:.3rem .6rem;border-radius:999px}
+#discardSheet .chips{margin:.3rem 0 .8rem}

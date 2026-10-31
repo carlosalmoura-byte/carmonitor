@@ -27,6 +27,7 @@ export function classify(l, checks, criteria, exclusion = null) {
   const reasons = [];
   const add = (level, field, msg) => reasons.push({ level, field, msg });
 
+  if (l.user_discard) add("fail", "user", `Descartado por você${l.user_discard.reason ? `: ${l.user_discard.reason}` : "."}`);
   if (exclusion) add("fail", "excluded", `Modelo desconsiderado por você (${exclusion.label}).`);
   if (l.available === false) add("fail", "available", "Anúncio indisponível (removido ou vendido).");
 
