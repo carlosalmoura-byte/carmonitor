@@ -130,7 +130,12 @@ Para cada modelo:
 3. Abra os anúncios candidatos (priorize os mais baratos e com menos km) e os links de `favorites`/`urls`.
 4. Distribua o limite de ~40 anúncios entre os modelos; anote no `--note` os modelos que ficaram sem verificação.
 
-### Fichas de versões novas (data/fichas.json)
+### Fichas de versões novas (data/fichas.json) — obrigatório em toda pesquisa
+
+Antes de publicar, rode `node tools/missing-fichas.mjs` (depois do merge-feed). Ele lista cada versão/ano-modelo do
+feed sem ficha. **Pesquise a ficha de cada linha listada** (catálogo da montadora; senão imprensa especializada) e
+acrescente em `data/fichas.json`. Se não achar fonte para algum item, deixe o item fora (fica pendente no app) e cite a
+versão/ano no `--note` como "ficha sem fonte para <item>".
 
 O app só confirma itens que o anúncio não cita quando existe ficha da **mesma versão e ano-modelo**. Ao encontrar
 versão/ano sem ficha (veja `core/specs.js` e `data/fichas.json`), pesquise a ficha (de preferência catálogo da

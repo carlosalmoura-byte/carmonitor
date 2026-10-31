@@ -13,6 +13,10 @@
    "inducao": {
     "state": "confirmado",
     "quote": "Carregamento de celular por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
    }
   },
   "tech": {
@@ -37,7 +41,7 @@
    "quality": "concessionária",
    "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/09/Polo-2023-versoes-e-equipamentos.pdf"
   },
-  "note": "Android Auto sem fio não comprovado para esta versão/ano (fontes citam só 'App-Connect'). Sem frenagem autônoma: a fonte cita apenas 'Alerta de frenagem de emergência'."
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022)."
  },
  {
   "id": "vw-virtus-highline-2023",
@@ -61,6 +65,10 @@
      "Controle adaptativo de velocidade (ACC)"
     ],
     "quote": "[AEB e ACC] são funções de série em todas as versões com câmbio automático"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
    }
   },
   "tech": {
@@ -83,7 +91,7 @@
    "quality": "secundária",
    "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
   },
-  "note": "Android Auto sem fio não comprovado para esta versão/ano (fonte cita só 'VW Play')."
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022)."
  },
  {
   "id": "renault-kardian-techno-2025",
@@ -274,5 +282,193 @@
    "url": "https://garagem360.com.br/fiat-pulse-audace-2024/"
   },
   "note": "Sem frenagem autônoma na Audace (só na Impetus)."
+ },
+ {
+  "id": "peugeot-208-gt-2025",
+  "make": "peugeot",
+  "model": "208",
+  "version_includes": [
+   "gt"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "carregamento do smartphone por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "espelhamento sem fio para Apple CarPlay e Google Android Auto"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem de emergência automática",
+     "Alerta de colisão"
+    ],
+    "quote": "Peugeot Driver Assist … frenagem de emergência automática … alertas de colisão"
+   }
+  },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 12.5,
+   "road_g": 14.1,
+   "city_e": 8.8,
+   "road_e": 10,
+   "tank_l": 47,
+   "trunk_l": 265,
+   "source": {
+    "title": "Garagem360 — Peugeot 208 GT 2025",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/peugeot-208-gt-2025/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Peugeot 208 GT 2025: versão topo de linha com motor turbo",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/peugeot-208-gt-2025/"
+  }
+ },
+ {
+  "id": "vw-polo-comfortline-2024",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregamento de celular por indução (lista da Comfortline 2024)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
+   }
+  },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.0 TSI 170 (3 cil.)",
+   "power_g": 109,
+   "power_e": 116,
+   "torque_g": 16.8,
+   "torque_e": 16.8,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 12.5,
+   "road_g": 15.1,
+   "city_e": 8.5,
+   "road_e": 10.6,
+   "trunk_l": 300,
+   "source": {
+    "title": "Garagem360 — VW Polo Comfortline 2024",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=214846"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Polo Comfortline 2024 + Revista Carro (VW Play sem fio, abr/2022)",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=214846"
+  },
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022); a ficha da versão cita só “App-Connect”. Sem frenagem autônoma."
+ },
+ {
+  "id": "vw-nivus-comfortline-2024",
+  "make": "volkswagen",
+  "model": "nivus",
+  "version_includes": [
+   "comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregamento de celular por indução (itens de série do Nivus 2024)"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Controle adaptativo de velocidade (ACC)"
+    ],
+    "quote": "“ACC” – Controle adaptativo de velocidade e distância; “AEB” – Frenagem autônoma de emergência (itens de série do Nivus 2024)"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 TSI 200 (3 cil.)",
+   "power_g": 116,
+   "power_e": 128,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 12.1,
+   "road_g": 14.2,
+   "city_e": 8.3,
+   "road_e": 10.1,
+   "trunk_l": 415,
+   "source": {
+    "title": "Garagem360 — VW Nivus Comfortline 2024",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/vw-nivus-comfortline-2024/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Nivus Comfortline 2024",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/vw-nivus-comfortline-2024/"
+  },
+  "note": "Android Auto sem fio não comprovado: a Comfortline 2024 usa o rádio “Composition Touch” com App-Connect, não o VW Play."
+ },
+ {
+  "id": "citroen-basalt-shine-2025",
+  "make": "citroen",
+  "model": "basalt",
+  "version_includes": [
+   "shine"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "espelhamento sem fio para Android Auto e Apple CarPlay"
+   }
+  },
+  "tech": {
+   "body": "SUV cupê compacto",
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_e": 130,
+   "torque_e": 20.4,
+   "gearbox": "CVT",
+   "city_g": 12.1,
+   "city_e": 8.4,
+   "trunk_l": 490,
+   "source": {
+    "title": "WebMotors — Citroën Basalt 2025",
+    "quality": "secundária",
+    "url": "https://www.webmotors.com.br/citroen/basalt/2025"
+   }
+  },
+  "source": {
+   "title": "CNN Brasil — Citroën Basalt Shine (mai/2025)",
+   "quality": "secundária",
+   "url": "https://www.cnnbrasil.com.br/auto/citroen-basalt-shine-conheca-a-versao-que-tem-mimos-de-carros-mais-caros/"
+  },
+  "note": "Carregador por indução não comprovado nas fontes; sem frenagem autônoma."
  }
 ]
