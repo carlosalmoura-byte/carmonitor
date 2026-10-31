@@ -252,3 +252,5 @@ details.sugg>summary{cursor:pointer}
 .fipeLine.above .fipeTag{background:var(--bad-bg);color:var(--bad)}
 .fipeLine.at .fipeTag{background:var(--info-bg);color:var(--info)}
 .fipeLine.none .fipeTag{background:var(--surface2);color:var(--muted)}
+
+.scoreBtn.nd{background:var(--surface2);color:var(--muted)}

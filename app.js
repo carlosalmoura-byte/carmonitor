@@ -230,7 +230,7 @@ function renderCards() {
     const cmpOn = ui.compare.has(l.id);
     return `<article class="card st-${l.status}">
       <div class="cardTop"><span><span class="rank">#${ranking.indexOf(l.id) + 1}</span> <span class="badge ${l.status}">${STATUS[l.status]}</span>
-        <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="Aderência ${sc.total} de 100. Toque para detalhes">🎯 ${sc.total}</button></span><span class="topIcons">
+        <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="${sc.total == null ? "Sem nota (descartado)" : `Nota ${sc.total} de 100`}. Toque para detalhes">🎯 ${sc.total ?? "—"}</button></span><span class="topIcons">
         <label class="cmpFlag ${cmpOn ? "on" : ""}" title="Marcar para comparar"><input type="checkbox" data-cmpflag="${l.id}" ${cmpOn ? "checked" : ""}> ⇆</label>
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
       <h3>${esc(title(l))} ${l.year_model ? `<span class="small">${esc(l.year_fab ? l.year_fab + "/" : "")}${esc(l.year_model)}</span>` : ""}</h3>
@@ -467,7 +467,7 @@ function renderDetail(d) {
         <button type="submit" class="primary" style="width:100%">Registrar reconferência</button>
       </form></div>
 
-    <h3>Aderência <button class="scoreBtn ${d.score?.level || "baixa"}" id="dScore">🎯 ${d.score?.total ?? "—"} · ${LEVEL_LABEL[d.score?.level] || ""}</button></h3>
+    <h3>Nota <button class="scoreBtn ${d.score?.level || "baixa"}" id="dScore">🎯 ${d.score?.total ?? "—"} · ${LEVEL_LABEL[d.score?.level] || ""}</button></h3>
     <h3>Critérios</h3><ul class="reasons">${reasons}</ul>
     <h3>Ficha técnica</h3>${techHtml(d)}
     <h3>Equipamentos obrigatórios</h3>${specInfo}${eq}
@@ -587,16 +587,18 @@ function renderDetail(d) {
 const specOf = (l) => l.spec_id ? E.allSpecs(S).find((s) => s.id === l.spec_id) : null;
 function scoreHtml(l) {
   const sc = l.score; if (!sc) return "<p class='small'>Sem nota ainda.</p>";
-  const pos = S.listings.filter((x) => !x.archived).sort(byAdherence).findIndex((x) => x.id === l.id) + 1;
-  const groups = ["Obrigatórios", "Preferências"].map((g) => {
-    const ps = sc.parts.filter((p) => p.group === g), got = ps.reduce((a, p) => a + p.pts, 0), max = ps.reduce((a, p) => a + p.max, 0);
-    return `<h3>${g} — ${got.toFixed(0)} de ${max.toFixed(0)}</h3><ul class="list">${ps.map((p) => `<li><span>${esc(p.label)}<span class="small">${esc(p.note || "")}</span>
-      <div class="bar" style="width:9rem"><i style="width:${(100 * p.pts / p.max).toFixed(0)}%"></i></div></span><b>${p.pts.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}/${p.max.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}</b></li>`).join("")}</ul>`;
-  }).join("");
+  if (sc.total == null) {
+    const fails = (l.reasons || []).filter((r) => r.level === "fail").map((r) => `<li>✕ ${esc(r.msg)}</li>`).join("");
+    return `<div class="rhead warn"><b>Sem nota.</b> Este anúncio não atende a pré-requisito(s), então não entra na comparação.</div><ul class="list">${fails}</ul>`;
+  }
+  const pos = S.listings.filter((x) => !x.archived && x.status !== "descartado").sort(byAdherence).findIndex((x) => x.id === l.id) + 1;
+  const n = S.listings.filter((x) => !x.archived && x.status !== "descartado").length;
+  const pend = (l.reasons || []).filter((r) => r.level === "pending").length;
   return `<div class="actions left" style="align-items:center"><span class="scoreBig">${sc.total}</span><span><span class="scoreBtn ${sc.level}">${LEVEL_LABEL[sc.level]}</span><br>
-    <span class="small">#${pos} de ${S.listings.filter((x) => !x.archived).length} no ranking${l.status === "descartado" ? " · descartado (nota limitada a 39)" : ""}</span></span></div>
-    <p class="small">60 pontos vêm dos critérios obrigatórios (pendente vale metade; confirmado só pela ficha vale um pouco menos que confirmado no anúncio).
-    40 pontos vêm das preferências: mais barato, menos km, mais novo, mais perto, menor consumo e porta-malas maior.</p>${groups}`;
+    <span class="small">#${pos} de ${n} em análise</span></span></div>
+    <p class="small">A nota compara só o que diferencia os carros que passaram no seu filtro. Os pré-requisitos (preço máximo, ano, km máxima, câmbio, vendedor, distância, indução e Android Auto sem fio) não dão pontos: eles decidem se o carro é aprovado, pendente ou descartado.${pend ? ` Este anúncio tem ${pend} pendência(s) a confirmar — elas não mudam a nota.` : ""}</p>
+    <ul class="list">${sc.parts.map((p) => `<li><span>${esc(p.label)}<span class="small">${esc(p.note || "")}</span>
+      <div class="bar" style="width:9rem"><i style="width:${(100 * p.pts / p.max).toFixed(0)}%"></i></div></span><b>${p.pts.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}/${p.max.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</b></li>`).join("")}</ul>`;
 }
 function openScore(id) {
   const l = byId(id); if (!l) return;
@@ -643,7 +645,7 @@ function renderCompare() {
   const wins = new Map(it.map((x) => [x.id, 0]));
   let html = `<table class="cmp"><tbody>
     ${row("Veículo", (x) => `<b>${esc(title(x))}</b> ${x.favorite ? "★" : ""}<br><span class="small">${esc(x.version || "")}</span>`)}
-    ${row("Aderência", (x) => `🎯 ${x.score?.total ?? "—"} <span class="small">${LEVEL_LABEL[x.score?.level] || ""}</span>`, (x) => x.score?.total)}
+    ${row("Nota", (x) => `🎯 ${x.score?.total ?? "—"} <span class="small">${LEVEL_LABEL[x.score?.level] || ""}</span>`, (x) => x.score?.total)}
     ${row("Status", (x) => `<span class="badge ${x.status}">${STATUS[x.status]}</span>`, (x) => ({ aprovado: 2, pendente: 1, descartado: 0 })[x.status])}
     ${row("Preço", (x) => brl(x.price), (x) => x.price, "min")}
     ${row("Em relação à FIPE", (x) => { const f = fipeDiscount(x); return f == null ? (x.below_fipe_tag ? "abaixo (selo)" : "—") : `${pct(f)} ${f >= 0 ? "abaixo" : "acima"}<br><span class="small">FIPE ${brl(x.fipe)}</span>`; }, (x) => fipeDiscount(x))}

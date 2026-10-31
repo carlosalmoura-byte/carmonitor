@@ -34,7 +34,7 @@
     <div class="searchRow tabSearch" id="tabSearch">
       <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
       <select id="sort" aria-label="Ordenar">
-        <option value="score">Mais aderente</option><option value="price">Menor preço</option><option value="km">Menor km</option>
+        <option value="score">Maior nota</option><option value="price">Menor preço</option><option value="km">Menor km</option>
         <option value="distance">Mais perto</option><option value="fipe">Mais abaixo da FIPE</option><option value="recent">Recentes</option>
       </select>
     </div>
@@ -264,8 +264,8 @@
 </div>
 
 <!-- Aderência -->
-<div class="sheet" id="scoreSheet" role="dialog" aria-modal="true" aria-label="Aderência">
-  <div class="sheetHead"><h2>Aderência</h2><button class="ghost" data-close>✕</button></div>
+<div class="sheet" id="scoreSheet" role="dialog" aria-modal="true" aria-label="Nota">
+  <div class="sheetHead"><h2>Nota do anúncio</h2><button class="ghost" data-close>✕</button></div>
   <div id="scoreBody"></div>
 </div>
 
@@ -281,6 +281,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=22"></script>
+<script type="module" src="app.js?v=23"></script>
 </body>
 </html>
