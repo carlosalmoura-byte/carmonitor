@@ -6,5 +6,10 @@
  "note": "pesquisa a pedido (filtro do app de 31/10 17:07, com Onix, HB20, HB20S e Kardian ignorados): 1 anúncio novo (Pulse Impetus 2022/2023, R$ 92.000, 35.000 km, Abaixo da Fipe, só dados do cartão da listagem). Páginas de anúncio não abriram (permissão não respondida em execução sem usuário), então os anúncios existentes não foram reconferidos e status foi mantido. Listagens lidas sem anúncio nos critérios (preço/km): Nivus Highline, Nivus Comfortline, Nivus 2022, Tera, Creta 2023. Não abriram: Fastback, T-Cross, Kicks, WR-V, C3 Aircross, Yaris, City, Renegade, Tiggo 5x. Não verificados: BYD, GWM, Argo, Cronos, Montana, Polo, Virtus, Tracker, 208, 2008, Basalt, HR-V, Corolla Cross, Versa, Compass, Duster | Correção manual 31/10 14:30: Pulse 81742086 reconferido na página (vendedor pessoa física, FIPE R$ 98.482, itens) e ficha Pulse Impetus 2023 adicionada.",
  "last_issue": null,
  "processed_issues": [],
- "filter_used_at": "2026-10-31T17:07:04.388Z"
+ "filter_used_at": "2026-10-31T17:07:04.388Z",
+ "running": {
+  "since": "2026-10-31T18:06:46.065Z",
+  "kind": "pedido",
+  "filter_at": "2026-10-31T18:04:13.925Z"
+ }
 }
