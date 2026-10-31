@@ -122,7 +122,13 @@ function updateTitle() {
 
 // ---------------------------------------------------------------- navegação
 $("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[data-view]"); if (b) showView(b.dataset.view); });
-function showView(v) {
+function showView(v, fromBack = false) {
+  const cur = $(".view.active")?.id?.replace("view-", "");
+  if (!fromBack && v !== cur) {
+    if (v === "listings") { if (cur !== "listings" && history.state?.view) { history.back(); return; } }
+    else if (cur === "listings") history.pushState({ view: v }, "");
+    else history.replaceState({ view: v }, "");
+  }
   $$("#nav button").forEach((x) => x.classList.toggle("active", x.dataset.view === v));
   $$(".view").forEach((x) => x.classList.toggle("active", x.id === "view-" + v));
   saveCompare();
@@ -139,9 +145,17 @@ $("#settingsNav").addEventListener("click", (e) => {
 });
 function openSheet(id) { $(id).classList.add("open"); document.body.style.overflow = "hidden"; }
 function closeSheet(id) { $(id).classList.remove("open"); document.body.style.overflow = ""; if (id === "#detailSheet") ui.openId = null; }
-$$(".sheet").forEach((s) => s.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeSheet("#" + s.id); }));
+$$(".sheet").forEach((s) => s.addEventListener("click", (e) => {
+  if (!e.target.closest("[data-close]")) return;
+  if (history.state?.sheet) history.back(); else closeSheet("#" + s.id); // fecha pelo histórico para o "voltar" não ficar sobrando
+}));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".sheet.open").forEach((s) => closeSheet("#" + s.id)); });
-window.addEventListener("popstate", () => $$(".sheet.open").forEach((s) => closeSheet("#" + s.id)));
+// botão "voltar" do Android: fecha a janela aberta; senão volta da tela atual para a lista de anúncios
+window.addEventListener("popstate", () => {
+  const open = $$(".sheet.open");
+  if (open.length) { open.forEach((s) => closeSheet("#" + s.id)); return; }
+  if (!$("#view-listings").classList.contains("active")) showView("listings", true);
+});
 
 // ---------------------------------------------------------------- lista
 // Cada aba guarda a própria busca e ordenação.
