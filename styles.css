@@ -297,3 +297,7 @@ details>summary{scroll-margin-top:4rem}
 
 .badge.atende{background:var(--ok-bg);color:var(--ok);text-transform:none}
 .card.st-aprovado:not(:has(.badge.aprovado)){border-top-color:var(--ok)}
+.sendBar{position:sticky;top:.5rem;z-index:5;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:space-between;
+  background:var(--pend-bg);color:var(--ink);border:1px solid var(--pend);border-radius:var(--radius);padding:.7rem .9rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.sendBar[hidden]{display:none}
+.sendBar span{flex:1 1 14rem;font-size:.9rem}

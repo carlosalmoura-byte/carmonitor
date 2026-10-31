@@ -929,7 +929,7 @@ $("#criteriaForm").ref_city.addEventListener("change", (e) => {
   const other = e.target.value === "__other"; $("#refOtherWrap").hidden = !other; if (other) $("#criteriaForm").ref_other.focus();
 });
 let critSnapshot = null;
-// salva sozinho: qualquer mudança no filtro é aplicada e enviada (sem precisar de "OK")
+// salva sozinho: qualquer mudança no filtro é aplicada à lista na hora; a pesquisa só é pedida no botão "Pesquisar com este filtro"
 let critTimer = null;
 $("#criteriaForm").addEventListener("change", (e) => {
   if (e.target.name === "ref_city" && e.target.value === "__other") return; // espera digitar a cidade
@@ -957,7 +957,7 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     const refChanged = S.settings.criteria.ref_location !== oldRef;
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")
       l.distance = { km: null, status: "nao_verificada", precision: null, note: "Aguardando cálculo da rota a partir da nova cidade." };
-    E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast("Filtro salvo e aplicado.");
+    E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast(filterDirty() ? "Filtro aplicado à lista. Ao terminar, toque em “Pesquisar com este filtro”." : "Filtro aplicado à lista.");
     critSnapshot = { ...S.settings.criteria };
     await filterChanged();
     if (refChanged) fillDistancesBg();
@@ -1076,7 +1076,7 @@ $("#ghForm").addEventListener("submit", (e) => {
     S.settings.github_token = t;
     if (!t) return toast("Token removido.");
     await ensureFilterPublished();
-    toast(S.meta.filter_error ? `Token salvo, mas o filtro não foi enviado: ${S.meta.filter_error}.` : "Token salvo e filtro enviado. A pesquisa vai usar o seu filtro.");
+    toast(filterDirty() ? "Token salvo. Para pesquisar com o filtro do app, toque em “Pesquisar com este filtro”." : "Token salvo.");
   });
 });
 $("#contactForm").addEventListener("submit", (e) => {
@@ -1202,7 +1202,7 @@ async function publishFilter() {
     try {
       const pub = JSON.parse(unb64(j.content));
       if (JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions }) === JSON.stringify(cur)) {
-        S.meta.filter_updated_at = pub.updated_at; S.meta.filter_error = null; return "igual";
+        S.meta.filter_updated_at = pub.updated_at; S.meta.filter_published_sig = JSON.stringify(cur); S.meta.filter_error = null; return "igual";
       }
     } catch { /* arquivo inválido: regrava */ }
   } else if (g.status !== 404) throw new Error(g.status === 401 ? "token inválido ou expirado" : `GitHub respondeu ${g.status} ao ler o filtro`);
@@ -1213,29 +1213,51 @@ async function publishFilter() {
   if (!r.ok) throw new Error(r.status === 403 || r.status === 404
     ? "o token não tem permissão para gravar arquivos (dê “Contents: Read and write” ao token no GitHub)"
     : r.status === 401 ? "token inválido ou expirado" : `GitHub respondeu ${r.status} ao gravar o filtro`);
-  S.meta.filter_updated_at = updated_at; S.meta.filter_error = null; return "publicado";
+  S.meta.filter_updated_at = updated_at; S.meta.filter_published_sig = JSON.stringify(cur); S.meta.filter_error = null; return "publicado";
 }
-/** Filtro mudou no app: publica para a pesquisa usar e pede nova pesquisa. Sem token/permissão, cai no pedido por issue. */
-async function filterChanged() {
+/** Assinatura do filtro (critérios + ignorados) para saber se o do aparelho difere do enviado à pesquisa. */
+const filterSig = () => JSON.stringify(filterPayload());
+/** O filtro do aparelho mudou desde o último envio? (sem envio conhecido = considera enviado, para não incomodar) */
+const filterDirty = () => !!(S.meta.filter_published_sig && S.meta.filter_published_sig !== filterSig());
+/** Filtro mudou no app: só aplica localmente. Nada é enviado até o usuário tocar em "Pesquisar com este filtro". */
+function filterChanged() { persist(); renderResearchStatus(); renderSendBar(); }
+/** Envia o filtro atual para a pesquisa (grava data/filtro.json = pedido de pesquisa). */
+async function sendFilter() {
   try {
     const r = await publishFilter();
-    if (r === "publicado") { S.meta.research_requested_at = new Date().toISOString(); toast("Filtro enviado. A pesquisa com ele roda em até ~1 h."); }
+    S.meta.research_requested_at = new Date().toISOString();
+    if (r === "igual") { persist(); renderResearchStatus(); renderSendBar(); return sendResearchRequest("manual"); }
+    toast("Filtro enviado. A pesquisa com ele roda em até ~1 h.");
   } catch (e) {
     S.meta.filter_error = e.message;
     if (confirm(`Não consegui enviar o filtro sozinho (${e.message}).\nAbrir o GitHub com o pedido de pesquisa pronto?`)) await sendResearchRequest("filtros");
   }
-  persist(); renderResearchStatus();
+  persist(); renderResearchStatus(); renderSendBar();
 }
-/** Ao abrir o app: garante que o filtro publicado é o mesmo do aparelho. */
+/** Ao abrir o app: lê (sem gravar) o filtro que a pesquisa está usando, para comparar com o do aparelho. */
 async function ensureFilterPublished() {
-  if (!S.settings.github_token) { S.meta.filter_error = "sem token do GitHub"; renderResearchStatus(); return; }
   try {
-    const r = await publishFilter();
-    if (r === "publicado") S.meta.research_requested_at = new Date().toISOString();
-  } catch (e) { S.meta.filter_error = e.message; }
-  persist(); renderResearchStatus();
+    const r = await fetch(`data/filtro.json?t=${Date.now()}`, { cache: "no-store" });
+    if (r.ok) {
+      const pub = await r.json();
+      // a cópia do site pode estar alguns minutos atrasada: ignora se for mais antiga que o último envio feito daqui
+      if (!S.meta.filter_updated_at || new Date(pub.updated_at) >= new Date(S.meta.filter_updated_at)) {
+        S.meta.filter_updated_at = pub.updated_at;
+        S.meta.filter_published_sig = JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions });
+      }
+    }
+    S.meta.filter_error = S.settings.github_token ? null : "sem token do GitHub";
+  } catch { /* sem internet */ }
+  if (!S.meta.filter_published_sig) S.meta.filter_published_sig = filterSig();
+  persist(); renderResearchStatus(); renderSendBar();
 }
-$("#researchBtn").onclick = () => {
+function renderSendBar() {
+  const bar = $("#sendFilterBar"); if (!bar) return;
+  bar.hidden = !filterDirty();
+}
+$("#sendFilterBtn").onclick = (e) => act(e.currentTarget, sendFilter);
+$("#researchBtn").onclick = (e) => {
+  if (filterDirty() && S.settings.github_token) return act(e.currentTarget, sendFilter);
   if (!S.settings.github_token && !confirm("Vou abrir o GitHub com o pedido pronto. Toque em “Submit new issue” para enviar.\n(Para enviar sem esse passo, configure o token em Ajustes → Dados e rotas.)")) return;
   sendResearchRequest("manual");
 };
@@ -1270,13 +1292,14 @@ function researchState() {
   const checkHours = [...Array(24).keys()].filter((h) => h !== 5 && h !== 12);
   const check = nextAt(checkHours, 41);
   const viaSched = schedStart <= check;
-  return { done, fu, used, run, filterPending, reqPending, pending, schedStart, schedReady, check, viaSched, err: S.meta.filter_error };
+  return { done, fu, used, run, filterPending, reqPending, pending, schedStart, schedReady, check, viaSched, err: S.meta.filter_error, dirty: filterDirty() };
 }
 function renderResearchStatus() {
   const r = researchState();
   let icon, text, cls;
   if (r.run) { icon = "🔄"; cls = "pend"; text = `Pesquisando agora${r.run.filter_at && r.run.filter_at === r.fu ? " com o seu filtro" : ""} (desde ${hhmm(new Date(r.run.since))})`; }
   else if (r.err) { icon = "⚠️"; cls = "warn"; text = "Seu filtro não chegou à pesquisa · toque para ver"; }
+  else if (r.dirty) { icon = "✏️"; cls = "pend"; text = "Filtro alterado, ainda não enviado · toque para pesquisar"; }
   else if (r.pending) { icon = "⏳"; cls = "pend"; const t = r.viaSched ? r.schedStart : r.check; text = `${r.filterPending ? "Filtro novo" : "Pedido recebido"}: pesquisa ${when(t)} (${inTime(t)})`; }
   else { icon = "✅"; cls = "ok"; text = `${r.done ? `Atualizada ${when(new Date(r.done))}` : "Sem pesquisa ainda"} · próxima ${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h`; }
   const nNew = ui.since ? S.listings.filter((l) => !l.archived && l.status !== "descartado" && l.first_seen && new Date(l.first_seen) > new Date(ui.since)).length : 0;
@@ -1284,12 +1307,14 @@ function renderResearchStatus() {
   $("#researchIcon").textContent = icon; $("#researchStatus").textContent = text;
   $("#researchPill").className = "researchPill " + cls;
   if ($("#researchSheet").classList.contains("open")) renderResearchSheet();
+  setResearchBtnLabel();
 }
 function renderResearchSheet() {
   const r = researchState(), st = lastStatus || {};
   let head;
   if (r.run) head = `🔄 <b>Pesquisando agora.</b> Começou ${when(new Date(r.run.since))}${r.run.filter_at === r.fu ? ", com o seu filtro atual" : ""}. Leva uns 15 minutos; depois puxe a lista para baixo.`;
   else if (r.err) head = `⚠️ <b>Seu filtro não chegou à pesquisa.</b> Motivo: ${esc(r.err)}. Enquanto isso, a pesquisa usa o último filtro recebido.`;
+  else if (r.dirty) head = `✏️ <b>Você alterou o filtro, mas ainda não enviou.</b> A lista já foi refiltrada aqui no aparelho; as pesquisas (inclusive as automáticas) continuam usando o último filtro enviado. Quando terminar os ajustes, toque em <b>Pesquisar com este filtro</b>.`;
   else if (r.pending) { const t = r.viaSched ? r.schedStart : r.check;
     head = `⏳ <b>${r.filterPending ? "Você mudou o filtro." : "Pedido de pesquisa recebido."}</b> A lista atual ainda é da pesquisa anterior. A nova pesquisa${r.filterPending ? ", com o filtro novo," : ""} começa ${when(t)} (${inTime(t)})${r.viaSched ? " — é a automática, que já usa o seu filtro" : ""}.`; }
   else head = `✅ <b>Lista em dia.</b> A última pesquisa já usou o seu filtro atual.`;
@@ -1305,9 +1330,10 @@ function renderResearchSheet() {
     <p>${r.done ? `${when(new Date(r.done))}${res ? ` — ${res}` : ""}.` : "Ainda não houve pesquisa."}${filt ? `<br><span class="small">Feita ${filt}.</span>` : ""}</p>
     <h3 class="rsub">Próximas pesquisas</h3>
     <ul class="rnext">${next.join("")}</ul>
-    <p class="small">Automáticas todo dia por volta das 6h e das 13h. Quando você muda o filtro, uma pesquisa extra roda na próxima hora cheia (aos 41 min) — a não ser que a automática venha antes.</p>
+    <p class="small">Automáticas todo dia por volta das 6h e das 13h. Quando você toca em “Pesquisar com este filtro”, uma pesquisa extra roda na próxima hora cheia (aos 41 min) — a não ser que a automática venha antes.</p>
     ${st.note ? `<details><summary class="small">Detalhes técnicos da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
 }
+function setResearchBtnLabel() { $("#researchBtn").textContent = filterDirty() && S.settings.github_token ? "🔎 Pesquisar com este filtro" : "🔎 Pedir nova pesquisa agora"; }
 $("#researchPill").onclick = () => { renderResearchStatus(); renderResearchSheet(); openSheet("#researchSheet"); history.pushState({ sheet: 5 }, ""); };
 setInterval(() => { if (document.visibilityState === "visible" && S) renderResearchStatus(); }, 30000);
 
