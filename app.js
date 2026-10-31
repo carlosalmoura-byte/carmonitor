@@ -146,10 +146,11 @@ $("#sort").addEventListener("change", () => { tabState(ui.status).sort = $("#sor
 // deslizar para a esquerda/direita troca de aba
 (() => {
   let x0 = null, y0 = null;
-  const skip = (t) => t.closest(".statusTabs, .tableWrap, .sheet, input, select, textarea");
-  const view = $("#view-listings");
+  const skip = (t) => !!t.closest(".statusTabs, .tableWrap, .sheet, input, select, textarea");
+  const view = document;
+  const onList = () => $("#view-listings").classList.contains("active") && !$(".sheet.open");
   view.addEventListener("touchstart", (e) => {
-    if (e.touches.length !== 1 || skip(e.target)) { x0 = null; return; }
+    if (e.touches.length !== 1 || !onList() || skip(e.target) || e.target.closest(".bottomNav, .cmpBar, header")) { x0 = null; return; }
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
   }, { passive: true });
   view.addEventListener("touchend", (e) => {
@@ -219,9 +220,11 @@ function renderCards() {
       l.unavailable_since ? `<span class="chip ausente">saiu do ar em ${esc(E.fmtDate(l.unavailable_since).slice(0, 10))}</span>` : "",
     ].join("");
     const sc = l.score || { total: 0, level: "baixa" };
+    const cmpOn = ui.compare.has(l.id);
     return `<article class="card st-${l.status}">
       <div class="cardTop"><span><span class="rank">#${ranking.indexOf(l.id) + 1}</span> <span class="badge ${l.status}">${STATUS[l.status]}</span>
-        <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="Aderência ${sc.total} de 100. Toque para detalhes">🎯 ${sc.total}</button></span><span class="small">
+        <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="Aderência ${sc.total} de 100. Toque para detalhes">🎯 ${sc.total}</button></span><span class="topIcons">
+        <label class="cmpFlag ${cmpOn ? "on" : ""}" title="Marcar para comparar"><input type="checkbox" data-cmpflag="${l.id}" ${cmpOn ? "checked" : ""}> ⇆</label>
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
       <h3>${esc(title(l))} ${l.year_model ? `<span class="small">${esc(l.year_fab ? l.year_fab + "/" : "")}${esc(l.year_model)}</span>` : ""}</h3>
       <div class="ver">${esc(l.version || "versão não informada")}</div>
@@ -234,11 +237,11 @@ function renderCards() {
       ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
-        <label class="cmpFlag ${ui.compare.has(l.id) ? "on" : ""}"><input type="checkbox" data-cmpflag="${l.id}" ${ui.compare.has(l.id) ? "checked" : ""}> Comparar</label>
-        ${l.user_discard || l.user_approve ? `<button data-undiscard="${l.id}">↺ Desfazer decisão</button>`
-          : `${l.status === "pendente" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button>` : ""}${l.status !== "descartado" ? `<button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}`}
-        <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
+        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
+          : l.status === "pendente" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>`
+          : l.status === "aprovado" ? `<button class="danger wide" data-discard="${l.id}">✕ Descartar</button>` : ""}
         <button data-open="${l.id}">Detalhes</button>
+        <a class="btn ghost" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Anúncio ↗</a>
       </div></article>`;
   }).join("");
 }
@@ -709,7 +712,10 @@ function renderSettings() {
   renderIgnoreSuggestions();
   $("#dlMakes").innerHTML = [...new Set([...Object.keys(CATALOG), ...S.listings.map((l) => l.make && cap(l.make))].filter(Boolean))].sort().map((m) => `<option value="${esc(m)}">`).join("");
   updateModelList();
-  $("#exclList").innerHTML = S.exclusions.length ? S.exclusions.map((r, i) => `<li><span>${esc(exclusionLabel(r))}${r.version_includes ? "" : ` <span class="small">todas as versões</span>`}${r.reason ? `<span class="exclReason">Motivo: ${esc(r.reason)}</span>` : ""}</span><button class="ghost danger" data-delexcl="${i}">Remover</button></li>`).join("")
+  $("#exclCount").textContent = S.exclusions.length ? `(${S.exclusions.length})` : "";
+  $("#exclList").innerHTML = S.exclusions.length ? S.exclusions.map((r, i) => `<li class="excl"><details><summary><span class="exclName">${esc(exclusionLabel(r))}</span>${r.reason ? `<span class="exclReasonShort">${esc(r.reason)}</span>` : ""}</summary>
+      <form class="exclEdit" data-editexcl="${i}"><label>Motivo<input name="reason" value="${esc(r.reason || "")}" placeholder="opcional"></label>
+      <div class="cardActions"><button type="submit">Salvar motivo</button><button type="button" class="ghost danger" data-delexcl="${i}">Remover</button></div></form></details></li>`).join("")
     : `<li class="small">Nenhum modelo ignorado.</li>`;
   $("#specList").innerHTML = E.allSpecs(S).concat(SEED_SPECS.filter((s) => S.disabled_specs.includes(s.id))).map((s) => {
     const off = S.disabled_specs.includes(s.id), custom = S.custom_specs.some((x) => x.id === s.id);
@@ -765,13 +771,13 @@ function renderIgnoreSuggestions() {
     const done = S.exclusions.some((r) => sameRule(r, rule));
     return `<button type="button" class="${done ? "done" : ""}" data-sugg="${key}" ${done ? "disabled" : ""}>${done ? "✓ " : "⊘ "}${esc(text)}</button>`;
   };
-  $("#exclSuggest").innerHTML = SUGG.length ? SUGG.map((g, i) => `<div class="sugg">
-      <b>${esc(cap(g.make))} ${esc(cap(g.model))}</b> <span class="small">${g.count} anúncio(s)</span>
+  $("#exclSuggest").innerHTML = SUGG.length ? SUGG.map((g, i) => `<details class="sugg"><summary>
+      <b>${esc(cap(g.make))} ${esc(cap(g.model))}</b> <span class="small">${g.count} anúncio(s)</span></summary>
       <span class="lvl">Mais amplo</span><div class="chips">
         ${chip(g.ruleMake, `Toda a marca ${cap(g.make)}`, `${i}:make`)}
         ${chip(g.ruleModel, `Todos os ${cap(g.model)} (${g.count})`, `${i}:model`)}</div>
       ${g.trims.length ? `<span class="lvl">Só um acabamento</span><div class="chips">${g.trims.map((t, j) => chip(t.rule, `Só ${cap(t.trim)} (${t.count})`, `${i}:trim:${j}`)).join("")}</div>` : ""}
-    </div>`).join("") : `<p class="small">Quando houver anúncios no app, os modelos aparecem aqui para escolher.</p>`;
+    </details>`).join("") : `<p class="small">Quando houver anúncios no app, os modelos aparecem aqui para escolher.</p>`;
 }
 $("#exclSuggest").addEventListener("click", (e) => {
   const b = e.target.closest("[data-sugg]"); if (!b) return;
@@ -814,6 +820,10 @@ $("#exclForm").addEventListener("submit", (e) => {
   rule.label = `${cap(make)} ${entry ? entry[0] : cap(modelName)}${ver ? " — " + ver : ""}`.toUpperCase();
   rule.reason = f.reason.value.trim();
   act(null, async () => { S.exclusions.push(rule); f.reset(); E.reclassifyAll(S, deps); renderSettings(); renderCards(); toast("Modelo ignorado."); filterChanged(); });
+});
+$("#exclList").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target.closest("[data-editexcl]"); if (!f) return;
+  act(null, async () => { S.exclusions[+f.dataset.editexcl].reason = f.reason.value.trim(); renderSettings(); toast("Motivo salvo."); });
 });
 $("#exclList").addEventListener("click", (e) => { const b = e.target.closest("[data-delexcl]"); if (!b) return;
   act(null, async () => { S.exclusions.splice(+b.dataset.delexcl, 1); E.reclassifyAll(S, deps); renderSettings(); renderCards(); filterChanged(); }); });
@@ -1049,7 +1059,25 @@ async function routine(force = false) {
   $("#routineMsg").innerHTML = `<div class="msg ok">Rotina: ${r.processados} processados · ${r.distancias_calculadas} rotas calculadas · ${r.novos_aprovados} novos aprovados · ${r.a_reconferir} a reconferir.</div>`;
   setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 8000);
 }
-async function refreshAll() { await syncResearch(true); await routine(true); fillDistancesBg(); }
+/** Há versão nova do app publicada? Compara o ?v= do app.js no index.html do servidor com o carregado. */
+const APP_V = (document.querySelector('script[src*="app.js"]')?.getAttribute("src").match(/v=(\d+)/) || [])[1] || "0";
+async function checkAppUpdate() {
+  try {
+    const html = await (await fetch("./?_=" + Date.now(), { cache: "no-store" })).text();
+    const v = (html.match(/app\.js\?v=(\d+)/) || [])[1];
+    if (v && v !== APP_V) {
+      toast("Nova versão do app — carregando…");
+      try { const reg = await navigator.serviceWorker?.getRegistration(); await reg?.update(); } catch { /* ok */ }
+      setTimeout(() => location.reload(), 600); return true;
+    }
+  } catch { /* sem internet */ }
+  return false;
+}
+async function refreshAll() {
+  if (await checkAppUpdate()) return;
+  await syncResearch(true); await ensureFilterPublished(); await routine(true); fillDistancesBg();
+  toast(`Atualizado às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}.`);
+}
 
 // puxar para atualizar (na lista de anúncios)
 (() => {
@@ -1096,7 +1124,7 @@ function handleShare() {
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   syncResearch(false).then(() => ensureFilterPublished()).then(() => routine(false)).then(() => fillDistancesBg()).catch((e) => console.warn(e));
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") syncResearch(false).then(() => routine(false)).catch(() => {});
+    if (document.visibilityState === "visible") checkAppUpdate().then((upd) => upd || syncResearch(false).then(() => routine(false))).catch(() => {});
   });
   window.__cm = { get state() { return S; } }; // depuração/testes
 })();

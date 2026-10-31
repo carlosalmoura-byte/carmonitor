@@ -199,7 +199,7 @@ main{padding-bottom:88px}
 @keyframes slideR{from{transform:translateX(-28px);opacity:.4}to{transform:none;opacity:1}}
 .cards.slideL{animation:slideL .18s ease-out}.cards.slideR{animation:slideR .18s ease-out}
 
-.cmpFlag{display:inline-flex;align-items:center;gap:.35rem;margin:0;padding:.35rem .6rem;border:1px solid var(--line,#ccc);border-radius:8px;font-size:.88rem;cursor:pointer}
+.cmpFlag{display:inline-flex;align-items:center;gap:.3rem;margin:0;padding:.25rem .5rem;border:1px solid var(--line);border-radius:8px;font-size:.9rem;cursor:pointer;color:var(--muted)}
 .cmpFlag input{width:1.1rem;height:1.1rem;margin:0}
 .cmpFlag.on{border-color:var(--accent,#1f6f5c);font-weight:600}
 button.okBtn{color:var(--ok)}
@@ -209,3 +209,25 @@ button.okBtn{color:var(--ok)}
 .cmpBar[hidden]{display:none!important}
 body:has(.cmpBar:not([hidden])) .fab{bottom:calc(136px + env(safe-area-inset-bottom))}
 @media (min-width:900px){ .cmpBar{left:calc(50% - 470px);right:calc(50% - 470px)} }
+
+/* cartão: ações em grade 2x2 */
+.topIcons{display:flex;align-items:center;gap:.4rem}
+.cardActions{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.cardActions>*{width:100%;justify-content:center;text-align:center;margin:0}
+.cardActions .wide{grid-column:1/-1}
+.cmpFlag.on{color:var(--accent);background:var(--surface2)}
+/* busca dentro da aba */
+.tabSearch{margin:-.3rem 0 .7rem}
+/* modelos ignorados compactos */
+.compactList li.excl{display:block;padding:0}
+.compactList summary{display:flex;align-items:baseline;gap:.5rem;padding:.55rem 0;cursor:pointer;list-style:none}
+.compactList summary::-webkit-details-marker{display:none}
+.compactList summary::after{content:"›";margin-left:auto;color:var(--muted);transition:transform .15s}
+.compactList details[open] summary::after{transform:rotate(90deg)}
+.exclName{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.exclReasonShort{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.exclEdit{padding:0 0 .7rem}
+details.fold{border:1px solid var(--line);border-radius:10px;padding:.55rem .7rem;margin:.7rem 0}
+details.fold>summary{cursor:pointer;font-weight:600;font-size:.92rem}
+details.sugg{padding:.45rem .7rem}
+details.sugg>summary{cursor:pointer}

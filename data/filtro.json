@@ -1,0 +1,10 @@
+{
+ "updated_at": "2026-10-31T16:46:00.000Z",
+ "origem": "transcrito pelo Claude do print de Ajustes → Critérios enviado pelo usuário em 31/10/2026 13:46 (o app ainda não conseguiu enviar o filtro sozinho; modelos ignorados não estavam no print)",
+ "criteria": {
+  "min_price": null, "max_price": 100000, "year_min": 2022, "year_max": 2027, "min_km": null, "max_km": 35000,
+  "transmissions": ["automatico"], "conditions": ["usado", "seminovo", "novo"], "seller_types": ["loja", "concessionaria"],
+  "ref_location": "Barueri, SP", "max_distance_km": 60, "adas_required": false
+ },
+ "exclusions": []
+}

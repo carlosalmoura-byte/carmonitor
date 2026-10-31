@@ -21,13 +21,6 @@
 <main>
   <!-- ANÚNCIOS -->
   <section id="view-listings" class="view active">
-    <div class="searchRow">
-      <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
-      <select id="sort" aria-label="Ordenar">
-        <option value="score">Mais aderente</option><option value="price">Menor preço</option><option value="km">Menor km</option>
-        <option value="distance">Mais perto</option><option value="fipe">Mais abaixo da FIPE</option><option value="recent">Recentes</option>
-      </select>
-    </div>
     <div class="researchBar">
       <span id="researchStatus" class="small"></span>
       <button class="primary" id="researchBtn">🔎 Pedir nova pesquisa</button>
@@ -40,6 +33,13 @@
       <button data-status="reconferir">A reconferir <span id="c-reconferir">0</span></button>
       <button data-status="fipe">💰 Abaixo da FIPE <span id="c-fipe">0</span></button>
       <button data-status="favoritos">★ Favoritos <span id="c-fav">0</span></button>
+    </div>
+    <div class="searchRow tabSearch" id="tabSearch">
+      <input type="search" id="q" placeholder="Filtrar por marca, modelo, cidade">
+      <select id="sort" aria-label="Ordenar">
+        <option value="score">Mais aderente</option><option value="price">Menor preço</option><option value="km">Menor km</option>
+        <option value="distance">Mais perto</option><option value="fipe">Mais abaixo da FIPE</option><option value="recent">Recentes</option>
+      </select>
     </div>
     <div id="routineMsg"></div>
     <div id="cards" class="cards"></div>
@@ -129,10 +129,13 @@
     <div class="panel subview" id="sub-exclusions">
       <h2>Modelos desconsiderados</h2>
       <p class="hint">Anúncios destes modelos vão para Descartados, mesmo que atendam a tudo, e não geram alertas.</p>
-      <h3>Nos seus anúncios</h3>
-      <p class="hint" style="margin-top:0">Escolha o nível: a marca inteira, o modelo inteiro ou só um acabamento.</p>
-      <div id="exclSuggest"></div>
-      <h3>Ou digite</h3>
+      <h3>Ignorados <span class="small" id="exclCount"></span></h3>
+      <ul class="list compactList" id="exclList"></ul>
+      <details class="fold"><summary>Ignorar um modelo dos seus anúncios</summary>
+        <p class="hint" style="margin-top:.4rem">Toque no modelo e escolha o nível: a marca inteira, o modelo inteiro ou só um acabamento.</p>
+        <div id="exclSuggest"></div>
+      </details>
+      <details class="fold"><summary>Ignorar digitando marca e modelo</summary>
       <form id="exclForm">
         <div class="row2">
           <label>Marca<input name="make" list="dlMakes" placeholder="escolha ou digite" autocomplete="off" required></label>
@@ -143,7 +146,7 @@
         <button class="primary" type="submit" style="width:100%">Ignorar este modelo</button>
         <datalist id="dlMakes"></datalist><datalist id="dlModels"></datalist><datalist id="dlVersions"></datalist>
       </form>
-      <ul class="list" id="exclList"></ul>
+      </details>
     </div>
 
     <div class="panel subview" id="sub-specs">
@@ -275,6 +278,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=17"></script>
+<script type="module" src="app.js?v=18"></script>
 </body>
 </html>
