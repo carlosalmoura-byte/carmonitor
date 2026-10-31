@@ -829,6 +829,12 @@ $("#criteriaForm").ref_city.addEventListener("change", (e) => {
   const other = e.target.value === "__other"; $("#refOtherWrap").hidden = !other; if (other) $("#criteriaForm").ref_other.focus();
 });
 let critSnapshot = null;
+// salva sozinho: qualquer mudança no filtro é aplicada e enviada (sem precisar de "OK")
+let critTimer = null;
+$("#criteriaForm").addEventListener("change", (e) => {
+  if (e.target.name === "ref_city" && e.target.value === "__other") return; // espera digitar a cidade
+  clearTimeout(critTimer); critTimer = setTimeout(() => $("#criteriaForm").requestSubmit(), 900);
+});
 $("#criteriaForm").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target, n = (k) => f.elements[k].value === "" ? null : Number(f.elements[k].value);
   if (n("year_min") && n("year_max") && n("year_min") > n("year_max")) return toast("Ano mínimo maior que o máximo.");
@@ -851,7 +857,7 @@ $("#criteriaForm").addEventListener("submit", (e) => {
     const refChanged = S.settings.criteria.ref_location !== oldRef;
     if (refChanged) for (const l of S.listings) if (l.distance?.status !== "manual")
       l.distance = { km: null, status: "nao_verificada", precision: null, note: "Aguardando cálculo da rota a partir da nova cidade." };
-    E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast("Critérios salvos e anúncios reclassificados.");
+    E.reclassifyAll(S, deps); renderSettings(); renderCards(); updateTitle(); toast("Filtro salvo e aplicado.");
     critSnapshot = { ...S.settings.criteria };
     await filterChanged();
     if (refChanged) fillDistancesBg();
