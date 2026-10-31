@@ -8,5 +8,10 @@
  "processed_issues": [
   1
  ],
- "filter_used_at": "2026-10-31T18:04:13.925Z"
+ "filter_used_at": "2026-10-31T18:04:13.925Z",
+ "last_attempt": {
+  "at": "2026-10-31T21:49:12.000Z",
+  "ok": false,
+  "reason": "WebMotors inacessível nesta execução (páginas não abriram)"
+ }
 }

@@ -1292,12 +1292,16 @@ function researchState() {
   const checkHours = [...Array(24).keys()].filter((h) => h !== 5 && h !== 12);
   const check = nextAt(checkHours, 41);
   const viaSched = schedStart <= check;
-  return { done, fu, used, run, filterPending, reqPending, pending, schedStart, schedReady, check, viaSched, err: S.meta.filter_error, dirty: filterDirty() };
+  const la = lastStatus?.last_attempt;
+  const failed = la && la.ok === false && (!done || new Date(la.at) > new Date(done)) && !run ? la : null;
+  return { done, fu, used, run, filterPending, reqPending, pending, schedStart, schedReady, check, viaSched, err: S.meta.filter_error, dirty: filterDirty(), failed };
 }
 function renderResearchStatus() {
   const r = researchState();
   let icon, text, cls;
   if (r.run) { icon = "🔄"; cls = "pend"; text = `Pesquisando agora${r.run.filter_at && r.run.filter_at === r.fu ? " com o seu filtro" : ""} (desde ${hhmm(new Date(r.run.since))})`; }
+  else if (r.failed) { icon = "⚠️"; cls = "warn"; const t = r.viaSched ? r.schedStart : r.check;
+    text = `Pesquisa de ${hhmm(new Date(r.failed.at))} falhou · nova tentativa ${when(t)}`; }
   else if (r.err) { icon = "⚠️"; cls = "warn"; text = "Seu filtro não chegou à pesquisa · toque para ver"; }
   else if (r.dirty) { icon = "✏️"; cls = "pend"; text = "Filtro alterado, ainda não enviado · toque para pesquisar"; }
   else if (r.pending) { icon = "⏳"; cls = "pend"; const t = r.viaSched ? r.schedStart : r.check; text = `${r.filterPending ? "Filtro novo" : "Pedido recebido"}: pesquisa ${when(t)} (${inTime(t)})`; }
@@ -1313,6 +1317,8 @@ function renderResearchSheet() {
   const r = researchState(), st = lastStatus || {};
   let head;
   if (r.run) head = `🔄 <b>Pesquisando agora.</b> Começou ${when(new Date(r.run.since))}${r.run.filter_at === r.fu ? ", com o seu filtro atual" : ""}. Leva uns 15 minutos; depois puxe a lista para baixo.`;
+  else if (r.failed) { const t = r.viaSched ? r.schedStart : r.check;
+    head = `⚠️ <b>A pesquisa de ${when(new Date(r.failed.at))} não concluiu.</b> Motivo: ${esc(r.failed.reason)}. Nada mudou na sua lista. Nova tentativa ${when(t)} (${inTime(t)}).`; }
   else if (r.err) head = `⚠️ <b>Seu filtro não chegou à pesquisa.</b> Motivo: ${esc(r.err)}. Enquanto isso, a pesquisa usa o último filtro recebido.`;
   else if (r.dirty) head = `✏️ <b>Você alterou o filtro, mas ainda não enviou.</b> A lista já foi refiltrada aqui no aparelho; as pesquisas (inclusive as automáticas) continuam usando o último filtro enviado. Quando terminar os ajustes, toque em <b>Pesquisar com este filtro</b>.`;
   else if (r.pending) { const t = r.viaSched ? r.schedStart : r.check;

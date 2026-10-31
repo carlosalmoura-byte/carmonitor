@@ -58,6 +58,10 @@ git add data/status.json && git commit -m "Pesquisa iniciada" && git pull --reba
 
 O app mostra "Pesquisando agora". O `merge-feed` limpa essa marca ao publicar.
 
+**Se a pesquisa não puder concluir** (WebMotors inacessível, erro, nada pôde ser lido), não deixe a marca "em andamento":
+rode `node tools/fail-research.mjs "<motivo curto>"`, faça commit de `data/status.json` e push. O app mostra
+"Última tentativa falhou: <motivo>" e a hora da próxima tentativa; o pedido continua pendente.
+
 ### Pedido perto da pesquisa agendada
 
 Se a verificação de pedidos cair entre 5:30 e 5:59 ou entre 12:30 e 12:59 (horário de Brasília), **não pesquise**:
