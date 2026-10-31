@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T17:07:04.388Z",
+ "updated_at": "2026-10-31T18:04:13.925Z",
  "origem": "app CarMonitor",
  "criteria": {
   "min_price": null,
@@ -22,7 +22,11 @@
   ],
   "ref_location": "Barueri, SP",
   "max_distance_km": 60,
-  "adas_required": false
+  "adas_required": false,
+  "no_auction": true,
+  "no_armored": true,
+  "body_types": [],
+  "avoid_colors": []
  },
  "exclusions": [
   {
