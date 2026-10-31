@@ -63,6 +63,15 @@ O app mostra "Pesquisando agora". O `merge-feed` limpa essa marca ao publicar.
 Se a verificação de pedidos cair entre 5:30 e 5:59 ou entre 12:30 e 12:59 (horário de Brasília), **não pesquise**:
 a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
 
+### Avisos de problema enviados pelo app
+
+Issues abertas com título começando por `Problema no anúncio` trazem um bloco JSON com `url`, `kind`
+(`nao_abre`, `vendido`, `dados`, `outro`) e `text`. Também são pedido pendente: reabra a página do anúncio (ou
+procure-o na listagem). Se a página mostrar que saiu do ar, publique `{ "url": ..., "available": false }`; se os dados
+estiverem errados, publique a transcrição corrigida. Ao terminar, feche a issue com um comentário curto do que achou
+(`curl -X PATCH .../issues/N -d '{"state":"closed"}'` com o token do git, se houver; senão só registre em
+`--issue N`).
+
 ## 2. Regras (obrigatórias)
 
 - Os Termos de Uso da Webmotors proíbem raspagem automatizada. A pesquisa acontece **somente quando há pedido ou no horário agendado pelo usuário (6h e 13h)** e

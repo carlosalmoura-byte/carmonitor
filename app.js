@@ -471,6 +471,45 @@ function openDetail(id) {
   $("#detailSheet").scrollTop = 0;
 }
 
+const REPORT_KINDS = { nao_abre: "o anúncio não abre / dá erro", vendido: "o carro já foi vendido / saiu do ar", dados: "dados errados (preço, km, vendedor, itens)", outro: "outro problema" };
+function openReport(id) {
+  const l = byId(id); if (!l) return;
+  $("#reportBody").innerHTML = `<p><b>${esc(title(l))} ${esc(l.year_model || "")}</b><br><span class="small">${esc(l.version || "")} · ${brl(l.price)}</span></p>
+    <form id="reportForm" data-id="${id}">
+      <fieldset class="scope"><legend>O que aconteceu?</legend>
+        ${Object.entries(REPORT_KINDS).map(([k, t], i) => `<label class="chk"><input type="radio" name="kind" value="${k}" ${i ? "" : "checked"}> ${t[0].toUpperCase() + t.slice(1)}</label>`).join("")}
+      </fieldset>
+      <label>Detalhes (opcional)<textarea name="text" rows="3" placeholder="ex.: página do WebMotors mostra “anúncio não encontrado”; o preço é outro"></textarea></label>
+      <p class="small">“Não abre” e “vendido” tiram o anúncio da análise (vai para Descartados como indisponível). O aviso também vai para a próxima pesquisa reconferir o anúncio.</p>
+      <div class="cardActions"><button class="primary" type="submit">Enviar aviso</button><button type="button" class="ghost" data-close>Cancelar</button></div>
+    </form>`;
+  openSheet("#reportSheet"); history.pushState({ sheet: 6 }, "");
+}
+$("#reportSheet").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target, l = byId(+f.dataset.id); if (!l) return;
+  const kind = f.kind.value, text = f.text.value.trim();
+  act($("button[type=submit]", f), async () => {
+    const rep = { kind, kind_label: REPORT_KINDS[kind], text, at: new Date().toISOString(), sent: false };
+    l.reports = [...(l.reports || []), rep];
+    const prevAvail = l.available;
+    if (kind === "nao_abre" || kind === "vendido") E.reconfirm(S, l, { available: false, note: `Reportado por você: ${REPORT_KINDS[kind]}${text ? ` — ${text}` : ""}` }, deps);
+    rep.sent = await sendProblemReport(l, rep);
+    closeSheet("#reportSheet"); renderCards(); if (ui.openId === l.id) renderDetail(l);
+    toast(rep.sent ? "Aviso registrado e enviado para a pesquisa reconferir." : "Aviso registrado no app.", (kind === "nao_abre" || kind === "vendido") ? () => act(null, async () => {
+      E.reconfirm(S, l, { available: prevAvail !== false, note: "Aviso desfeito" }, deps); renderCards(); if (ui.openId === l.id) renderDetail(l); toast("Desfeito."); }) : null);
+  });
+});
+/** Envia o aviso como issue no GitHub (a pesquisa reconfere o anúncio). Sem token, fica só no app. */
+async function sendProblemReport(l, rep) {
+  const token = S.settings.github_token; if (!token) return false;
+  try {
+    const body = `Aviso do app CarMonitor: ${rep.kind_label}.\n\n\`\`\`json\n${JSON.stringify({ url: l.url, kind: rep.kind, text: rep.text, at: rep.at })}\n\`\`\``;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/issues`, { method: "POST",
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+      body: JSON.stringify({ title: `Problema no anúncio ${l.url.split("/").pop()} — ${rep.kind_label}`, body }) });
+    return r.ok;
+  } catch { return false; }
+}
 const QUESTIONS = {
   inducao: "O carro tem carregador de celular por indução (sem fio)?",
   android_auto_sem_fio: "O Android Auto conecta sem fio (sem cabo)?",
@@ -544,6 +583,8 @@ function renderDetail(d) {
     ${d.unavailable_since ? `<div class="msg err">Este anúncio saiu do ar em ${esc(E.fmtDate(d.unavailable_since))}. O histórico fica guardado até você excluir.</div>` : ""}
     ${decisionBox(d)}
     <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio no WebMotors ↗</a></p>
+    <p style="text-align:center;margin-top:-.4rem"><button class="ghost small" id="dReport">⚠ O anúncio deu erro ou tem algo errado? Avise aqui</button></p>
+    ${(d.reports || []).length ? `<div class="msg warn">Você reportou: ${esc(d.reports[d.reports.length - 1].kind_label)}${d.reports[d.reports.length - 1].text ? ` — “${esc(d.reports[d.reports.length - 1].text)}”` : ""} (${esc(E.fmtDate(d.reports[d.reports.length - 1].at))})${d.reports[d.reports.length - 1].sent ? " · enviado para a pesquisa reconferir" : ""}.</div>` : ""}
 
     <h3>Nota <button class="scoreBtn ${d.score?.level || "baixa"}" id="dScore">🎯 ${d.score?.total ?? "—"} · ${LEVEL_LABEL[d.score?.level] || ""}</button></h3>
     <h3>Ficha técnica</h3>${techHtml(d)}
@@ -636,6 +677,7 @@ function renderDetail(d) {
     openExternal(link); reload();
   };
   $("#dScore").onclick = () => openScore(d.id);
+  $("#dReport").onclick = () => openReport(d.id);
   $$("[data-quick]", $("#detail")).forEach((b) => b.onclick = () => {
     const [item, state] = b.dataset.quick.split(":");
     act(null, async () => {
