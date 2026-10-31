@@ -474,5 +474,74 @@
    "url": "https://www.cnnbrasil.com.br/auto/citroen-basalt-shine-conheca-a-versao-que-tem-mimos-de-carros-mais-caros/"
   },
   "note": "Carregador por indução não comprovado nas fontes; sem frenagem autônoma."
+ },
+ {
+  "id": "nissan-kicks-sense-2024",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "sense"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {},
+  "tech": {
+   "engine": "1.6 16V flex",
+   "power_e": 113,
+   "power_g": 110,
+   "torque_e": 15.3,
+   "torque_g": 15.2,
+   "gearbox": "CVT",
+   "city_g": 11.4,
+   "city_e": 7.8,
+   "trunk_l": 432,
+   "tank_l": 41,
+   "source": {
+    "title": "Garagem360 — Nissan Kicks Sense 2024: ficha técnica, preço e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=209798"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Nissan Kicks Sense 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=209798"
+  },
+  "note": "Fonte cita \"Apple CarPlay® e Android Auto®\" sem dizer se é sem fio; carregador por indução não citado na versão Sense; nenhum ADAS na lista de série (só piloto automático convencional) — itens deixados sem confirmação."
+ },
+ {
+  "id": "fiat-cronos-drive-cvt-2025",
+  "make": "fiat",
+  "model": "cronos",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {},
+  "tech": {
+   "engine": "1.3 Firefly flex",
+   "power_e": 107,
+   "power_g": 98,
+   "torque_e": 13.7,
+   "torque_g": 13.2,
+   "gearbox": "CVT",
+   "trunk_l": 525,
+   "tank_l": 48,
+   "source": {
+    "title": "Garagem360 — Fiat Cronos Drive 1.3 AT 2025",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=261423"
+   }
+  },
+  "source": {
+   "title": "Conexão Tocantins — Fiat mostra o desempenho, tecnologia e eficiência do Cronos 2025",
+   "quality": "secundária",
+   "url": "https://www.conexaoto.com.br/2025/03/01/fiat-mostra-o-desempenho-tecnologia-e-eficiencia-do-cronos-2025"
+  },
+  "note": "Fontes 2025 citam \"compatível com Android Auto e Apple CarPlay\" sem dizer se é sem fio (o sem fio só aparece em teste do 2026); carregador por indução não citado; nenhum ADAS na lista de série — itens deixados sem confirmação."
  }
 ]

@@ -1,22 +1,17 @@
 {
- "processed_at": "2026-10-31T18:48:56.210Z",
- "novos": 0,
+ "processed_at": "2026-10-31T22:53:21.503Z",
+ "novos": 2,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pedido: aviso 'Problema no anúncio' #1 (Nivus Comfortline 80926451, não abre). A página do anúncio também não abriu nesta verificação e o anúncio não apareceu na 1ª página da listagem nacional do Nivus Comfortline 2024+ (1.301 resultados) — sem confirmação de venda, mantido como estava (vendedor a verificar). Nenhum anúncio novo dentro do filtro nessa listagem.",
- "last_issue": 1,
+ "note": "pedido: filtro do app de 31/10 21:03 e aviso #2 (Polo Comfortline 79616736, não abre). 2 anúncios novos de loja (Kicks Sense Osasco, Cronos Drive CVT São Bernardo). A página do Polo 79616736 não abriu e ele não apareceu na listagem de VW em Barueri — mantido como estava. Verificados: VW Barueri (Nivus, T-Cross), Fiat SP (Pulse, Fastback, Cronos), Honda/Nissan Osasco, Creta Barueri, Jeep Barueri, Basalt/C3 Aircross/2008 SP — só a 1ª página de cada listagem. Descartados por ser Pessoa Física: Nivus 77981844, Basalt Feel 81466585. Não verificados (página do anúncio não abriu, cartão incompleto): Basalt First Edition 81490014, C3 Aircross Shine 80735629 e 81488982, Creta Action 81485167. Sem verificação: Tracker, Polo/Virtus, Argo, Renegade, Duster, Versa, HR-V, Yaris, Corolla Cross, Tiggo 5x, BYD, GWM. Fichas adicionadas: Kicks Sense 2024 e Cronos Drive CVT 2025 (só dados técnicos) — ficha sem fonte para indução, Android Auto sem fio e ADAS nessas duas versões. Seguem sem ficha: Tracker Midnight/LTZ 2024.",
+ "last_issue": 2,
  "processed_issues": [
-  1
+  1,
+  2
  ],
- "filter_used_at": "2026-10-31T18:04:13.925Z",
+ "filter_used_at": "2026-10-31T21:03:05.657Z",
  "last_attempt": {
-  "at": "2026-10-31T21:49:12.000Z",
-  "ok": false,
-  "reason": "WebMotors inacessível nesta execução (páginas não abriram)"
- },
- "running": {
-  "since": "2026-10-31T22:42:21.048Z",
-  "kind": "pedido",
-  "filter_at": "2026-10-31T21:03:05.657Z"
+  "at": "2026-10-31T22:53:21.503Z",
+  "ok": true
  }
 }
