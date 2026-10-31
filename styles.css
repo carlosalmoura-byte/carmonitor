@@ -194,3 +194,7 @@ main{padding-bottom:88px}
 .why{background:var(--bad-bg);border-left:3px solid var(--bad);color:var(--bad);padding:.4rem .55rem;border-radius:6px;font-size:.86rem;margin:.35rem 0;line-height:1.35}
 .chipBtn{font-size:.82rem;padding:.3rem .6rem;border-radius:999px}
 #discardSheet .chips{margin:.3rem 0 .8rem}
+
+@keyframes slideL{from{transform:translateX(28px);opacity:.4}to{transform:none;opacity:1}}
+@keyframes slideR{from{transform:translateX(-28px);opacity:.4}to{transform:none;opacity:1}}
+.cards.slideL{animation:slideL .18s ease-out}.cards.slideR{animation:slideR .18s ease-out}

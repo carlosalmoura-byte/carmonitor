@@ -121,14 +121,45 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape") $$(".sheet
 window.addEventListener("popstate", () => $$(".sheet.open").forEach((s) => closeSheet("#" + s.id)));
 
 // ---------------------------------------------------------------- lista
-$("#statusTabs").addEventListener("click", (e) => {
-  const b = e.target.closest("button"); if (!b) return;
-  ui.status = b.dataset.status;
+// Cada aba guarda a própria busca e ordenação.
+const TAB_KEY = "tabFilters";
+let tabFilters = {};
+try { tabFilters = JSON.parse(localStorage.getItem(TAB_KEY) || "{}") || {}; } catch { tabFilters = {}; }
+const tabState = (t) => (tabFilters[t] ??= { q: "", sort: "score" });
+function saveTabFilters() { try { localStorage.setItem(TAB_KEY, JSON.stringify(tabFilters)); } catch { /* ok */ } }
+function selectTab(status, dir = 0) {
+  const b = $(`#statusTabs button[data-status="${status}"]`); if (!b) return;
+  ui.status = status;
   $$("#statusTabs button").forEach((x) => x.classList.toggle("active", x === b));
+  b.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+  const st = tabState(status);
+  $("#q").value = st.q; $("#sort").value = st.sort;
   renderCards();
+  if (dir) { const c = $("#cards"); c.classList.remove("slideL", "slideR"); void c.offsetWidth; c.classList.add(dir > 0 ? "slideL" : "slideR"); }
+}
+$("#statusTabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (b) selectTab(b.dataset.status);
 });
-$("#q").addEventListener("input", () => renderCards());
-$("#sort").addEventListener("change", () => renderCards());
+$("#q").addEventListener("input", () => { tabState(ui.status).q = $("#q").value; saveTabFilters(); renderCards(); });
+$("#sort").addEventListener("change", () => { tabState(ui.status).sort = $("#sort").value; saveTabFilters(); renderCards(); });
+// deslizar para a esquerda/direita troca de aba
+(() => {
+  let x0 = null, y0 = null;
+  const skip = (t) => t.closest(".statusTabs, .tableWrap, .sheet, input, select, textarea");
+  const view = $("#view-listings");
+  view.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1 || skip(e.target)) { x0 = null; return; }
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive: true });
+  view.addEventListener("touchend", (e) => {
+    if (x0 == null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const tabs = $$("#statusTabs button").map((b) => b.dataset.status);
+    const i = tabs.indexOf(ui.status), j = i + (dx < 0 ? 1 : -1);
+    if (j >= 0 && j < tabs.length) selectTab(tabs[j], dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
 
 const title = (l) => [l.make, l.model].filter(Boolean).join(" ") || l.title || `Anúncio #${l.id}`;
 function distText(l) {
@@ -1033,7 +1064,7 @@ function handleShare() {
   for (const l of S.listings) if (!("seller" in l)) { l.seller = null; l.seller_type = null; E.reparseTexts(l); migrate = true; }
   if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
-  saveCompare(); updateTitle(); renderCards(); handleShare(); renderResearchStatus();
+  saveCompare(); updateTitle(); selectTab(ui.status); handleShare(); renderResearchStatus();
   const h = location.hash.match(/listing=(\d+)/);
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
   requestPersistence();
