@@ -21,10 +21,7 @@
 <main>
   <!-- ANÚNCIOS -->
   <section id="view-listings" class="view active">
-    <div class="researchBar">
-      <span id="researchStatus" class="small"></span>
-      <button class="primary" id="researchBtn">🔎 Pedir nova pesquisa</button>
-    </div>
+    <button class="researchPill" id="researchPill" aria-haspopup="dialog"><span id="researchIcon">⏳</span><span id="researchStatus"></span><span class="rpMore">›</span></button>
     <div class="statusTabs" id="statusTabs">
       <button data-status="" class="active">Em análise <span id="c-all">0</span></button>
       <button data-status="aprovado">Aprovados <span id="c-aprovado">0</span></button>
@@ -277,7 +274,13 @@
   <div id="discardBody"></div>
 </div>
 
+<div class="sheet" id="researchSheet" role="dialog" aria-modal="true" aria-label="Pesquisa">
+  <div class="sheetHead"><h2>Pesquisa de anúncios</h2><button class="ghost" data-close>✕</button></div>
+  <div id="researchBody"></div>
+  <button class="primary" id="researchBtn" style="width:100%;margin-top:.8rem">🔎 Pedir nova pesquisa agora</button>
+</div>
+
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=19"></script>
+<script type="module" src="app.js?v=20"></script>
 </body>
 </html>

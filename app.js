@@ -1040,18 +1040,51 @@ async function loadResearchStatus() {
   try { const r = await fetch("data/status.json", { cache: "no-store" }); if (r.ok) lastStatus = await r.json(); } catch { /* sem internet */ }
   renderResearchStatus();
 }
-function renderResearchStatus() {
-  const req = S.meta.research_requested_at, done = lastStatus?.processed_at || S.meta.feed_generated_at;
-  let t;
-  if (req && (!done || new Date(req) > new Date(done))) t = `Pedido enviado em ${E.fmtDate(req)} · aguardando (até ~1 h). Puxe a lista para baixo para conferir.`;
-  else if (done) t = `Última pesquisa: ${E.fmtDate(done)}${lastStatus && lastStatus.processed_at === done ? ` · ${lastStatus.novos} novo(s), ${lastStatus.atualizados} atualizado(s)` : ""}. Automáticas às 6h e 13h.`;
-  else t = "Nenhuma pesquisa ainda.";
-  const fu = S.meta.filter_updated_at, used = lastStatus?.filter_used_at;
-  if (S.meta.filter_error) t += ` ⚠ Filtro do app não enviado: ${S.meta.filter_error}.`;
-  else if (fu && used && used === fu) t += " ✓ Feita com o seu filtro atual.";
-  else if (fu && lastStatus && used !== fu) t += " ⚠ A última pesquisa não usou o seu filtro atual; a próxima vai usar.";
-  $("#researchStatus").textContent = t;
+/** Próximos horários: pesquisas automáticas (prontas ~6h e ~13h; começam 5:46 e 12:46) e verificação de pedidos (a cada hora, :41). */
+function nextAt(hours, minute, from = new Date()) {
+  const c = [];
+  for (let d = 0; d < 2; d++) for (const h of hours) { const t = new Date(from); t.setDate(t.getDate() + d); t.setHours(h, minute, 0, 0); if (t > from) c.push(t); }
+  return c.sort((a, b) => a - b)[0];
 }
+const hhmm = (d) => d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+function inTime(d) {
+  const m = Math.max(0, Math.round((d - Date.now()) / 60000));
+  return m < 60 ? `em ${m} min` : `em ${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}`;
+}
+function researchState() {
+  const req = S.meta.research_requested_at, done = lastStatus?.processed_at || S.meta.feed_generated_at;
+  const fu = S.meta.filter_updated_at, used = lastStatus?.filter_used_at;
+  const filterPending = !!(fu && lastStatus && used !== fu);
+  const reqPending = !!(req && (!done || new Date(req) > new Date(done)));
+  const pending = filterPending || reqPending;
+  const sched = nextAt([5, 12], 46), check = nextAt([...Array(24).keys()], 41);
+  const next = pending && check < sched ? { at: check, kind: "pedido" } : { at: sched, kind: "agendada" };
+  return { done, fu, used, filterPending, reqPending, pending, next, sched, check, err: S.meta.filter_error };
+}
+function renderResearchStatus() {
+  const r = researchState();
+  const icon = r.err ? "⚠️" : r.pending ? "⏳" : "✅";
+  const nxt = `${r.next.kind === "pedido" ? "pesquisa com seu filtro" : "próxima"} ${hhmm(r.next.at)} (${inTime(r.next.at)})`;
+  $("#researchIcon").textContent = icon;
+  $("#researchStatus").textContent = r.err ? "Filtro não enviado — toque para ver" : r.done ? `Pesquisa de ${E.fmtDate(r.done).slice(0, 5)} ${E.fmtDate(r.done).slice(-5)} · ${nxt}` : `Nenhuma pesquisa ainda · ${nxt}`;
+  $("#researchPill").className = "researchPill " + (r.err ? "warn" : r.pending ? "pend" : "ok");
+  if ($("#researchSheet").classList.contains("open")) renderResearchSheet();
+}
+function renderResearchSheet() {
+  const r = researchState(), st = lastStatus || {};
+  const row = (k, v) => `<div class="rrow"><span>${k}</span><b>${v}</b></div>`;
+  $("#researchBody").innerHTML = `
+    ${r.err ? `<div class="msg warn">⚠ O filtro do app não foi enviado: ${esc(r.err)}. A pesquisa vai usar o último filtro recebido.</div>` : ""}
+    ${row("Última pesquisa", r.done ? esc(E.fmtDate(r.done)) : "—")}
+    ${st.processed_at === r.done && st.processed_at ? row("Resultado", `${st.novos} novo(s) · ${st.atualizados} atualizado(s) · ${st.sairam_do_ar} saíram do ar`) : ""}
+    ${row("Filtro usado", !r.fu ? "—" : r.used === r.fu ? "✓ o seu filtro atual" : "⚠ um filtro anterior")}
+    ${r.pending ? row("Pedido na fila", `${r.filterPending ? "filtro alterado" : "pedido manual"} · verificação às ${hhmm(r.check)} (${inTime(r.check)})`) : ""}
+    ${row("Próxima automática", `${hhmm(r.sched)} (${inTime(r.sched)}) · fica pronta em ~10 min`)}
+    <p class="small" style="margin-top:.7rem">As pesquisas automáticas rodam às 5:46 e 12:46 (prontas por volta das 6h e 13h). Quando você muda o filtro, a verificação de hora em hora (aos 41 min) roda uma pesquisa com ele. Depois, puxe a lista para baixo para carregar.</p>
+    ${st.note ? `<details><summary class="small">Observações da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
+}
+$("#researchPill").onclick = () => { renderResearchSheet(); openSheet("#researchSheet"); history.pushState({ sheet: 5 }, ""); };
+setInterval(() => { if (document.visibilityState === "visible" && S) renderResearchStatus(); }, 30000);
 
 // ---------------------------------------------------------------- rotina ao abrir
 async function routine(force = false) {

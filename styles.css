@@ -231,3 +231,12 @@ details.fold{border:1px solid var(--line);border-radius:10px;padding:.55rem .7re
 details.fold>summary{cursor:pointer;font-weight:600;font-size:.92rem}
 details.sugg{padding:.45rem .7rem}
 details.sugg>summary{cursor:pointer}
+
+.researchPill{display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;font-size:.85rem;padding:.5rem .7rem;margin-bottom:.6rem;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.researchPill #researchStatus{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.researchPill .rpMore{color:var(--muted);font-size:1.1rem}
+.researchPill.warn{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.researchPill.pend{background:var(--pend-bg);color:var(--pend);border-color:transparent}
+.rrow{display:flex;justify-content:space-between;gap:.8rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.88rem}
+.rrow span{color:var(--muted)}.rrow b{text-align:right;font-weight:600}
+.msg.warn{background:var(--bad-bg);color:var(--bad)}
