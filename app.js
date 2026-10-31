@@ -144,14 +144,17 @@ function renderCards() {
   const counts = { aprovado: 0, pendente: 0, descartado: 0 };
   items.forEach((l) => counts[l.status]++);
   $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
-  $("#c-descartado").textContent = counts.descartado; $("#c-all").textContent = items.length;
-  $("#c-reconferir").textContent = items.filter(stale).length;
+  const live = items.filter((l) => l.status !== "descartado"); // descartados só aparecem na aba Descartados
+  $("#c-descartado").textContent = counts.descartado; $("#c-all").textContent = live.length;
+  $("#c-reconferir").textContent = live.filter(stale).length;
   $("#c-fav").textContent = items.filter((l) => l.favorite).length;
-  $("#c-fipe").textContent = items.filter(isBelowFipe).length;
-  if (ui.status === "reconferir") items = items.filter(stale);
+  $("#c-fipe").textContent = live.filter(isBelowFipe).length;
+  if (ui.status === "descartado") items = items.filter((l) => l.status === "descartado");
   else if (ui.status === "favoritos") items = items.filter((l) => l.favorite);
-  else if (ui.status === "fipe") items = items.filter(isBelowFipe);
-  else if (ui.status) items = items.filter((l) => l.status === ui.status);
+  else if (ui.status === "reconferir") items = live.filter(stale);
+  else if (ui.status === "fipe") items = live.filter(isBelowFipe);
+  else if (ui.status) items = live.filter((l) => l.status === ui.status);
+  else items = live;
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
   const keyf = {
     price: (l) => l.price ?? 1e12, km: (l) => l.km ?? 1e12, distance: (l) => l.distance?.km ?? 1e12,
@@ -950,7 +953,6 @@ async function routine(force = false) {
   setTimeout(() => { $("#routineMsg").innerHTML = ""; }, 8000);
 }
 async function refreshAll() { await syncResearch(true); await routine(true); fillDistancesBg(); }
-$("#routineBtn").onclick = (e) => act(e.target, refreshAll);
 
 // puxar para atualizar (na lista de anúncios)
 (() => {
