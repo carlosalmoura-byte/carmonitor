@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-10-31T21:03:05.657Z",
+ "updated_at": "2026-11-01T17:15:57.181Z",
  "origem": "app CarMonitor",
  "criteria": {
   "min_price": null,
@@ -21,7 +21,7 @@
    "loja",
    "concessionaria"
   ],
-  "ref_location": "Barueri, SP",
+  "ref_location": "São Paulo, SP",
   "max_distance_km": 60,
   "adas_required": false,
   "no_auction": true,
@@ -58,6 +58,12 @@
    "make": "PEUGEOT",
    "model": "208",
    "version_includes": null,
+   "version_excludes": null
+  },
+  {
+   "make": "FIAT",
+   "model": "PULSE",
+   "version_includes": "10 TURBO 200 FLEX AUDACE CVT",
    "version_excludes": null
   }
  ]
