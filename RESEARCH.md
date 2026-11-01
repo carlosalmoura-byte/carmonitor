@@ -5,6 +5,40 @@ O usuário pede uma nova pesquisa pelo botão **Atualizar pesquisa** do app, que
 com o título começando por `Atualizar pesquisa` e um bloco JSON com os critérios. Este documento descreve como
 atender esse pedido.
 
+## 0. Onde a pesquisa roda — navegador do computador (preferencial) ou nuvem (reserva)
+
+**Navegador do computador (preferencial).** Se a sessão tiver as ferramentas do navegador do app Claude no
+computador do usuário (`mcp__remote-devices__Claude_Browser__*`; carregue-as com ToolSearch
+`mcp__remote-devices__Claude_Browser__`, max_results 64), a pesquisa é feita **nele**: é o navegador do usuário, com a
+sessão/cookies dele, e o WebMotors abre as listagens e os anúncios completos (itens, vendedor, FIPE). Nesse modo:
+
+1. **Listagens:** `node tools/wm-url.mjs 3` imprime as URLs da busca filtrada do próprio WebMotors (cidade de
+   referência + vizinhas da Grande SP; preço, ano, km, câmbio e anunciante do filtro do app), 3 páginas por cidade.
+   Abra cada uma com `navigate`, espere ~5 s (`computer` wait) e rode o conteúdo de `tools/wm-cards.js` no
+   `javascript_tool` (cole o arquivo sem as linhas de comentário). Ele devolve os cartões (url, ano, km, preço, cidade,
+   selo Abaixo da Fipe). Página sem cartões = pare de paginar aquela cidade.
+2. **Escolha os anúncios** pelos cartões: pule modelos em `exclusions`, câmbio manual, preço/ano/km fora do filtro e
+   URLs que já estão em `data/anuncios.json` (salvo os de `favorites`/reconferência). Priorize as versões de
+   `data/versoes-alvo.json`, depois "Abaixo da Fipe" e menor km. Limite: **~60 anúncios por pesquisa** (~20 por pedido
+   fora do horário agendado).
+3. **Cada anúncio:** `navigate` para a URL, espere ~5 s, rode o conteúdo de `tools/wm-extract.js` no `javascript_tool`.
+   Ele devolve `{ok, blocked, url, text}` com `text` já no formato da seção 4 (itens de veículo, vendedor Loja/Pessoa
+   Física, FIPE da página). Use o `text` como veio (não acrescente nada). `ok:false` sem `blocked` = página não
+   carregou ou saiu do ar: espere mais 5 s e rode de novo uma vez; se a página disser que o anúncio não existe mais,
+   publique `available:false`.
+4. **Ritmo humano:** uma página por vez, 5–8 s entre páginas, nada de `fetch` em paralelo (o `fetch` direto nem traz o
+   anúncio — a página é montada por JavaScript). Não clique em nada além do necessário, não aceite cookies, não
+   preencha formulários, não faça login, não envie mensagens.
+5. **Verificação "Pressione e segure" (PerimeterX):** se `blocked:true` aparecer em qualquer página, **pare a pesquisa
+   na hora**. Nunca tente passar pela verificação. Publique o que já foi coletado (merge-feed normal, com a nota
+   "WebMotors pediu verificação humana") e, se nada foi coletado, rode
+   `node tools/fail-research.mjs "WebMotors pediu verificação: abra o navegador do app Claude no computador e pressione e segure"`.
+   O usuário passa a verificação e a próxima execução segue.
+6. Ao terminar, deixe a aba na página inicial do WebMotors (não feche o painel).
+
+**Nuvem (reserva).** Sem essas ferramentas (computador desligado/não vinculado), use o método das seções 3 em diante
+(WebSearch/WebFetch). Ele cobre menos e é bloqueado com frequência; registre no `--note` "pesquisa pela nuvem (reserva)".
+
 ## 1. Qual filtro usar e existe pedido pendente?
 
 **Regra principal: nunca pesquise sem antes ler o filtro que está no app.** O app grava o filtro atual do usuário
@@ -35,7 +69,12 @@ Registre todas as issues pendentes como processadas (`--issue N,M`).
 
 ### Modo agendado (6h e 13h)
 
-As execuções agendadas das 6h e 13h (horário de Brasília) pesquisam **mesmo sem pedido pendente**, a pedido do
+Pesquisa completa às 6h e às 13h (horário de Brasília), feita pela tarefa agendada **no computador** (navegador do
+app). Nos outros horários essa mesma tarefa só atende pedidos pendentes. A tarefa da nuvem roda às 9h46 apenas como
+**reserva**: se `data/status.json` já tiver `last_attempt.ok = true` com `processed_at` de hoje (Brasília), ela para sem
+fazer nada.
+
+As execuções agendadas pesquisam **mesmo sem pedido pendente**, a pedido do
 usuário, sempre com os critérios de `data/filtro.json`. Só se esse arquivo não existir, use o bloco JSON da issue
 "Atualizar pesquisa" mais recente; e só se também não houver issue, use o padrão (até R$ 100.000; ano-modelo
 2022–2025; até 35.000 km; automático; usados/seminovos; particular, loja e concessionária; Barueri, SP, até 60 km)
@@ -64,8 +103,8 @@ rode `node tools/fail-research.mjs "<motivo curto>"`, faça commit de `data/stat
 
 ### Pedido perto da pesquisa agendada
 
-Se a verificação de pedidos cair entre 5:30 e 5:59 ou entre 12:30 e 12:59 (horário de Brasília), **não pesquise**:
-a pesquisa agendada começa às 5:46/12:46 e já usa o filtro atual.
+A pesquisa completa das 6h e das 13h já atende qualquer pedido pendente (registre as issues nela). Se houver marca
+`running` com menos de 45 min em `data/status.json`, outra execução está pesquisando: pare sem fazer nada.
 
 ### Avisos de problema enviados pelo app
 
@@ -79,13 +118,13 @@ estiverem errados, publique a transcrição corrigida. Ao terminar, feche a issu
 ## 2. Regras (obrigatórias)
 
 - Os Termos de Uso da Webmotors proíbem raspagem automatizada. A pesquisa acontece **somente quando há pedido ou no horário agendado pelo usuário (6h e 13h)** e
-  é feita página a página como uma consulta humana: **WebSearch** (com `allowed_domains: ["webmotors.com.br"]`)
-  para achar páginas de listagem, **WebFetch** dessas páginas e dos anúncios que aparecem nelas. Nada de curl,
-  scripts ou contornar bloqueios no webmotors.com.br. URL recusada = siga em frente.
+  é feita página a página como uma consulta humana: no **navegador do computador** (seção 0) ou, na reserva da nuvem,
+  **WebSearch** (com `allowed_domains: ["webmotors.com.br"]`) + **WebFetch**. Nada de curl, requisições em paralelo ou
+  contornar bloqueios/verificações no webmotors.com.br. URL recusada = siga em frente.
 - **Não invente nada.** Transcreva apenas o que a página mostrou. O que não constar fica fora do texto.
 - Só marque `available: false` quando a página do anúncio indicar claramente que foi vendido/removido. Se a página
   não puder ser aberta, **não** marque nada (deixe como estava).
-- Limite: cerca de 40 páginas de anúncio por pedido.
+- Limite: ~60 anúncios na pesquisa completa pelo computador; ~40 na nuvem; ~20 em pedido fora do horário agendado.
 - **Leilão, blindagem, carroceria e cores:** respeite `no_auction`, `no_armored`, `body_types` (vazio = qualquer) e
   `avoid_colors` de `data/filtro.json` — não traga anúncio que a página mostre como de leilão, blindado, de carroceria
   fora da lista ou de cor evitada.

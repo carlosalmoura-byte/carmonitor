@@ -1266,7 +1266,7 @@ async function loadResearchStatus() {
   try { const r = await fetch("data/status.json", { cache: "no-store" }); if (r.ok) lastStatus = await r.json(); } catch { /* sem internet */ }
   renderResearchStatus();
 }
-/** Próximos horários: pesquisas automáticas (prontas ~6h e ~13h; começam 5:46 e 12:46) e verificação de pedidos (a cada hora, :41). */
+/** Próximos horários (tarefa no computador do usuário): automáticas às 6:21 e 13:21 (prontas ~30 min depois) e verificação de pedidos às :21, das 7h às 22h. */
 function nextAt(hours, minute, from = new Date()) {
   const c = [];
   for (let d = 0; d < 2; d++) for (const h of hours) { const t = new Date(from); t.setDate(t.getDate() + d); t.setHours(h, minute, 0, 0); if (t > from) c.push(t); }
@@ -1287,10 +1287,10 @@ function researchState() {
   const filterPending = !!(fu && lastStatus && used !== fu);
   const reqPending = !!(req && (!done || new Date(req) > new Date(done)));
   const pending = !run && (filterPending || reqPending);
-  // automática: começa 5:46/12:46 e fica pronta ~6h/13h; pedidos: verificação aos :41, exceto 5:41/12:41 (a automática atende)
-  const schedStart = nextAt([5, 12], 46), schedReady = new Date(schedStart.getTime() + 14 * 60000);
-  const checkHours = [...Array(24).keys()].filter((h) => h !== 5 && h !== 12);
-  const check = nextAt(checkHours, 41);
+  // automática: começa 6:21/13:21 e fica pronta ~30 min depois; pedidos: verificação aos :21 das 7h às 22h (às 13h a automática atende)
+  const schedStart = nextAt([6, 13], 21), schedReady = new Date(schedStart.getTime() + 30 * 60000);
+  const checkHours = [...Array(24).keys()].filter((h) => h >= 7 && h <= 22 && h !== 13);
+  const check = nextAt(checkHours, 21);
   const viaSched = schedStart <= check;
   const la = lastStatus?.last_attempt;
   const failed = la && la.ok === false && (!done || new Date(la.at) > new Date(done)) && !run ? la : null;
@@ -1305,7 +1305,7 @@ function renderResearchStatus() {
   else if (r.err) { icon = "⚠️"; cls = "warn"; text = "Seu filtro não chegou à pesquisa · toque para ver"; }
   else if (r.dirty) { icon = "✏️"; cls = "pend"; text = "Filtro alterado, ainda não enviado · toque para pesquisar"; }
   else if (r.pending) { icon = "⏳"; cls = "pend"; const t = r.viaSched ? r.schedStart : r.check; text = `${r.filterPending ? "Filtro novo" : "Pedido recebido"}: pesquisa ${when(t)} (${inTime(t)})`; }
-  else { icon = "✅"; cls = "ok"; text = `${r.done ? `Atualizada ${when(new Date(r.done))}` : "Sem pesquisa ainda"} · próxima ${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h`; }
+  else { icon = "✅"; cls = "ok"; text = `${r.done ? `Atualizada ${when(new Date(r.done))}` : "Sem pesquisa ainda"} · próxima ${dayWord(r.schedReady)} ~${hhmm(r.schedReady)}`; }
   const nNew = ui.since ? S.listings.filter((l) => !l.archived && l.status !== "descartado" && l.first_seen && new Date(l.first_seen) > new Date(ui.since)).length : 0;
   if (nNew && !r.err) text = `${nNew} novo(s) · ` + text;
   $("#researchIcon").textContent = icon; $("#researchStatus").textContent = text;
@@ -1316,7 +1316,7 @@ function renderResearchStatus() {
 function renderResearchSheet() {
   const r = researchState(), st = lastStatus || {};
   let head;
-  if (r.run) head = `🔄 <b>Pesquisando agora.</b> Começou ${when(new Date(r.run.since))}${r.run.filter_at === r.fu ? ", com o seu filtro atual" : ""}. Leva uns 15 minutos; depois puxe a lista para baixo.`;
+  if (r.run) head = `🔄 <b>Pesquisando agora.</b> Começou ${when(new Date(r.run.since))}${r.run.filter_at === r.fu ? ", com o seu filtro atual" : ""}. Leva uns 20–30 minutos; depois puxe a lista para baixo.`;
   else if (r.failed) { const t = r.viaSched ? r.schedStart : r.check;
     head = `⚠️ <b>A pesquisa de ${when(new Date(r.failed.at))} não concluiu.</b> Motivo: ${esc(r.failed.reason)}. Nada mudou na sua lista. Nova tentativa ${when(t)} (${inTime(t)}).`; }
   else if (r.err) head = `⚠️ <b>Seu filtro não chegou à pesquisa.</b> Motivo: ${esc(r.err)}. Enquanto isso, a pesquisa usa o último filtro recebido.`;
@@ -1329,14 +1329,14 @@ function renderResearchSheet() {
   const filt = !r.fu ? "" : r.used === r.fu ? "com o seu filtro atual ✓" : "com um filtro antigo (antes da sua última mudança)";
   const next = [];
   if (r.pending && !r.viaSched) next.push(`<li><b>${when(r.check)}</b> — com o seu ${r.filterPending ? "filtro novo" : "pedido"} (${inTime(r.check)})</li>`);
-  next.push(`<li><b>${dayWord(r.schedReady)} ~${r.schedReady.getHours()}h</b> — automática (${inTime(r.schedStart)})</li>`);
+  next.push(`<li><b>${dayWord(r.schedReady)} ~${hhmm(r.schedReady)}</b> — automática (${inTime(r.schedStart)})</li>`);
   $("#researchBody").innerHTML = `
     <div class="rhead ${r.err ? "warn" : r.pending || r.run ? "pend" : "ok"}">${head}</div>
     <h3 class="rsub">Última pesquisa</h3>
     <p>${r.done ? `${when(new Date(r.done))}${res ? ` — ${res}` : ""}.` : "Ainda não houve pesquisa."}${filt ? `<br><span class="small">Feita ${filt}.</span>` : ""}</p>
     <h3 class="rsub">Próximas pesquisas</h3>
     <ul class="rnext">${next.join("")}</ul>
-    <p class="small">Automáticas todo dia por volta das 6h e das 13h. Quando você toca em “Pesquisar com este filtro”, uma pesquisa extra roda na próxima hora cheia (aos 41 min) — a não ser que a automática venha antes.</p>
+    <p class="small">Automáticas todo dia às 6h21 e 13h21, pelo navegador do app Claude no seu computador (precisa estar ligado, com o app Claude aberto). Pedidos (“Pesquisar com este filtro”) são atendidos aos 21 min de cada hora, das 7h às 22h. Se o computador estiver desligado, a nuvem faz uma pesquisa reserva às 9h46, com menos cobertura.</p>
     ${st.note ? `<details><summary class="small">Detalhes técnicos da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
 }
 function setResearchBtnLabel() { $("#researchBtn").textContent = filterDirty() && S.settings.github_token ? "🔎 Pesquisar com este filtro" : "🔎 Pedir nova pesquisa agora"; }
