@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-01T08:57:55.087Z",
- "novos": 2,
+ "processed_at": "2026-11-01T15:56:32.993Z",
+ "novos": 5,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa agendada (filtro do app de 31/10 21:03). 2 anúncios novos, ambos só pelo cartão da listagem (página do anúncio não abriu, vendedor a verificar): Toyota Yaris XL Multidrive 2022/2023 80844686 e Yaris XLS Connect Multidrive 2022/2023 79523604 (FIPE da XLS Connect não encontrada: página da Tabela Fipe não abriu). Verificados (só a 1ª página de cada listagem): Tracker SP 2022 e 2024+, Virtus Highline/Comfortline SP, City Touring sedã e hatch SP, Barueri usados, T-Cross Barueri, Renegade SP 2023, Argo Trekking CVT/Argo 2023 SP, Yaris SP 2023 — sem outros cartões dentro de preço/ano/km/região. Descartado PF: Virtus Comfortline 81488078. Não abriram (permissão de acesso não respondida): listagens Polo SP 2022, City SP 2022, Barueri 2022+, Renegade SP 2022, Yaris SP 2022 e a página do anúncio Yaris 80940206. Sem verificação: Polo, Argo, Duster, Versa, Nivus, Pulse, Fastback, Cronos, Creta, Kicks, HR-V, WR-V, Compass, Corolla Cross, 2008, C3/Basalt/C3 Aircross, Tiggo 5x, BYD, GWM. Anúncios já no app não foram reconferidos. Ficha sem fonte para indução, Android Auto sem fio e ADAS em Yaris XL Multidrive 2023 e XLS Connect Multidrive 2023; seguem sem ficha Tracker Midnight/LTZ 2024.",
+ "note": "pesquisa agendada (filtro do app de 31/10 21:03). 5 anúncios novos com página aberta e vendedor Loja: Pulse Drive CVT 2023 72917841, Creta Limited 2022 81749178 (Abaixo da Fipe), Kicks Active 2024 80930094, C3 Aircross Shine 7L 2025 81488982 (Abaixo da Fipe), C3 Aircross Feel Pack 2025 80935197. Verificados: Polo Highline SP, Polo 2023 SP, Nivus Highline/2024 (todos acima de R$ 100 mil), Fastback 2024, Pulse 2023/2024, Creta 2022/2023, Kicks 2024/Exclusive, 2008 SP, C3 Aircross 2023+/2025. Descartados PF: Polo Comfortline 81051530, C3 Aircross Shine 81262901. Não abriram (permissão de acesso não respondida): anúncios Polo 81607101, 81137441, 81495672, Pulse Audace 72993878, Kicks Advance 81775273, Creta Action 80859347, C3 Aircross 79269943; links que caíram na listagem genérica (não marcados como vendidos): Polo 78415926, Pulse 77977169, C3 Aircross 78788582 e 76353553. A partir daí o WebMotors recusou todas as páginas: sem verificação HR-V, WR-V, Corolla Cross, Tera, Duster, Versa, BYD, GWM, Tiggo 5x, Argo, Compass, Renegade, Tracker, Virtus, T-Cross, City, Yaris. Anúncios já no app não foram reconferidos. Fichas novas: Pulse Drive CVT 2023, Creta Limited 2022, Kicks Active 2024, C3 Aircross Shine 7L e Feel Pack 2025 — ficha sem fonte para indução e ADAS no C3 Aircross e no Pulse Drive (indução é opcional), para ADAS no Creta Limited e para Android Auto sem fio no Kicks Active; seguem sem ficha Tracker Midnight/LTZ 2024, 208 Griffe 2022 e Yaris 2023.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,12 +11,7 @@
  ],
  "filter_used_at": "2026-10-31T21:03:05.657Z",
  "last_attempt": {
-  "at": "2026-11-01T08:57:55.087Z",
+  "at": "2026-11-01T15:56:32.993Z",
   "ok": true
- },
- "running": {
-  "since": "2026-11-01T15:47:24.785Z",
-  "kind": "agendada",
-  "filter_at": "2026-10-31T21:03:05.657Z"
  }
 }

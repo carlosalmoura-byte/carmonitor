@@ -543,5 +543,205 @@
    "url": "https://www.conexaoto.com.br/2025/03/01/fiat-mostra-o-desempenho-tecnologia-e-eficiencia-do-cronos-2025"
   },
   "note": "Fontes 2025 citam \"compatível com Android Auto e Apple CarPlay\" sem dizer se é sem fio (o sem fio só aparece em teste do 2026); carregador por indução não citado; nenhum ADAS na lista de série — itens deixados sem confirmação."
+ },
+ {
+  "id": "fiat-pulse-drive-cvt-2023",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "opcional",
+    "quote": "Pack Plus (R$ 4.300) – câmera de ré com linhas adaptativas, carregador wireless"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Apple Car Play e Android Auto wireless"
+   }
+  },
+  "tech": {
+   "engine": "1.3 Firefly flex",
+   "power_e": 107,
+   "power_g": 98,
+   "torque_e": 13.7,
+   "torque_g": 13.2,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "source": {
+    "title": "Garagem360 — Fiat Pulse: ficha técnica, preço e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=201624"
+   }
+  },
+  "source": {
+   "title": "Lista de equipamentos série e opcionais Pulse 1.3 Drive MT e AT (jul/2022)",
+   "quality": "concessionária",
+   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/07/Pulse-1.3-Drive-MT-e-AT-Lista-de-equipamentos-serie-e-opcionais.pdf"
+  },
+  "note": "Lista de jul/2022 não informa o ano-modelo; a página da Garagem360 (Pulse 2024) traz o mesmo Android Auto wireless e o carregador só nas versões S-Design/Audace/Impetus. Nenhum ADAS (AEB, faixa, ponto cego, ACC) citado para a Drive — item deixado sem confirmação."
+ },
+ {
+  "id": "hyundai-creta-limited-2022",
+  "make": "hyundai",
+  "model": "creta",
+  "version_includes": [
+   "limited"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregador sem fio para smartphones"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Central multimídia touchscreen de 8” com conexão sem fio para Apple CarPlay® e Google Android Auto®"
+   }
+  },
+  "tech": {
+   "engine": "1.0 turbo TGDI (3 cil.)",
+   "power_e": 120,
+   "power_g": 120,
+   "torque_e": 17.5,
+   "torque_g": 17.5,
+   "gearbox": "Automático, 6 marchas",
+   "trunk_l": 422,
+   "tank_l": 50,
+   "source": {
+    "title": "Catálogo Hyundai Creta 2022 (potência, torque, porta-malas) + Motor Show (tanque)",
+    "quality": "oficial/secundária",
+    "url": "https://hyundai.com.br/content/dam/hmb/cars/creta/2022/catalogos/catalogo_digital_creta_2022.pdf"
+   }
+  },
+  "source": {
+   "title": "Catálogo oficial Hyundai Creta Nova Geração (ano/modelo 2021/2022)",
+   "quality": "oficial",
+   "url": "https://hyundai.com.br/content/dam/hmb/cars/creta/2022/catalogos/catalogo_digital_creta_2022.pdf"
+  },
+  "note": "Na Limited o catálogo lista só HAC, ESS e piloto automático convencional; controle de velocidade adaptativo aparece apenas na Ultimate — ADAS deixado sem confirmação."
+ },
+ {
+  "id": "nissan-kicks-active-2024",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "active"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "carregador de celular por indução — citado apenas na versão Exclusive"
+   },
+   "adas": {
+    "state": "ausente",
+    "names": [],
+    "quote": "Pack Tech (alertas de colisão, mudança de faixa e ponto cego) — apenas na Exclusive"
+   }
+  },
+  "tech": {
+   "engine": "1.6 16V flex",
+   "power_e": 113,
+   "power_g": 110,
+   "torque_e": 15.3,
+   "torque_g": 15.2,
+   "gearbox": "CVT",
+   "source": {
+    "title": "Garagem360 — Nissan Kicks 2024: ficha técnica, preço e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=209804"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Nissan Kicks 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=209804"
+  },
+  "note": "Fonte cita \"Apple CarPlay e Android Auto\" na Active sem dizer se é sem fio — item deixado sem confirmação."
+ },
+ {
+  "id": "citroen-c3-aircross-shine-7l-2025",
+  "make": "citroen",
+  "model": "c3 aircross",
+  "version_includes": [
+   "shine",
+   "7l"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "espelhamento sem fio via Android Auto e Apple CarPlay"
+   }
+  },
+  "tech": {
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_e": 130,
+   "power_g": 125,
+   "torque_e": 20.4,
+   "torque_g": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "trunk_l": 493,
+   "tank_l": 47,
+   "source": {
+    "title": "Garagem360 — C3 Aircross 2025 (ficha 7 Shine)",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+   },
+   "note": "Porta-malas 493 l sem a 3ª fileira; 42 l com 7 lugares."
+  },
+  "source": {
+   "title": "Garagem360 — Citroën C3 Aircross 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+  },
+  "note": "Carregador por indução não citado; nenhum ADAS (AEB, faixa, ponto cego, ACC) citado — itens deixados sem confirmação."
+ },
+ {
+  "id": "citroen-c3-aircross-feel-pack-2025",
+  "make": "citroen",
+  "model": "c3 aircross",
+  "version_includes": [
+   "feel pack"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Central multimídia touchscreen de 10 polegadas com espelhamento sem fio via Android Auto e Apple CarPlay"
+   }
+  },
+  "tech": {
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_e": 130,
+   "power_g": 125,
+   "torque_e": 20.4,
+   "torque_g": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "source": {
+    "title": "Garagem360 — C3 Aircross 2025",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Citroën C3 Aircross 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+  },
+  "note": "Multimídia sem fio listada como item de série de todas as versões. Carregador por indução e ADAS não citados — itens deixados sem confirmação."
  }
 ]
