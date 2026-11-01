@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-10-31T22:53:21.503Z",
+ "processed_at": "2026-11-01T08:57:55.087Z",
  "novos": 2,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pedido: filtro do app de 31/10 21:03 e aviso #2 (Polo Comfortline 79616736, não abre). 2 anúncios novos de loja (Kicks Sense Osasco, Cronos Drive CVT São Bernardo). A página do Polo 79616736 não abriu e ele não apareceu na listagem de VW em Barueri — mantido como estava. Verificados: VW Barueri (Nivus, T-Cross), Fiat SP (Pulse, Fastback, Cronos), Honda/Nissan Osasco, Creta Barueri, Jeep Barueri, Basalt/C3 Aircross/2008 SP — só a 1ª página de cada listagem. Descartados por ser Pessoa Física: Nivus 77981844, Basalt Feel 81466585. Não verificados (página do anúncio não abriu, cartão incompleto): Basalt First Edition 81490014, C3 Aircross Shine 80735629 e 81488982, Creta Action 81485167. Sem verificação: Tracker, Polo/Virtus, Argo, Renegade, Duster, Versa, HR-V, Yaris, Corolla Cross, Tiggo 5x, BYD, GWM. Fichas adicionadas: Kicks Sense 2024 e Cronos Drive CVT 2025 (só dados técnicos) — ficha sem fonte para indução, Android Auto sem fio e ADAS nessas duas versões. Seguem sem ficha: Tracker Midnight/LTZ 2024.",
+ "note": "pesquisa agendada (filtro do app de 31/10 21:03). 2 anúncios novos, ambos só pelo cartão da listagem (página do anúncio não abriu, vendedor a verificar): Toyota Yaris XL Multidrive 2022/2023 80844686 e Yaris XLS Connect Multidrive 2022/2023 79523604 (FIPE da XLS Connect não encontrada: página da Tabela Fipe não abriu). Verificados (só a 1ª página de cada listagem): Tracker SP 2022 e 2024+, Virtus Highline/Comfortline SP, City Touring sedã e hatch SP, Barueri usados, T-Cross Barueri, Renegade SP 2023, Argo Trekking CVT/Argo 2023 SP, Yaris SP 2023 — sem outros cartões dentro de preço/ano/km/região. Descartado PF: Virtus Comfortline 81488078. Não abriram (permissão de acesso não respondida): listagens Polo SP 2022, City SP 2022, Barueri 2022+, Renegade SP 2022, Yaris SP 2022 e a página do anúncio Yaris 80940206. Sem verificação: Polo, Argo, Duster, Versa, Nivus, Pulse, Fastback, Cronos, Creta, Kicks, HR-V, WR-V, Compass, Corolla Cross, 2008, C3/Basalt/C3 Aircross, Tiggo 5x, BYD, GWM. Anúncios já no app não foram reconferidos. Ficha sem fonte para indução, Android Auto sem fio e ADAS em Yaris XL Multidrive 2023 e XLS Connect Multidrive 2023; seguem sem ficha Tracker Midnight/LTZ 2024.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,12 +11,7 @@
  ],
  "filter_used_at": "2026-10-31T21:03:05.657Z",
  "last_attempt": {
-  "at": "2026-10-31T22:53:21.503Z",
+  "at": "2026-11-01T08:57:55.087Z",
   "ok": true
- },
- "running": {
-  "since": "2026-11-01T08:47:11.328Z",
-  "kind": "agendada",
-  "filter_at": "2026-10-31T21:03:05.657Z"
  }
 }
