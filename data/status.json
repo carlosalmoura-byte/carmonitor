@@ -11,12 +11,8 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-01T18:04:39.571Z",
-  "ok": true
- },
- "running": {
-  "since": "2026-11-01T19:56:34.435Z",
-  "kind": "agendada",
-  "filter_at": "2026-11-01T17:15:57.181Z"
+  "at": "2026-11-01T19:57:20.533Z",
+  "ok": false,
+  "reason": "Computador indisponível: abra o app Claude no computador"
  }
 }
