@@ -13,5 +13,10 @@
  "last_attempt": {
   "at": "2026-11-01T08:57:55.087Z",
   "ok": true
+ },
+ "running": {
+  "since": "2026-11-01T15:47:24.785Z",
+  "kind": "agendada",
+  "filter_at": "2026-10-31T21:03:05.657Z"
  }
 }
