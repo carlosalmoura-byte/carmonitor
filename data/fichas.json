@@ -743,5 +743,272 @@
    "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
   },
   "note": "Multimídia sem fio listada como item de série de todas as versões. Carregador por indução e ADAS não citados — itens deixados sem confirmação."
+ },
+ {
+  "id": "vw-polo-comfortline-2025",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {},
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.0 TSI 170 (3 cil.)",
+   "power_g": 109,
+   "power_e": 116,
+   "torque_g": 16.8,
+   "torque_e": 16.8,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 12.5,
+   "road_g": 15.3,
+   "city_e": 8.7,
+   "road_e": 10.8,
+   "trunk_l": 300,
+   "source": {
+    "title": "Garagem360 — VW Polo 2025: ficha técnica e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=279696"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Polo 2025: ficha técnica e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=279696"
+  },
+  "note": "Fontes de 2025 (Garagem360, Carro.blog, MotorAgora) citam o carregador por indução só na Highline, mas a fonte do Polo 2024 lista o item na Comfortline — conflito, indução deixada sem confirmação. Android Auto sem fio sem fonte para 2025 (só \"App-Connect\"/\"VW Play\"). Sem ADAS ativo citado (só frenagem pós-colisão e piloto automático convencional)."
+ },
+ {
+  "id": "fiat-cronos-drive-cvt-2023",
+  "make": "fiat",
+  "model": "cronos",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Multimídia (com conexão sem fio para Android Auto e Apple CarPlay)"
+   }
+  },
+  "tech": {
+   "body": "Sedã compacto",
+   "engine": "1.3 Firefly (4 cil.)",
+   "power_g": 98,
+   "power_e": 107,
+   "torque_g": 13.2,
+   "torque_e": 13.7,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 13.4,
+   "road_g": 14.9,
+   "city_e": 9.3,
+   "road_e": 10.8,
+   "tank_l": 45,
+   "trunk_l": 525,
+   "source": {
+    "title": "Stellantis Media — ficha técnica Cronos Drive 1.3 AT Flex + AutoPapo (consumo)",
+    "quality": "oficial",
+    "url": "https://www.media.stellantis.com/br-pt/download-model-document/385"
+   }
+  },
+  "source": {
+   "title": "AutoPapo — Teste Fiat Cronos Drive 1.3 CVT 2023",
+   "quality": "secundária",
+   "url": "https://autopapo.com.br/noticia/fiat-cronos-drive-cvt-2023/"
+  },
+  "note": "Carregador por indução não citado nas fontes (sem fonte). Sem ADAS: só ABS, controles de tração e estabilidade, Hill Holder e piloto automático convencional."
+ },
+ {
+  "id": "chevrolet-tracker-lt-2025",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "lt"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "\"Carregador de celular por indução\" listado só na RS e \"Carregador sem fio\" só na Premier"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Integração com smartphones através do Android Auto e Apple CarPlay; Projeção da tela do smartphone sem o uso de cabo (itens de série)"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo (3 cil.)",
+   "power_g": 116,
+   "power_e": 116,
+   "torque_g": 16.3,
+   "torque_e": 16.8,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 11.2,
+   "road_g": 13.6,
+   "city_e": 7.8,
+   "road_e": 9.6,
+   "tank_l": 44,
+   "trunk_l": 393,
+   "source": {
+    "title": "Garagem360 — Chevrolet Tracker 2025: ficha técnica, preço e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=244983"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Tracker 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=244983"
+  },
+  "note": "Linha 2025 antes da reestilização. LT tem só alerta de frenagem de emergência e piloto automático convencional; frenagem automática e ponto cego só em LTZ/RS/Premier."
+ },
+ {
+  "id": "chevrolet-tracker-lt-2022",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "lt"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Na versão Premier, há sistema de carregador de celular por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "[espelhamento sem fio Android Auto/Apple CarPlay] A nova funcionalidade será item de série a partir da versão LT"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo (3 cil.)",
+   "power_g": 116,
+   "power_e": 116,
+   "torque_g": 16.3,
+   "torque_e": 16.8,
+   "gearbox": "Automático, 6 marchas",
+   "city_g": 11.9,
+   "road_g": 13.7,
+   "city_e": 8.2,
+   "road_e": 9.6,
+   "trunk_l": 393,
+   "source": {
+    "title": "Garagem360 — Chevrolet Tracker LT 2022: preços e equipamentos",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/chevrolet-tracker-lt-precos-equipamentos-versao-entrada"
+   }
+  },
+  "source": {
+   "title": "Revista Carro — Chevrolet Tracker 2022 estreia espelhamento sem fio",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/chevrolet-tracker-2022-estreia-espelhamento-sem-fio/"
+  },
+  "note": "ADAS sem fonte específica para a LT 2022."
+ },
+ {
+  "id": "vw-virtus-comfortline-2022",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Na VW Play, há espelhamento sem fio para Apple CarPlay e, via cabo, para Android Auto."
+   }
+  },
+  "tech": {
+   "body": "Sedã compacto",
+   "engine": "1.0 TSI 200 (3 cil.)",
+   "power_g": 116,
+   "power_e": 128,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "Automático, 6 marchas",
+   "road_g": 14.6,
+   "road_e": 10.2,
+   "trunk_l": 521,
+   "source": {
+    "title": "Garagem360 — VW Virtus Comfortline 2022",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/vw-virtus-comfortline-versao-turbo-mais-barata"
+   }
+  },
+  "source": {
+   "title": "Revista Carro — Polo e Virtus 2022 têm nova multimídia VW Play",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/polo-e-virtus-2022-tem-nova-multimidia-vw-play/"
+  },
+  "note": "Carregador por indução sem fonte. Sem ADAS ativo (pacote Comfort Tech: piloto automático convencional, detector de fadiga, Post Collision Brake)."
+ },
+ {
+  "id": "toyota-yaris-xls-2023",
+  "make": "toyota",
+  "model": "yaris",
+  "version_includes": [
+   "xls"
+  ],
+  "version_excludes": [
+   "sedan"
+  ],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "o multimídia de 7″ dotado de Android Auto/Apple CarPlay com fio está presente em toda a gama"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Alerta de colisão frontal com mitigação (pré-colisão)",
+     "Alerta de saída de faixa"
+    ],
+    "quote": "o alerta de colisão frontal com mitigação de velocidade e o sistema de evasão de faixa"
+   }
+  },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.5 16V (4 cil.)",
+   "power_g": 105,
+   "power_e": 110,
+   "torque_g": 14.3,
+   "torque_e": 15.0,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 12.2,
+   "road_g": 13.9,
+   "city_e": 8.7,
+   "road_e": 9.8,
+   "tank_l": 45,
+   "trunk_l": 310,
+   "source": {
+    "title": "Motor Show — Avaliação Toyota Yaris Hatch XLS (linha 2023)",
+    "quality": "secundária",
+    "url": "https://motorshow.com.br/avaliacao-toyota-yaris-hatch-xls-faz-mais-de-14-km-l-confira/"
+   }
+  },
+  "source": {
+   "title": "Motor Show — Toyota Yaris 2023 ganha visual atualizado e novos equipamentos",
+   "quality": "secundária",
+   "url": "https://motorshow.com.br/toyota-yaris-2023-ganha-visual-atualizado-e-novos-equipamentos"
+  },
+  "note": "Na imprensa a versão 2023 aparece como XLS (os anúncios usam XLS Connect Multidrive). Pré-colisão não freia o carro por completo; alerta de faixa não atua no volante. Indução sem fonte."
  }
 ]
