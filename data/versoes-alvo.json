@@ -1,0 +1,32 @@
+{
+ "updated_at": "2026-11-01T12:00:00.000Z",
+ "nota": "Listagens segmentadas por versão para a pesquisa. Todas as URLs vieram de resultados do WebSearch (nunca montar à mão). nivel A = toda pesquisa; B = só na pesquisa das 13h; C = só na pesquisa das 13h de segunda-feira. rendeu = nº de anúncios dessa versão já trazidos ao feed; ultima_verificacao/ultimo_resultado são atualizados a cada pesquisa.",
+ "alvos": [
+  {"nivel":"A","modelo":"Fiat Pulse Impetus CVT","itens":"indução e AA sem fio confirmados (ficha 2023)","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/fiat/pulse/10-turbo-200-flex-impetus-cvt","rendeu":2},
+  {"nivel":"A","modelo":"Fiat Pulse Drive CVT (1.0 turbo)","itens":"indução opcional, AA sem fio confirmado","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/fiat/pulse/10-turbo-200-flex-drive-cvt","rendeu":0},
+  {"nivel":"A","modelo":"Fiat Fastback Audace CVT 2024","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/fiat/fastback/10-turbo-200-flex-audace-cvt/de.2024/ate.2024","rendeu":0},
+  {"nivel":"A","modelo":"Fiat Cronos Drive CVT 2023+","itens":"ficha só técnica","url":"https://www.webmotors.com.br/carros/estoque/fiat/cronos/13-firefly-flex-drive-cvt/de.2023","rendeu":1},
+  {"nivel":"A","modelo":"Citroën Basalt Shine CVT","itens":"AA sem fio confirmado (ficha 2025)","url":"https://www.webmotors.com.br/carros/sp/citroen/basalt/10-turbo-200-flex-shine-cvt","rendeu":4},
+  {"nivel":"A","modelo":"Citroën C3 Aircross Shine CVT","itens":"AA sem fio confirmado (ficha 2025)","url":"https://www.webmotors.com.br/carros/estoque/citroen/c3-aircross/10-turbo-200-flex-shine-cvt","rendeu":0},
+  {"nivel":"A","modelo":"Citroën C3 Aircross Shine 7L CVT","itens":"AA sem fio confirmado (ficha 2025)","url":"https://www.webmotors.com.br/carros/estoque/citroen/c3-aircross/10-turbo-200-flex-shine-7l-cvt","rendeu":1},
+  {"nivel":"A","modelo":"Citroën C3 Aircross Feel Pack CVT","itens":"AA sem fio confirmado (ficha 2025)","url":"https://www.webmotors.com.br/carros/estoque/citroen/c3-aircross/10-turbo-200-flex-feel-pack-cvt","rendeu":1},
+  {"nivel":"A","modelo":"VW Polo Highline 170 TSI 2023+","itens":"indução e AA sem fio confirmados (ficha 2023)","url":"https://www.webmotors.com.br/carros/sp/volkswagen/polo/10-170-tsi-highline-automatico/de.2023","rendeu":1},
+  {"nivel":"A","modelo":"VW Polo Comfortline 170 TSI","itens":"indução e AA sem fio confirmados (ficha 2024)","url":"https://www.webmotors.com.br/carros/sp/volkswagen/polo/10-170-tsi-comfortline-automatico","rendeu":1},
+  {"nivel":"A","modelo":"VW Virtus Highline 200 TSI 2022+","itens":"indução, AA sem fio e ADAS confirmados (ficha 2023)","url":"https://www.webmotors.com.br/carros/sp/volkswagen/virtus/10-200-tsi-highline-automatico/de.2022","rendeu":1},
+  {"nivel":"A","modelo":"VW Virtus Comfortline 200 TSI","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/volkswagen/virtus/10-200-tsi-comfortline-automatico","rendeu":0},
+  {"nivel":"A","modelo":"VW Nivus Comfortline 200 TSI","itens":"indução e ADAS confirmados (ficha 2024)","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/volkswagen/nivus/10-200-tsi-total-flex-comfortline-automatico","rendeu":1},
+  {"nivel":"A","modelo":"Toyota Yaris (todas) 2023","itens":"sem ficha","url":"https://www.webmotors.com.br/carros-usados/sp-sao-paulo/toyota/yaris/de.2023/ate.2023","rendeu":2},
+  {"nivel":"A","modelo":"Hyundai Creta Limited 1.0 TGDI","itens":"indução e AA sem fio confirmados (ficha 2022)","url":"https://www.webmotors.com.br/carros/sp/hyundai/creta/10-tgdi-flex-limited-automatico","rendeu":1},
+  {"nivel":"A","modelo":"Nissan Kicks usados SP (Sense/Advance/Exclusive; Active não tem indução)","itens":"Active: indução ausente","url":"https://www.webmotors.com.br/carros-usados/sp-sao-paulo/nissan/kicks","rendeu":1},
+  {"nivel":"B","modelo":"Chevrolet Tracker LT 1.0","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/chevrolet/tracker/10-turbo-flex-lt-automatico","rendeu":0},
+  {"nivel":"B","modelo":"Chevrolet Tracker 2024+ (todas)","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/chevrolet/tracker/de.2024","rendeu":2},
+  {"nivel":"B","modelo":"Hyundai Creta Platinum 2022","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/hyundai/creta/10-tgdi-flex-platinum-automatico/de.2022/ate.2022","rendeu":0},
+  {"nivel":"B","modelo":"Peugeot 2008 2021+","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/peugeot/2008/de.2021","rendeu":0},
+  {"nivel":"B","modelo":"Jeep Renegade 2023+","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp-sao-paulo/jeep/renegade/de.2023","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"nenhum cartão no filtro (km > 40 mil ou preço > 100 mil)"},
+  {"nivel":"B","modelo":"Fiat Argo Trekking CVT","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/fiat/argo/13-firefly-flex-trekking-cvt","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"cartões fora da região ou acima do preço"},
+  {"nivel":"C","modelo":"Honda City Touring sedã 2023+","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/honda/city/15-i-vtec-flex-touring-cvt/de.2023","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"todos acima de R$ 100 mil ou de 40 mil km"},
+  {"nivel":"C","modelo":"Honda City Hatch Touring 2023+","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp/honda/city/15-i-vtec-flex-hatch-touring-cvt/de.2023","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"todos acima de R$ 100 mil ou de 40 mil km"},
+  {"nivel":"C","modelo":"VW T-Cross Barueri","itens":"sem ficha","url":"https://www.webmotors.com.br/carros/sp-barueri/volkswagen/t-cross","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"todos acima de R$ 100 mil ou de 40 mil km"},
+  {"nivel":"C","modelo":"Busca ampla Barueri (usados)","itens":"—","url":"https://www.webmotors.com.br/carros-usados/sp-barueri","rendeu":0,"ultima_verificacao":"2026-11-01","ultimo_resultado":"1ª página só com carros acima do preço"}
+ ]
+}

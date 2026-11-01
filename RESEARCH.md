@@ -99,9 +99,33 @@ estiverem errados, publique a transcrição corrigida. Ao terminar, feche a issu
   anúncio pendente com "vendedor a verificar" e o usuário confirma com um toque.
 - **FIPE:** prefira sempre o valor da página do anúncio; a Tabela Fipe da versão/ano é só o plano B.
 
-## 3. Onde procurar (cobertura ampla)
+## 3. Onde procurar
 
-**Primeiro, a busca filtrada do WebMotors (preferencial).** O WebMotors permite filtrar numa busca só por: cidade
+### Primeiro: versões-alvo (data/versoes-alvo.json) — preferencial
+
+Listagens amplas (cidade, marca, modelo sem versão) vêm cheias de carros fora do preço e são cortadas pelo WebFetch
+(~39 mil caracteres); o resto chega só como resumo, que **não** pode ser transcrito. Por isso a pesquisa começa pelas
+listagens **por versão** de `data/versoes-alvo.json`, que são curtas e trazem só versões que cabem no preço e têm (ou
+podem ter) indução e Android Auto sem fio.
+
+1. **Quais abrir:** nível `A` em toda pesquisa; `B` só na pesquisa das 13h; `C` só na das 13h de segunda-feira (ou se
+   sobrar limite). Pule o que estiver em `exclusions`. Dentro do nível, abra primeiro as de maior `rendeu`.
+2. **Só URLs vindas do WebSearch.** As URLs do arquivo vieram de resultados de busca. URL montada à mão costuma ser
+   recusada pelo WebFetch (erro de permissão). Para uma versão nova, ache a listagem com WebSearch
+   (`allowed_domains: ["webmotors.com.br"]`, ex.: "webmotors Fiat Pulse impetus cvt usado São Paulo") e só então a
+   acrescente ao arquivo. Se uma URL do arquivo falhar, procure de novo pela busca e troque-a.
+3. **Limite:** cerca de 40 páginas de anúncio no total; reserve ~30 para o nível A.
+4. **Ao terminar, atualize o arquivo** (vai no mesmo commit de `data/`): em cada alvo aberto grave
+   `ultima_verificacao` (data) e `ultimo_resultado` (curto: "2 anúncios", "nenhum no filtro", "não abriu"); some em
+   `rendeu` os anúncios novos que entraram no feed. Rebaixe para `B` um alvo `A` com 4 verificações seguidas sem nada
+   no filtro, e para `C` um `B` na mesma situação; promova para `A` um alvo que render anúncio. Versão com ficha que
+   mostre indução **ausente** sai da lista (ex.: Kicks Active).
+5. Depois das versões-alvo, se sobrar limite, use a busca filtrada e a busca por modelo abaixo para cobrir o que não
+   está na lista, e acrescente ao arquivo as versões que renderem.
+
+### Depois: busca filtrada e por modelo (cobertura ampla)
+
+**A busca filtrada do WebMotors.** O WebMotors permite filtrar numa busca só por: cidade
 (`ref_location`) com raio de alcance, preço, ano, km, câmbio (Automática, CVT), anunciante (Loja, Concessionária —
 conforme `seller_types`), "Leilão: sem passagem por leilão" (se `no_auction`), blindagem (se `no_armored`) e opcionais.
 Procure com WebSearch a página de listagem do WebMotors para a cidade de referência (ex.: "webmotors carros usados
