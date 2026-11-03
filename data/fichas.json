@@ -409,6 +409,10 @@
      "Controle adaptativo de velocidade (ACC)"
     ],
     "quote": "“ACC” – Controle adaptativo de velocidade e distância; “AEB” – Frenagem autônoma de emergência (itens de série do Nivus 2024)"
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Comfortline 2024: “Composition Touch” com APP-Connect (VW Play só na Highline); na Composition Touch o espelhamento é “através de cabo e não mais sem fio”"
    }
   },
   "tech": {
@@ -435,7 +439,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/vw-nivus-comfortline-2024/"
   },
-  "note": "Android Auto sem fio não comprovado: a Comfortline 2024 usa o rádio “Composition Touch” com App-Connect, não o VW Play."
+  "note": "Android Auto sem fio não comprovado: a Comfortline 2024 usa o rádio “Composition Touch” com App-Connect, não o VW Play. AA sem fio: Garagem360 Nivus 2024 (https://garagem360.com.br/?p=185577) + Garagem360 T-Cross perde VW Play (https://garagem360.com.br/?p=181015)."
  },
  {
   "id": "citroen-basalt-shine-2025",
@@ -1010,5 +1014,335 @@
    "url": "https://motorshow.com.br/toyota-yaris-2023-ganha-visual-atualizado-e-novos-equipamentos"
   },
   "note": "Na imprensa a versão 2023 aparece como XLS (os anúncios usam XLS Connect Multidrive). Pré-colisão não freia o carro por completo; alerta de faixa não atua no volante. Indução sem fonte."
+ },
+ {
+  "id": "vw-polo-highline-2025",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "highline"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2026,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Highline: “Carregador de smartphone sem fio” (Polo 2025)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; Highline com VW Play de 10,1″"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Polo 2025: versões e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=279696"
+  },
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022), como nas fichas Polo Highline 2023. Sem ADAS (só frenagem pós-colisão e piloto automático convencional)."
+ },
+ {
+  "id": "vw-polo-sense-2025",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "sense"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2026,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "“Carregador de smartphone sem fio” aparece só como item da Highline (Polo 2025)"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Polo 2025: versões e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=279696"
+  }
+ },
+ {
+  "id": "chevrolet-tracker-ltz-2024",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "ltz"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Série em todas as versões: “Projeção da tela do smartphone sem o uso de cabo”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "“Carregador sem fio” listado apenas na versão Premier"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "LTZ: Alerta de Colisão Frontal; Aviso de Ponto Cego; Frenagem automática de emergência em baixa velocidade",
+    "names": [
+     "Alerta de colisão frontal",
+     "Frenagem automática de emergência (baixa velocidade)",
+     "Aviso de ponto cego"
+    ]
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Tracker 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/chevrolet-tracker-2024/"
+  }
+ },
+ {
+  "id": "nissan-versa-exclusive-2024",
+  "make": "nissan",
+  "model": "versa",
+  "version_includes": [
+   "exclusive"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Exclusive: “Carregador sem fio com indicador no console”"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Exclusive: Monitoramento de Ponto Cego (BSW); Alerta de tráfego cruzado traseiro (RCTA)",
+    "names": [
+     "Monitoramento de ponto cego (BSW)",
+     "Alerta de tráfego cruzado traseiro (RCTA)"
+    ]
+   }
+  },
+  "source": {
+   "title": "Lista de equipamentos de série Novo Versa 2024 (concessionária)",
+   "quality": "concessionária",
+   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2024/02/Lista-de-equipamentos-de-serie-Novo-Versa-2024.pdf"
+  },
+  "note": "Fonte não diz se Android Auto é sem fio (multimídia de 8″) — item fica pendente."
+ },
+ {
+  "id": "jeep-renegade-longitude-2024",
+  "make": "jeep",
+  "model": "renegade",
+  "version_includes": [
+   "longitude"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Longitude: “carregador do celular por Indução” (Renegade 2024)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Longitude: “sistema multimídia de 8,4” com Android Auto e Apple CarPlay sem fio e carregador sem fio” (linha 2022 com motor T270)"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Série: Frenagem autônoma de emergência; Aviso de mudança de faixas",
+    "names": [
+     "Frenagem autônoma de emergência",
+     "Aviso de mudança de faixa"
+    ]
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Jeep Renegade 2024 + Olhar Digital — Renegade T270 (fev/2022)",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=210269"
+  },
+  "note": "Android Auto sem fio: Olhar Digital, 10/02/2022 (https://olhardigital.com.br/2022/02/10/carros-e-tecnologia/jeep-apresenta-novo-renegade-com-motor-t270-do-compass-e-design-repaginado/)."
+ },
+ {
+  "id": "jeep-renegade-sport-2023",
+  "make": "jeep",
+  "model": "renegade",
+  "version_includes": [
+   "sport"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Sport: “sistema multimídia de 7” com Android Auto e Apple CarPlay sem fio”"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Sport: frenagem autônoma de emergência, alerta e assistente de manutenção de faixa; detector de fadiga",
+    "names": [
+     "Frenagem autônoma de emergência",
+     "Assistente de permanência em faixa",
+     "Detector de fadiga"
+    ]
+   }
+  },
+  "source": {
+   "title": "Olhar Digital — Jeep apresenta novo Renegade com motor T270 (fev/2022)",
+   "quality": "secundária",
+   "url": "https://olhardigital.com.br/2022/02/10/carros-e-tecnologia/jeep-apresenta-novo-renegade-com-motor-t270-do-compass-e-design-repaginado/"
+  },
+  "note": "Carregador por indução não citado para a Sport — fica pendente."
+ },
+ {
+  "id": "vw-tcross-200tsi-2024",
+  "make": "volkswagen",
+  "model": "t cross",
+  "version_includes": [
+   "200 tsi"
+  ],
+  "version_excludes": [
+   "comfortline",
+   "highline",
+   "sense"
+  ],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Linha 2023: “as versões 200 TSI e Comfortline 200 TSI perderam a central multimídia VW Play”; espelhamento “através de cabo e não mais sem fio”"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW T-Cross perde VW Play (set/2022)",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=181015"
+  }
+ },
+ {
+  "id": "fiat-fastback-audace-2023",
+  "make": "fiat",
+  "model": "fastback",
+  "version_includes": [
+   "audace"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "“Carreador de celular por indução” (lista de itens do Fastback 2023)"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Audace: “ADAS, frenagem automática de emergência, alerta de mudança de faixa”",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Alerta de mudança de faixa (LDW)"
+    ]
+   }
+  },
+  "source": {
+   "title": "Motor Agora — Fiat Fastback 2023: preço, ficha técnica",
+   "quality": "secundária",
+   "url": "https://www.motoragora.com.br/?p=59082"
+  },
+  "note": "Na linha 2023 o Android Auto sem fio é citado só na Impetus (tela de 10,1″); na Audace (8,4″) a fonte não diz — fica pendente."
+ },
+ {
+  "id": "nissan-kicks-exclusive-2023",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "exclusive"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "opcional",
+    "quote": "Linha 2023: só a Exclusive Pack Tech “traz de série, agora, um carregador para celular por indução”"
+   }
+  },
+  "source": {
+   "title": "Motor Show — Nissan lança Kicks 2023 com mais equipamentos",
+   "quality": "secundária",
+   "url": "https://motorshow.com.br/nissan-lanca-kicks-2023-com-mais-equipamentos-veja-o-que-mudou"
+  },
+  "note": "Na Exclusive sem Pack Tech o carregador não vem de série — confirme com o vendedor. Android Auto sem fio não citado."
+ },
+ {
+  "id": "nissan-kicks-advance-2024",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "advance"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "“carregador de celular por indução” listado como item da Exclusive (Kicks 2024)"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Nissan Kicks (linha 2024) — versões e ficha técnica",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=182245"
+  }
+ },
+ {
+  "id": "citroen-basalt-first-edition-2025",
+  "make": "citroen",
+  "model": "basalt",
+  "version_includes": [
+   "first edition"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "“Citroën Connect Touchscreen de 10” com Android Auto e Apple Carplay sem fio com comandos no volante”"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Citroën Basalt First Edition (out/2024)",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=262358"
+  },
+  "note": "Baseada na Shine Turbo 200; carregador por indução não citado — fica pendente."
+ },
+ {
+  "id": "honda-city-exl-2023",
+  "make": "honda",
+  "model": "city",
+  "version_includes": [
+   "exl"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "City EXL 2023: “conectividade sem fio através dos aplicativos Android Auto e Apple CarPlay”; sedã: “Multimídia de 8\" touchscreen com interface sem fio para Apple CarPlay e Android Auto”"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Honda City Hatch 2023 EXL + catálogo New City Sedã (Honda)",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=183329"
+  },
+  "note": "Fonte da EXL é do City Hatch 2023; o catálogo oficial do sedã (https://www.honda.com.br/automoveis/sites/hab/files/2021-11/newcity_seda_v4.pdf) confirma a central de 8″ com interface sem fio. Carregador por indução não citado."
  }
 ]

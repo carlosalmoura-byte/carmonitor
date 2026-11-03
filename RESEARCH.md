@@ -208,8 +208,14 @@ Para cada modelo:
 
 ### Fichas de versões novas (data/fichas.json) — obrigatório em toda pesquisa
 
+**Regra fixa do usuário: toda versão candidata que ainda não tem ficha tem a ficha pesquisada automaticamente, na
+mesma execução — sem perguntar e sem deixar para depois.** Candidata = anúncio que entrou no feed e não foi descartado
+por preço, ano, km, câmbio, vendedor, modelo ignorado ou outro critério que não dependa da ficha. Reserve tempo para
+isso: se o limite de anúncios apertar, abra menos anúncios, mas não pule fichas. Se a execução terminar antes de todas,
+publique o que tiver e cite no `--note` as versões que ficaram sem ficha (a próxima execução começa por elas).
+
 Antes de publicar, rode `node tools/missing-fichas.mjs` (depois do merge-feed). Ele lista cada versão/ano-modelo do
-feed sem ficha. **Pesquise a ficha de cada linha listada** (catálogo da montadora; senão imprensa especializada) e
+feed sem ficha. **Pesquise a ficha de cada linha listada que seja candidata** (catálogo da montadora; senão imprensa especializada) e
 acrescente em `data/fichas.json`. Se não achar fonte para algum item, deixe o item fora (fica pendente no app) e cite a
 versão/ano no `--note` como "ficha sem fonte para <item>".
 
