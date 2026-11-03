@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-01T18:04:39.571Z",
- "novos": 10,
- "atualizados": 0,
+ "processed_at": "2026-11-03T13:27:38.138Z",
+ "novos": 32,
+ "atualizados": 1,
  "sairam_do_ar": 0,
- "note": "pesquisa a pedido (filtro do app de 01/11 17:15). 10 anúncios novos: com página aberta e vendedor Loja — Polo Comfortline 2025 73933178 (Abaixo da Fipe), Cronos Drive CVT 2023 78524369 (Jundiaí); só cartão da listagem (vendedor a verificar) — Polo Comfortline 80938384, 80675733, 80610966, 81464189; Virtus Comfortline 2022 67581985; Tracker LT 80128493 e 79755226; Yaris XLS Connect 2023 80940206 (FIPE não encontrada). Descartado PF: C3 Aircross Shine 80735629. Links que caíram na listagem genérica (não marcados como vendidos): Pulse Drive 79515881, Nivus 79433254, Yaris 80854347. Verificados sem nada no filtro: Pulse Impetus, Fastback, Basalt, C3 Aircross Feel Pack, Polo Highline, Virtus Highline, Creta Limited, Kicks Exclusive, 2008. Listagens só mostram ~10 cartões da 1ª página. Não verificados: HR-V, WR-V, City, Corolla Cross, Tera, T-Cross, Duster, Versa, Renegade, Compass, Argo, BYD, GWM, Tiggo 5x, Montana. Anúncios já no app não foram reconferidos. Fichas novas: Polo Comfortline 2025 (só técnica — indução em conflito entre fontes, AA sem fio sem fonte), Cronos Drive CVT 2023 (indução sem fonte), Tracker LT 2022 e 2025 (indução ausente; alvo removido), Virtus Comfortline 2022 (AA sem fio ausente; indução sem fonte), Yaris XLS 2023 (AA sem fio ausente; indução sem fonte).",
+ "note": "pesquisa pelo navegador do computador (pedido do usuário, 03/11 10h): busca filtrada do WebMotors em São Paulo (págs. 1–3) e Barueri (pág. 1); 33 anúncios abertos com página completa (itens, vendedor, FIPE da página). WebMotors pediu verificação humana uma vez (usuário passou). Não verificados nesta rodada: demais cidades da Grande SP.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,13 +11,7 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-03T12:53:16.958Z",
-  "ok": false,
-  "reason": "Pesquisa pela nuvem (reserva): acesso ao WebMotors recusado (pedido de permissão do WebFetch sem resposta)"
- },
- "running": {
-  "since": "2026-11-03T13:13:49.304Z",
-  "kind": "agendada",
-  "filter_at": "2026-11-01T17:15:57.181Z"
+  "at": "2026-11-03T13:27:38.138Z",
+  "ok": true
  }
 }
