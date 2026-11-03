@@ -25,7 +25,7 @@
     if ((after(lab) || "").toLowerCase() === "sim") car.push(out);
   }
   f.caracteristicas = [...new Set(car)];
-  f.itens = sec("Itens de veículo", "(Sobre o vendedor|Sobre o veículo|Observações do vendedor|Compare os preços)");
+  f.itens = sec("Itens de veículo", "(Sobre o vendedor|Sobre o veículo|Observações do vendedor|Compare os preços|Confiança e tranquilidade)");
   const vend = sec("Sobre o vendedor", "(Compare os preços|Para ver as parcelas)");
   const nome = vend[0] || null;
   const temLoja = /Ver todos os carros deste vendedor/.test(vend.join(" "));
