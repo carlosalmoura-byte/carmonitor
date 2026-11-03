@@ -687,6 +687,14 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "espelhamento sem fio via Android Auto e Apple CarPlay"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista completa de série do C3 Aircross Shine 2025 só traz recarga por cabo: “1 porta USB de recarga e dados e tomada 12v no painel” e “2 portas USB de rápido carregamento para 2ª fileira” — sem carregador sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Lista completa de série do C3 Aircross Shine 2025 sem frenagem autônoma, alerta de colisão, alerta de faixa, ponto cego ou ACC (só piloto automático convencional e câmera de ré)"
    }
   },
   "tech": {
@@ -706,11 +714,11 @@
    "note": "Porta-malas 493 l sem a 3ª fileira; 42 l com 7 lugares."
   },
   "source": {
-   "title": "Garagem360 — Citroën C3 Aircross 2025: ficha técnica, preço e itens de série",
+   "title": "Garagem360 — Citroën C3 Aircross 7 Shine 2025: ficha técnica e itens de série",
    "quality": "secundária",
-   "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+   "url": "https://garagem360.com.br/citroen-c3-aircross-7-shine-2025/"
   },
-  "note": "Carregador por indução não citado; nenhum ADAS (AEB, faixa, ponto cego, ACC) citado — itens deixados sem confirmação."
+  "note": "Indução e ADAS ausentes da lista completa de itens de série (Garagem360, versão 7 Shine 2025)."
  },
  {
   "id": "citroen-c3-aircross-feel-pack-2025",
@@ -726,6 +734,14 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "Central multimídia touchscreen de 10 polegadas com espelhamento sem fio via Android Auto e Apple CarPlay"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Nem a versão topo (Shine 2025) tem carregador sem fio: “1 porta USB de recarga e dados e tomada 12v no painel” e “2 portas USB de rápido carregamento para 2ª fileira”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Nem a versão topo (Shine 2025) tem ADAS na lista de série"
    }
   },
   "tech": {
@@ -746,7 +762,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
   },
-  "note": "Multimídia sem fio listada como item de série de todas as versões. Carregador por indução e ADAS não citados — itens deixados sem confirmação."
+  "note": "Feel Pack fica abaixo da Shine; a lista completa da Shine 2025 (https://garagem360.com.br/citroen-c3-aircross-7-shine-2025/) não tem carregador sem fio nem ADAS."
  },
  {
   "id": "vw-polo-comfortline-2025",
