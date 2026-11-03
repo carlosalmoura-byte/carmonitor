@@ -134,7 +134,9 @@ export function setManualCheck(l, item, { state, source, evidence, detail }, dep
 export async function updateDistance(state, l, deps, force = false) {
   if (l.distance?.status === "manual" && !force) return;
   if (!deps?.distance) { l.distance = { km: null, status: "nao_verificada", precision: null, note: "Cálculo de rota indisponível." }; return; }
-  l.distance = await deps.distance(state, state.settings.criteria.ref_location, l.city, l.state, l.address);
+  const store = l.seller_type && l.seller_type !== "particular" ? l.seller : null;
+  l.distance = await deps.distance(state, state.settings.criteria.ref_location, l.city, l.state, l.address, null, store);
+  if (l.distance) l.distance.v = 2;
 }
 
 export function setManualDistance(l, km, source) {
@@ -362,7 +364,10 @@ export function reclassifyAll(state, deps) {
 export async function fillDistances(state, deps, onEach) {
   let n = 0;
   for (const l of state.listings) {
-    if (l.archived || l.distance?.status !== "nao_verificada" || !l.city || !l.state) continue;
+    if (l.archived || !l.city || !l.state) continue;
+    // recalcula as antigas feitas até o centro da cidade (versão 1) para tentar a localização da loja
+    const upgrade = l.distance?.status === "verificada" && l.distance.precision === "cidade" && !l.distance.v && l.seller_type && l.seller_type !== "particular";
+    if (l.distance?.status !== "nao_verificada" && !upgrade) continue;
     const tried = l.distance?.tried_at ? new Date(l.distance.tried_at) : null;
     if (tried && (deps?.now ? deps.now() : new Date()) - tried < 6 * 3600000) continue; // falhou há pouco: tenta de novo depois
     await updateDistance(state, l, deps);

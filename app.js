@@ -1,5 +1,5 @@
 "use strict";
-import { TR_LABEL } from "./core/classify.js";
+import { TR_LABEL, BODY_LABEL } from "./core/classify.js";
 import { makeDistance } from "./core/distance.js";
 import * as E from "./core/engine.js";
 import { ITEMS } from "./core/equipment.js";
@@ -203,7 +203,7 @@ const title = (l) => [l.make, l.model].filter(Boolean).join(" ") || l.title || `
 function distText(l) {
   const d = l.distance || {};
   if (d.status === "nao_verificada" || d.km == null) return "não verificada";
-  return num(d.km, " km") + (d.status === "manual" ? " (informada)" : d.precision === "cidade" ? " (centro da cidade)" : "");
+  return num(d.km, " km") + (d.status === "manual" ? " (informada)" : d.precision === "loja" ? " até a loja" : d.precision === "endereco" ? " até o endereço" : d.precision === "cidade" ? " (centro da cidade)" : "");
 }
 const stale = (l) => E.isStale(l, S.settings.stale_days);
 
@@ -274,6 +274,7 @@ function renderCards() {
       <div class="facts">
         <div><span>Km</span> ${num(l.km)}</div><div><span>Câmbio</span> ${esc(TR[l.transmission] || "—")}</div>
         <div><span>Local</span> ${esc(l.city ? l.city + "/" + (l.state || "?") : "—")}</div><div><span>Distância</span> <span data-dist="${l.id}">${esc(distText(l))}</span></div>
+        <div><span>Cor</span> ${esc(l.color ? l.color[0].toUpperCase() + l.color.slice(1) : "—")}</div><div><span>Carroceria</span> ${esc(BODY_LABEL[l.body || l.body_ficha] || "—")}</div>
         <div style="grid-column:1/-1"><span>Vendedor</span> ${esc(l.seller || "—")}${l.seller_type ? ` · ${SELLER[l.seller_type]}` : ""}</div>
         ${l.plate_end != null ? `<div style="grid-column:1/-1"><span>Placa final ${l.plate_end}</span> · rodízio SP: ${RODIZIO[l.plate_end]}</div>` : ""}
       </div>
