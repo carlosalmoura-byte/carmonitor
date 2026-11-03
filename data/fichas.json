@@ -1344,5 +1344,154 @@
    "url": "https://garagem360.com.br/?p=183329"
   },
   "note": "Fonte da EXL é do City Hatch 2023; o catálogo oficial do sedã (https://www.honda.com.br/automoveis/sites/hab/files/2021-11/newcity_seda_v4.pdf) confirma a central de 8″ com interface sem fio. Carregador por indução não citado."
+ },
+ {
+  "id": "hyundai-creta-action-2025",
+  "make": "hyundai",
+  "model": "creta",
+  "version_includes": [
+   "action"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Creta Action 2024/2025: sem central multimídia — “Rádio integrado ao painel com conexão Bluetooth® com streaming de áudio”"
+   }
+  },
+  "source": {
+   "title": "Catálogo digital Hyundai CRETA Action 2025",
+   "quality": "oficial",
+   "url": "https://www.hyundai.com.br/content/dam/hmb/cars/creta-action/catalog/catalogo_digital_CRETA_Action_2025.pdf"
+  }
+ },
+ {
+  "id": "renault-duster-intense-plus-2026",
+  "make": "renault",
+  "model": "duster",
+  "version_includes": [
+   "intense plus"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2026,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Intense Plus: “Display Link de 8” com espelhamento sem fio”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "“Carregador por indução” listado só na Iconic Plus (Duster 2026)"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Renault Duster 2026: versões e equipamentos",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=277612"
+  }
+ },
+ {
+  "id": "citroen-c4-cactus-noir-2024",
+  "make": "citroen",
+  "model": "c4 cactus",
+  "version_includes": [
+   "noir"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Noir: “Carregador por indução”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Série no C4 Cactus 2024: “Central multimídia touchscreen de 10″ com espelhamento Android auto e Apple CarPlay sem fio”"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Noir: Sistema de frenagem automática; Alerta de colisão; Alerta de saída de faixa; Alerta de atenção ao condutor",
+    "names": [
+     "Frenagem automática",
+     "Alerta de colisão",
+     "Alerta de saída de faixa",
+     "Alerta de atenção ao condutor"
+    ]
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Citroën C4 Cactus Noir 2024: ficha técnica e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=224990"
+  }
+ },
+ {
+  "id": "vw-virtus-tsi-at-2025",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "170 tsi automatico"
+  ],
+  "version_excludes": [
+   "comfortline",
+   "highline",
+   "exclusive",
+   "sense"
+  ],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Itens de série de todas as versões do Virtus 2025: “Carregamento de celular por indução”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; Virtus 2025: “VW Play” de 10,1″ em todas as versões"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "TSI AT: ACC (controle adaptativo de velocidade e distância) e AEB (frenagem autônoma de emergência)",
+    "names": [
+     "Controle adaptativo de velocidade (ACC)",
+     "Frenagem autônoma de emergência (AEB)"
+    ]
+   }
+  },
+  "source": {
+   "title": "Garagem360 — VW Virtus 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=251133"
+  },
+  "note": "Versão de entrada automática (TSI AT, anunciada como “170 TSI Automático”). Android Auto sem fio pela regra do VW Play."
+ },
+ {
+  "id": "fiat-cronos-drive-cvt-2026",
+  "make": "fiat",
+  "model": "cronos",
+  "version_includes": [
+   "drive"
+  ],
+  "version_excludes": [
+   "manual"
+  ],
+  "year_from": 2026,
+  "year_to": 2026,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Cronos 2026: o UConnect de 7” “agora tem conexões sem fio com Apple CarPlay e Android Auto”, de série desde a Drive 1.0"
+   }
+  },
+  "source": {
+   "title": "Motor Show — Fiat Cronos 2026: versões e preços",
+   "quality": "secundária",
+   "url": "https://motorshow.com.br/fiat-cronos-2026-esta-de-cara-nova-e-mais-equipado-veja-precos-e-versoes"
+  },
+  "note": "Carregador por indução não citado — fica pendente."
  }
 ]
