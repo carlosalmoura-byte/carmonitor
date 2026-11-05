@@ -254,9 +254,20 @@ function distText(l) {
 }
 const stale = (l) => E.isStale(l, S.settings.stale_days);
 
+/** Descartados que não precisam aparecer: saíram do ar ou a ficha/anúncio comprova que falta item obrigatório.
+ *  Ficam ocultos (não apagados) — dá para ver tocando em "mostrar" no fim da lista. Favoritos sempre aparecem. */
+function hiddenDiscard(l) {
+  if (l.status !== "descartado" || l.favorite || l.user_discard) return null;
+  if (l.available === false) return "saiu do ar";
+  const mand = ["inducao", "android_auto_sem_fio", ...(S.settings.criteria.adas_required ? ["adas"] : [])];
+  if ((l.reasons || []).some((r) => r.level === "fail" && mand.includes(r.field))) return "sem item obrigatório";
+  return null;
+}
 function renderCards() {
   const q = $("#q").value.trim().toLowerCase();
   let items = S.listings.filter((l) => !l.archived);
+  const hidden = items.filter((l) => hiddenDiscard(l));
+  if (!ui.showHidden) items = items.filter((l) => !hiddenDiscard(l));
   const counts = { aprovado: 0, pendente: 0, descartado: 0 };
   items.forEach((l) => counts[tabOf(l)]++);
   $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
@@ -280,12 +291,16 @@ function renderCards() {
   const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
   $("#unread").textContent = S.notifications.filter((n) => !n.read && alertRelevant(n)).length;
   const el = $("#cards");
+  const nOut = hidden.filter((l) => l.available === false).length, nMiss = hidden.length - nOut;
+  const hiddenNote = ui.status === "descartado" && hidden.length
+    ? `<div class="empty small">${ui.showHidden ? "Mostrando também" : "Ocultos"}: ${nOut ? `${nOut} que saíram do ar` : ""}${nOut && nMiss ? " e " : ""}${nMiss ? `${nMiss} sem item obrigatório (indução/Android Auto sem fio comprovadamente ausentes)` : ""}.
+        <button class="ghost" data-togglehidden>${ui.showHidden ? "Ocultar" : "Mostrar"}</button></div>` : "";
   if (!items.length) {
     el.innerHTML = `<div class="empty">${S.listings.length ? "Nada neste filtro." :
-      "Nenhum anúncio ainda. A pesquisa automática traz os anúncios por volta das 6h e das 13h."}</div>`;
+      "Nenhum anúncio ainda. A pesquisa automática traz os anúncios por volta das 6h e das 13h."}</div>` + hiddenNote;
     return;
   }
-  el.innerHTML = items.map((l) => {
+  el.innerHTML = hiddenNote + items.map((l) => {
     const first = l.snapshots.find((s) => s.price)?.price;
     const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
     const optAdas = !S.settings.criteria.adas_required;
@@ -406,6 +421,7 @@ $("#cards").addEventListener("click", (e) => {
   const cf = e.target.closest("[data-cmpflag]");
   if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
   if (e.target.closest(".cmpFlag")) return;
+  if (e.target.closest("[data-togglehidden]")) { ui.showHidden = !ui.showHidden; renderCards(); return; }
   const ms = e.target.closest("[data-msg]");
   if (ms) { messageSeller(+ms.dataset.msg); return; }
   const ap = e.target.closest("[data-approve]");
