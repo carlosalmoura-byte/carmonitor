@@ -74,19 +74,41 @@ function watchPayload() {
   const keep = S.listings.filter((l) => !l.archived && l.available !== false && (l.favorite || l.user_approve));
   return [...new Set(keep.map((l) => l.url))].sort();
 }
+const watchLists = () => ({
+  favoritos: S.listings.filter((l) => !l.archived && l.favorite).map((l) => l.url).sort(),
+  aprovados: S.listings.filter((l) => !l.archived && l.user_approve).map((l) => l.url).sort(),
+});
+/** Aparelho novo: traz favoritos e aprovados salvos por outro aparelho (só acrescenta, nunca remove). */
+async function importWatch() {
+  if (S.meta.watch_imported) return;
+  try {
+    const r = await fetch(`data/acompanhar.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) { if (r.status === 404) S.meta.watch_imported = true; return; }
+    const w = await r.json(), id = (u) => (String(u).match(/(\d{6,})\/?$/) || [])[1];
+    const fav = new Set((w.favoritos || []).map(id)), apr = new Set((w.aprovados || []).map(id));
+    let n = 0;
+    for (const l of S.listings) {
+      const k = id(l.url);
+      if (fav.has(k) && !l.favorite) { l.favorite = true; n++; }
+      if (apr.has(k) && !l.user_approve) { l.user_approve = true; E.refresh(S, l, deps); n++; }
+    }
+    S.meta.watch_imported = true; persist();
+    if (n) { renderCards(); toast(`${n} favorito(s)/aprovado(s) trazidos do seu outro aparelho.`); }
+  } catch { /* tenta na próxima abertura */ }
+}
 function scheduleWatchSync() {
   if (!S?.settings?.github_token) return;
   clearTimeout(watchTimer);
   watchTimer = setTimeout(() => syncWatch().catch(() => { /* tenta de novo na próxima alteração */ }), 5000);
 }
 async function syncWatch() {
-  const urls = watchPayload(), sig = JSON.stringify(urls);
+  const urls = watchPayload(), sig = JSON.stringify([urls, watchLists()]);
   if (S.meta.watch_sig === sig) return;
   const api = `https://api.github.com/repos/${REPO}/contents/data/acompanhar.json`;
   const h = { Authorization: `Bearer ${S.settings.github_token}`, Accept: "application/vnd.github+json" };
   const g = await fetch(`${api}?ref=main`, { headers: h, cache: "no-store" });
   const sha = g.ok ? (await g.json()).sha : null;
-  const doc = { updated_at: new Date().toISOString(), origem: "app CarMonitor", nota: "favoritos e aprovados — reconferir todo dia", urls };
+  const doc = { updated_at: new Date().toISOString(), origem: "app CarMonitor", nota: "favoritos e aprovados — reconferir todo dia", urls, ...watchLists() };
   const r = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" },
     body: JSON.stringify({ message: "Lista de acompanhamento do app", content: b64(JSON.stringify(doc, null, 1) + "\n"), branch: "main", ...(sha ? { sha } : {}) }) });
   if (r.ok) { S.meta.watch_sig = sig; saveState(S).catch(() => {}); }
@@ -1276,7 +1298,17 @@ async function ensureFilterPublished() {
     if (r.ok) {
       const pub = await r.json();
       // a cópia do site pode estar alguns minutos atrasada: ignora se for mais antiga que o último envio feito daqui
-      if (!S.meta.filter_updated_at || new Date(pub.updated_at) >= new Date(S.meta.filter_updated_at)) {
+      const fresh = !S.meta.filter_updated_at; // aparelho/navegador que nunca recebeu o filtro
+      const newer = fresh || new Date(pub.updated_at) > new Date(S.meta.filter_updated_at);
+      const localDirty = !fresh && filterDirty(); // mudanças feitas aqui e ainda não enviadas
+      if (pub.criteria && newer && !localDirty && JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions }) !== filterSig()) {
+        // adota o último filtro enviado (de qualquer aparelho): todos os aparelhos ficam com o mesmo filtro
+        Object.assign(S.settings.criteria, pub.criteria);
+        S.exclusions = (pub.exclusions || []).map((r) => ({ ...r }));
+        E.reclassifyAll(S, deps); renderCards(); try { renderSettings(); } catch { /* ajustes fechados */ }
+        if (!fresh) toast("Filtro atualizado com o último enviado de outro aparelho.");
+      }
+      if (newer || new Date(pub.updated_at) >= new Date(S.meta.filter_updated_at)) {
         S.meta.filter_updated_at = pub.updated_at;
         S.meta.filter_published_sig = JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions });
       }
@@ -1284,6 +1316,7 @@ async function ensureFilterPublished() {
     S.meta.filter_error = S.settings.github_token ? null : "sem token do GitHub";
   } catch { /* sem internet */ }
   if (!S.meta.filter_published_sig) S.meta.filter_published_sig = filterSig();
+  await importWatch();
   persist(); renderResearchStatus(); renderSendBar();
 }
 function renderSendBar() {
