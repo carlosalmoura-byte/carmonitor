@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-05T09:23:59.115Z",
- "novos": 11,
- "atualizados": 0,
- "sairam_do_ar": 0,
- "note": "pesquisa agendada pelo navegador do computador: só a 1ª página da busca filtrada de São Paulo foi lida; WebMotors pediu verificação humana na 2ª página e a pesquisa parou. 11 anúncios novos entraram pelo cartão da listagem (vendedor e FIPE a verificar).",
+ "processed_at": "2026-11-05T11:00:18.090Z",
+ "novos": 4,
+ "atualizados": 2,
+ "sairam_do_ar": 2,
+ "note": "pesquisa a pedido pelo navegador do computador (05/11 8h): reconferidos 9 anúncios (2 saíram do ar: Polo Highline 81747874 de Barueri e Creta Limited 81825935 — este voltou como 81916487); novos: Polo Highline Osasco, Tracker Premier 2022 Osasco, Tiggo 5x Pro Cotia. Listagens lidas: São Paulo págs. 2–3, Barueri, Osasco, Cotia. Usuário passou a verificação humana uma vez.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,12 +11,8 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-05T09:23:59.115Z",
+  "at": "2026-11-05T11:00:18.090Z",
   "ok": true
  },
- "running": {
-  "since": "2026-11-05T10:54:28.068Z",
-  "kind": "pedido",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 5
 }
