@@ -1277,7 +1277,7 @@ const filterSig = () => JSON.stringify(filterPayload());
 /** O filtro do aparelho mudou desde o último envio? (sem envio conhecido = considera enviado, para não incomodar) */
 const filterDirty = () => !!(S.meta.filter_published_sig && S.meta.filter_published_sig !== filterSig());
 /** Filtro mudou no app: só aplica localmente. Nada é enviado até o usuário tocar em "Pesquisar com este filtro". */
-function filterChanged() { persist(); renderResearchStatus(); renderSendBar(); }
+function filterChanged() { S.meta.filter_edited_at = new Date().toISOString(); persist(); renderResearchStatus(); renderSendBar(); }
 /** Envia o filtro atual para a pesquisa (grava data/filtro.json = pedido de pesquisa). */
 async function sendFilter() {
   try {
@@ -1300,8 +1300,9 @@ async function ensureFilterPublished() {
       // a cópia do site pode estar alguns minutos atrasada: ignora se for mais antiga que o último envio feito daqui
       const fresh = !S.meta.filter_updated_at; // aparelho/navegador que nunca recebeu o filtro
       const newer = fresh || new Date(pub.updated_at) > new Date(S.meta.filter_updated_at);
-      const localDirty = !fresh && filterDirty(); // mudanças feitas aqui e ainda não enviadas
-      if (pub.criteria && newer && !localDirty && JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions }) !== filterSig()) {
+      // o filtro daqui só vale mais que o enviado se foi editado AQUI depois do último envio (de qualquer aparelho)
+      const editedHere = S.meta.filter_edited_at && new Date(S.meta.filter_edited_at) > new Date(pub.updated_at);
+      if (pub.criteria && !editedHere && JSON.stringify({ criteria: pub.criteria, exclusions: pub.exclusions }) !== filterSig()) {
         // adota o último filtro enviado (de qualquer aparelho): todos os aparelhos ficam com o mesmo filtro
         Object.assign(S.settings.criteria, pub.criteria);
         S.exclusions = (pub.exclusions || []).map((r) => ({ ...r }));
