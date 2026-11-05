@@ -802,7 +802,8 @@ function scoreHtml(l) {
     <span class="small">#${pos} de ${n} em análise</span></span></div>
     <p class="small">A nota compara só o que diferencia os carros que passaram no seu filtro. Os pré-requisitos (preço máximo, ano, km máxima, câmbio, vendedor, distância, indução e Android Auto sem fio) não dão pontos: eles decidem se o carro é aprovado, pendente ou descartado.${pend ? ` Este anúncio tem ${pend} pendência(s) a confirmar — elas não mudam a nota.` : ""}</p>
     <ul class="list">${sc.parts.map((p) => `<li><span>${esc(p.label)}<span class="small">${esc(p.note || "")}</span>
-      <div class="bar" style="width:9rem"><i style="width:${(100 * p.pts / p.max).toFixed(0)}%"></i></div></span><b>${p.pts.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}/${p.max.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}</b></li>`).join("")}</ul>`;
+      ${p.nd ? "" : `<div class="bar" style="width:9rem"><i style="width:${(100 * p.pts / (p.max || 1)).toFixed(0)}%"></i></div>`}</span><b>${p.nd ? "—" : `${p.pts.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}/${p.max.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}`}</b></li>`).join("")}</ul>
+    <p class="small">Escalas: preço x FIPE — 10% abaixo vale tudo, no valor 60%, 10% acima zero · km — 0 km vale tudo, no limite do filtro 40% · ano — perde 15% por ano de uso · preço — no limite do filtro 40% · ADAS não comprovado 40% · item sem dado (—) fica fora da conta.</p>`;
 }
 function openScore(id) {
   const l = byId(id); if (!l) return;
