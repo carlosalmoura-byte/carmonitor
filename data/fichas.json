@@ -1838,5 +1838,61 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/chevrolet-tracker-2024/"
   }
+ },
+ {
+  "id": "chevrolet-tracker-premier-2022",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "premier"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "“Na versão Premier, há sistema de carregador de celular por indução, que permite a recarga também sem o uso de fios.”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Tracker 2022: espelhamento sem fio do Android Auto e Apple CarPlay “item de série a partir da versão LT”"
+   }
+  },
+  "source": {
+   "title": "Revista Carro — Chevrolet Tracker 2022 estreia espelhamento sem fio",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/chevrolet-tracker-2022-estreia-espelhamento-sem-fio/"
+  },
+  "note": "Confirmado também no teste da Garagem360 (https://garagem360.com.br/?p=120819)."
+ },
+ {
+  "id": "caoa-chery-tiggo-5x-pro-2023",
+  "make": "caoa chery",
+  "model": "tiggo 5x pro",
+  "version_includes": [
+   "turbo"
+  ],
+  "version_excludes": [
+   "hybrid"
+  ],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Tiggo 5X 2023 (versão única Pro): “Carregador de celular por indução / Porta celular”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Tiggo 5X 2023: sem ACC, permanência em faixa, frenagem autônoma ou ponto cego na lista (só piloto automático e câmera 360°)"
+   }
+  },
+  "source": {
+   "title": "Motor Agora — Caoa Chery Tiggo 5X 2023: preço, ficha técnica",
+   "quality": "secundária",
+   "url": "https://www.motoragora.com.br/?p=47818"
+  },
+  "note": "Android Auto/CarPlay citados sem dizer se são sem fio — fica pendente (pergunte ao vendedor)."
  }
 ]
