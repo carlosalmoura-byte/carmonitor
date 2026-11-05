@@ -406,6 +406,14 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 window.addEventListener("pagehide", saveUi);
 function openExternal(url) {
   saveUi();
+  // Android: abre no Chrome como app separado (intent). Assim o "voltar" do Android fecha a aba do Chrome e
+  // devolve para o CarMonitor, em vez de cair no app do WebMotors (que fecha tudo ao voltar) ou de sair do PWA.
+  if (/Android/i.test(navigator.userAgent) && /^https:\/\/([a-z0-9-]+\.)*webmotors\.com\.br\//i.test(url)) {
+    const u = new URL(url);
+    location.href = `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=com.android.chrome;` +
+      `S.browser_fallback_url=${encodeURIComponent(url)};end`;
+    return;
+  }
   const w = window.open(url, "_blank");
   if (w) { try { w.opener = null; } catch { /* ok */ } } else location.href = url; // bloqueado: abre na mesma janela
 }
