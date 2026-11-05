@@ -330,6 +330,7 @@ function renderCards() {
       <div class="cardActions">
         ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
           : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
+        ${l.status !== "descartado" && l.available !== false ? `<button class="wide" data-msg="${l.id}">💬 Mensagem ao vendedor${askList(l).length ? ` <span class="small">(+${askList(l).length} pergunta${askList(l).length > 1 ? "s" : ""})</span>` : ""}</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
       </div></article>`;
   }).join("");
@@ -405,6 +406,8 @@ $("#cards").addEventListener("click", (e) => {
   const cf = e.target.closest("[data-cmpflag]");
   if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
   if (e.target.closest(".cmpFlag")) return;
+  const ms = e.target.closest("[data-msg]");
+  if (ms) { messageSeller(+ms.dataset.msg); return; }
   const ap = e.target.closest("[data-approve]");
   if (ap) { approve(+ap.dataset.approve); return; }
   const sb = e.target.closest("[data-score]");
@@ -588,14 +591,35 @@ const QUESTIONS = {
   inducao: "O carro tem carregador de celular por indução (sem fio)?",
   android_auto_sem_fio: "O Android Auto conecta sem fio (sem cabo)?",
   adas: "Tem frenagem automática de emergência ou outros assistentes de condução?",
-  distance: "Qual o endereço onde o carro está?", price: "Qual o valor final?", km: "Qual a quilometragem atual?",
+  seller: "O carro é de loja/concessionária ou de particular?", distance: "Qual o endereço onde o carro está?", price: "Qual o valor final?", km: "Qual a quilometragem atual?",
   year_model: "Qual o ano de fabricação e o ano-modelo?", transmission: "O câmbio é automático?",
 };
 const pendingOf = (d) => (d.reasons || []).filter((r) => r.level === "pending");
+/** Perguntas para o vendedor: tudo que está pendente + ADAS (desejável) quando não comprovado. */
+function askList(d) {
+  const fields = new Set(pendingOf(d).map((r) => r.field));
+  for (const k of ["inducao", "android_auto_sem_fio"]) if ((d.checks?.[k]?.state || "pendente") === "pendente") fields.add(k);
+  if (!S.settings.criteria.adas_required && (d.checks?.adas?.state || "pendente") === "pendente") fields.add("adas");
+  if (!d.seller_type) fields.add("seller");
+  return [...fields].map((f) => QUESTIONS[f]).filter(Boolean);
+}
 function askMessage(d) {
-  const qs = pendingOf(d).map((r) => QUESTIONS[r.field]).filter(Boolean);
+  const qs = askList(d);
   const base = E.contactMessage(S, d);
   return qs.length ? `${base}\n\nAntes de agendar, pode me confirmar:\n${qs.map((q) => `- ${q}`).join("\n")}` : base;
+}
+/** Botão do cartão: monta a mensagem (com as perguntas do que falta) e abre o WhatsApp do vendedor; sem telefone,
+ *  copia a mensagem e abre o anúncio (no WebMotors, toque em WhatsApp/Mensagem e cole). */
+function messageSeller(id) {
+  const d = byId(id); if (!d) return;
+  const text = d.contact_draft || askMessage(d);
+  const link = E.whatsappLink(d.seller_phone || "", text);
+  d.contacted_at = new Date().toISOString(); persist();
+  if (link) { openExternal(link); return; }
+  (navigator.clipboard?.writeText(text) || Promise.reject()).then(() => {
+    toast(`Mensagem copiada${askList(d).length ? " com as perguntas do que falta" : ""}. No anúncio, toque em WhatsApp ou Mensagem e cole.`);
+    setTimeout(() => openExternal(d.url), 900);
+  }).catch(() => { openDetail(d.id); setTimeout(() => $("#dContact")?.scrollIntoView({ block: "start" }), 120); toast("Não consegui copiar sozinho: copie a mensagem aqui e cole no anúncio."); });
 }
 /** Bloco de decisão no topo do detalhe: o que falta, por que foi descartado, e as ações. */
 function decisionBox(d) {
@@ -715,7 +739,7 @@ function renderDetail(d) {
       <p class="small" style="margin-top:0">${esc(d.seller || "Vendedor não identificado")}${d.seller_type ? ` · ${SELLER[d.seller_type]}` : ""}.
         Sem o telefone, o botão abaixo <b>copia a mensagem e abre o anúncio</b>: no WebMotors toque em <b>WhatsApp</b> ou <b>Mensagem</b> e cole. Com o telefone (no anúncio: <b>Ver telefone</b>), abre direto o WhatsApp do vendedor.</p>
       <label>Telefone / WhatsApp do vendedor<input name="phone" id="dPhone" inputmode="tel" placeholder="(11) 9xxxx-xxxx" value="${esc(d.seller_phone || "")}"></label>
-      <label>Mensagem (pode editar)<textarea id="dMsg" rows="7">${esc(d.contact_draft || E.contactMessage(S, d))}</textarea></label>
+      <label>Mensagem (pode editar)<textarea id="dMsg" rows="7">${esc(d.contact_draft || askMessage(d))}</textarea></label>
       <div class="actions left">
         <button class="primary" id="dWhats">${d.seller_phone ? "Enviar pelo WhatsApp" : "Copiar mensagem e abrir anúncio"}</button><button id="dCopyMsg">Copiar mensagem</button>
         <button id="dShareMsg">Compartilhar…</button><button class="ghost" id="dResetMsg">Mensagem padrão</button>
