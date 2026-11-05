@@ -14,7 +14,7 @@ export const SOURCE_LABEL = { url: "URL do anúncio", texto_colado: "Texto do an
   derivado_km: "Derivado da km", derivado_version: "Derivado da versão", derivado_title: "Derivado do título",
   derivado_vendedor: "Deduzido do nome do vendedor" };
 export const MY_CAR_DEFAULT = "Chevrolet Onix Hatch 1.0 Turbo automático LT 2020, com 108 mil km";
-export const CONTACT_TEMPLATE_DEFAULT = "Olá! Vi o anúncio do {carro} {ano}, por {preco}, no WebMotors ({link}). Tenho interesse no carro. " +
+export const CONTACT_TEMPLATE_DEFAULT = "Olá, meu nome é Moura! Vi o anúncio do {carro} {ano}, por {preco}, no WebMotors ({link}). Tenho interesse no carro. " +
   "Ele continua disponível? Gostaria de agendar uma visita para conhecê-lo. Também tenho um {meu_carro} para avaliação e possível inclusão na negociação. Obrigado!";
 const CONFLICT_FIELDS = ["year_fab", "year_model", "transmission"];
 
@@ -38,6 +38,11 @@ export function upgradeState(s) {
   s.settings = { ...base.settings, ...s.settings, criteria: { ...DEFAULT_CRITERIA, ...(s.settings?.criteria || {}) },
     notify: { ...DEFAULT_NOTIFY, ...(s.settings?.notify || {}) }, distance: { ...base.settings.distance, ...(s.settings?.distance || {}) } };
   s.meta = { ...base.meta, ...s.meta };
+  // mensagem salva que começa com o "Olá!" antigo: passa a se apresentar (pedido do usuário)
+  if (typeof s.settings.contact_template === "string" && /^Olá!\s/.test(s.settings.contact_template))
+    s.settings.contact_template = s.settings.contact_template.replace(/^Olá!\s/, "Olá, meu nome é Moura! ");
+  for (const l of s.listings || []) if (typeof l.contact_draft === "string" && /^Olá!\s/.test(l.contact_draft))
+    l.contact_draft = l.contact_draft.replace(/^Olá!\s/, "Olá, meu nome é Moura! ");
   return s;
 }
 
