@@ -403,3 +403,11 @@ test("leilão/blindagem/carroceria/cor e características", () => {
   const s1 = scoreListing({ ...base, status: "aprovado", reasons: [], features: ["unico_dono", "revisoes_concessionaria", "garantia_fabrica"] }, DEFAULT_CRITERIA).total;
   assert.ok(s1 > s0, `${s1} > ${s0}`);
 });
+
+test("todas as fichas publicadas (data/fichas.json) passam na validação do app", async () => {
+  const { validateSpec } = await import("../core/specs.js");
+  const fs = await import("node:fs");
+  const fichas = JSON.parse(fs.readFileSync(new URL("../data/fichas.json", import.meta.url), "utf8"));
+  const bad = fichas.map((s) => [s.id, validateSpec(s)]).filter(([, e]) => e.length);
+  assert.deepEqual(bad, []);
+});
