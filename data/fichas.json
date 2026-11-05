@@ -467,6 +467,10 @@
    "inducao": {
     "state": "ausente",
     "quote": "Catálogo WebMotors do Basalt 2025: carregador de celular por indução/sem fio não aparece em nenhuma versão (Feel, Shine, First Edition)"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Catálogo WebMotors do Basalt 2025: nenhum item de assistência (frenagem autônoma, faixa, ponto cego, ACC) em Feel, Shine ou First Edition — só piloto automático"
    }
   },
   "tech": {
@@ -1396,6 +1400,10 @@
    "inducao": {
     "state": "ausente",
     "quote": "Catálogo WebMotors do Basalt 2025: carregador de celular por indução/sem fio não aparece em nenhuma versão (Feel, Shine, First Edition)"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Catálogo WebMotors do Basalt 2025: nenhum item de assistência (frenagem autônoma, faixa, ponto cego, ACC) em Feel, Shine ou First Edition — só piloto automático"
    }
   },
   "source": {
@@ -1804,5 +1812,31 @@
    "url": "https://garagem360.com.br/?p=215634"
   },
   "note": "Carregador por indução: a fonte se contradiz (não aparece na lista da Turbo, mas o texto da Audace diz que herda o carregador da entrada) — fica pendente."
+ },
+ {
+  "id": "chevrolet-tracker-midnight-2024",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "midnight"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Série em todas as versões do Tracker 2024: “Projeção da tela do smartphone sem o uso de cabo”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Tracker 2024: “Carregador sem fio” listado apenas na versão Premier"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Tracker 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/chevrolet-tracker-2024/"
+  }
  }
 ]
