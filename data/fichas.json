@@ -449,12 +449,16 @@
    "shine"
   ],
   "version_excludes": [],
-  "year_from": 2025,
+  "year_from": 2024,
   "year_to": 2025,
   "items": {
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "espelhamento sem fio para Android Auto e Apple CarPlay"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Catálogo WebMotors do Basalt 2025: carregador de celular por indução/sem fio não aparece em nenhuma versão (Feel, Shine, First Edition)"
    }
   },
   "tech": {
@@ -477,7 +481,7 @@
    "quality": "secundária",
    "url": "https://www.cnnbrasil.com.br/auto/citroen-basalt-shine-conheca-a-versao-que-tem-mimos-de-carros-mais-caros/"
   },
-  "note": "Carregador por indução não comprovado nas fontes; sem frenagem autônoma."
+  "note": "Carregador por indução não comprovado nas fontes; sem frenagem autônoma. Indução ausente: https://www.webmotors.com.br/citroen/basalt/2025"
  },
  {
   "id": "nissan-kicks-sense-2024",
@@ -489,7 +493,12 @@
   "version_excludes": [],
   "year_from": 2024,
   "year_to": 2024,
-  "items": {},
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   }
+  },
   "tech": {
    "engine": "1.6 16V flex",
    "power_e": 113,
@@ -512,7 +521,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=209798"
   },
-  "note": "Fonte cita \"Apple CarPlay® e Android Auto®\" sem dizer se é sem fio; carregador por indução não citado na versão Sense; nenhum ADAS na lista de série (só piloto automático convencional) — itens deixados sem confirmação."
+  "note": "Fonte cita \"Apple CarPlay® e Android Auto®\" sem dizer se é sem fio; carregador por indução não citado na versão Sense; nenhum ADAS na lista de série (só piloto automático convencional) — itens deixados sem confirmação. Android Auto sem fio: https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
  },
  {
   "id": "fiat-cronos-drive-cvt-2025",
@@ -525,7 +534,12 @@
   "version_excludes": [],
   "year_from": 2025,
   "year_to": 2025,
-  "items": {},
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista completa de série do Cronos Drive 1.3 CVT 2024 e 2025 sem carregador sem fio (só “tomada 12V”); Garagem360 2024: https://garagem360.com.br/?p=220298"
+   }
+  },
   "tech": {
    "engine": "1.3 Firefly flex",
    "power_e": 107,
@@ -774,7 +788,12 @@
   "version_excludes": [],
   "year_from": 2025,
   "year_to": 2025,
-  "items": {},
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Polo 2025: “Carregador de smartphone sem fio” só aparece na versão Highline"
+   }
+  },
   "tech": {
    "body": "Hatch compacto",
    "engine": "1.0 TSI 170 (3 cil.)",
@@ -799,7 +818,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=279696"
   },
-  "note": "Fontes de 2025 (Garagem360, Carro.blog, MotorAgora) citam o carregador por indução só na Highline, mas a fonte do Polo 2024 lista o item na Comfortline — conflito, indução deixada sem confirmação. Android Auto sem fio sem fonte para 2025 (só \"App-Connect\"/\"VW Play\"). Sem ADAS ativo citado (só frenagem pós-colisão e piloto automático convencional)."
+  "note": "Fontes de 2025 (Garagem360, Carro.blog, MotorAgora) citam o carregador por indução só na Highline, mas a fonte do Polo 2024 lista o item na Comfortline — conflito, indução deixada sem confirmação. Android Auto sem fio sem fonte para 2025 (só \"App-Connect\"/\"VW Play\"). Sem ADAS ativo citado (só frenagem pós-colisão e piloto automático convencional). Indução: Garagem360 Polo 2025 https://garagem360.com.br/?p=279696"
  },
  {
   "id": "fiat-cronos-drive-cvt-2023",
@@ -816,6 +835,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "Multimídia (com conexão sem fio para Android Auto e Apple CarPlay)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista completa de série do Cronos Drive 1.3 CVT 2024 e 2025 sem carregador sem fio (só “tomada 12V”); Garagem360 2024: https://garagem360.com.br/?p=220298"
    }
   },
   "tech": {
@@ -843,7 +866,7 @@
    "quality": "secundária",
    "url": "https://autopapo.com.br/noticia/fiat-cronos-drive-cvt-2023/"
   },
-  "note": "Carregador por indução não citado nas fontes (sem fonte). Sem ADAS: só ABS, controles de tração e estabilidade, Hill Holder e piloto automático convencional."
+  "note": "Carregador por indução não citado nas fontes (sem fonte). Sem ADAS: só ABS, controles de tração e estabilidade, Hill Holder e piloto automático convencional. Indução ausente também nas linhas 2024/2025 (mesma geração)."
  },
  {
   "id": "chevrolet-tracker-lt-2025",
@@ -1137,6 +1160,10 @@
      "Monitoramento de ponto cego (BSW)",
      "Alerta de tráfego cruzado traseiro (RCTA)"
     ]
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Versa 2024: “A versão Exclusive ganhou nova central com tela de 8 polegadas, mas a conectividade ainda é via cabo”"
    }
   },
   "source": {
@@ -1144,7 +1171,7 @@
    "quality": "concessionária",
    "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2024/02/Lista-de-equipamentos-de-serie-Novo-Versa-2024.pdf"
   },
-  "note": "Fonte não diz se Android Auto é sem fio (multimídia de 8″) — item fica pendente."
+  "note": "Android Auto com fio: AutoPapo https://autopapo.com.br/noticia/nissan-versa-2024/"
  },
  {
   "id": "jeep-renegade-longitude-2024",
@@ -1204,6 +1231,10 @@
      "Assistente de permanência em faixa",
      "Detector de fadiga"
     ]
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Linha 2022/2024: o carregador sem fio aparece só a partir da Longitude (“…Android Auto e Apple CarPlay sem fio e carregador sem fio”); na Sport não consta (Garagem360 Sport 2024: https://garagem360.com.br/?p=205929)"
    }
   },
   "source": {
@@ -1261,6 +1292,10 @@
      "Frenagem autônoma de emergência (AEB)",
      "Alerta de mudança de faixa (LDW)"
     ]
+   },
+   "android_auto_sem_fio": {
+    "state": "opcional",
+    "quote": "Audace 2023: Android Auto/CarPlay sem fio só com o pacote Connect Me (central uConnect de 10,1″) — Canaltech (dez/2022); de série a Audace tem a central de 8,4″, sem conexão sem fio citada"
    }
   },
   "source": {
@@ -1268,7 +1303,7 @@
    "quality": "secundária",
    "url": "https://www.motoragora.com.br/?p=59082"
   },
-  "note": "Na linha 2023 o Android Auto sem fio é citado só na Impetus (tela de 10,1″); na Audace (8,4″) a fonte não diz — fica pendente."
+  "note": "Na linha 2023 o Android Auto sem fio é citado só na Impetus (tela de 10,1″); na Audace (8,4″) a fonte não diz — fica pendente. AA sem fio: https://canaltech.com.br/carros/analise/review-fiat-fastback-audace/"
  },
  {
   "id": "nissan-kicks-exclusive-2023",
@@ -1284,6 +1319,10 @@
    "inducao": {
     "state": "opcional",
     "quote": "Linha 2023: só a Exclusive Pack Tech “traz de série, agora, um carregador para celular por indução”"
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
    }
   },
   "source": {
@@ -1291,7 +1330,7 @@
    "quality": "secundária",
    "url": "https://motorshow.com.br/nissan-lanca-kicks-2023-com-mais-equipamentos-veja-o-que-mudou"
   },
-  "note": "Na Exclusive sem Pack Tech o carregador não vem de série — confirme com o vendedor. Android Auto sem fio não citado."
+  "note": "Na Exclusive sem Pack Tech o carregador não vem de série — confirme com o vendedor. Android Auto sem fio não citado. Android Auto sem fio ausente na 1ª geração: https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
  },
  {
   "id": "nissan-kicks-advance-2024",
@@ -1307,6 +1346,10 @@
    "inducao": {
     "state": "ausente",
     "quote": "“carregador de celular por indução” listado como item da Exclusive (Kicks 2024)"
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
    }
   },
   "source": {
@@ -1329,6 +1372,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "“Citroën Connect Touchscreen de 10” com Android Auto e Apple Carplay sem fio com comandos no volante”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Catálogo WebMotors do Basalt 2025: carregador de celular por indução/sem fio não aparece em nenhuma versão (Feel, Shine, First Edition)"
    }
   },
   "source": {
@@ -1336,7 +1383,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=262358"
   },
-  "note": "Baseada na Shine Turbo 200; carregador por indução não citado — fica pendente."
+  "note": "Baseada na Shine Turbo 200; carregador por indução não citado — fica pendente. Indução ausente: https://www.webmotors.com.br/citroen/basalt/2025"
  },
  {
   "id": "honda-city-exl-2023",
@@ -1352,6 +1399,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "City EXL 2023: “conectividade sem fio através dos aplicativos Android Auto e Apple CarPlay”; sedã: “Multimídia de 8\" touchscreen com interface sem fio para Apple CarPlay e Android Auto”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "City 2023/2024: carregador por indução não consta em nenhuma versão (lista de série; o único “sem-fio” é o da central multimídia)"
    }
   },
   "source": {
@@ -1359,7 +1410,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=183329"
   },
-  "note": "Fonte da EXL é do City Hatch 2023; o catálogo oficial do sedã (https://www.honda.com.br/automoveis/sites/hab/files/2021-11/newcity_seda_v4.pdf) confirma a central de 8″ com interface sem fio. Carregador por indução não citado."
+  "note": "Fonte da EXL é do City Hatch 2023; o catálogo oficial do sedã (https://www.honda.com.br/automoveis/sites/hab/files/2021-11/newcity_seda_v4.pdf) confirma a central de 8″ com interface sem fio. Carregador por indução não citado. Indução: Motor Show (jan/2024) https://motorshow.com.br/honda-city-recebe-novas-versoes-de-entrada-e-linha-parte-de-r-113-600"
  },
  {
   "id": "hyundai-creta-action-2025",
@@ -1501,6 +1552,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "Cronos 2026: o UConnect de 7” “agora tem conexões sem fio com Apple CarPlay e Android Auto”, de série desde a Drive 1.0"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Cronos 2026: carregador por indução só entre os acessórios Mopar — não consta nas listas de Drive 1.0, Drive 1.3 AT e Precision nem nos opcionais"
    }
   },
   "source": {
@@ -1508,6 +1563,134 @@
    "quality": "secundária",
    "url": "https://motorshow.com.br/fiat-cronos-2026-esta-de-cara-nova-e-mais-equipado-veja-precos-e-versoes"
   },
-  "note": "Carregador por indução não citado — fica pendente."
+  "note": "Indução: Folha PE https://www.folhape.com.br/colunistas/fmotors/fiat-cronos-2026-evolui-no-design-e-acerta-na-dose-de-tecnologia-confira-versoes-e-valores/50342/"
+ },
+ {
+  "id": "nissan-kicks-1g-sem-fio",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [],
+  "version_excludes": [
+   "exclusive",
+   "advance"
+  ],
+  "year_from": 2022,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   }
+  },
+  "source": {
+   "title": "Canaltech — 5 motivos para não comprar o Nissan Kicks 2024",
+   "quality": "secundária",
+   "url": "https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
+  },
+  "note": "Vale para as versões Sense/Active/Play da 1ª geração."
+ },
+ {
+  "id": "nissan-kicks-play-2025",
+  "make": "nissan",
+  "model": "kicks play",
+  "version_includes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   }
+  },
+  "source": {
+   "title": "Canaltech — 5 motivos para não comprar o Nissan Kicks 2024",
+   "quality": "secundária",
+   "url": "https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
+  },
+  "note": "Kicks Play = Kicks de 1ª geração mantido em linha (multimídia de 7″/8″).",
+  "version_excludes": []
+ },
+ {
+  "id": "fiat-cronos-drive-cvt-2024",
+  "make": "fiat",
+  "model": "cronos",
+  "version_includes": [
+   "drive"
+  ],
+  "version_excludes": [
+   "manual"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista completa de série do Cronos Drive 1.3 CVT 2024 e 2025 sem carregador sem fio (só “tomada 12V”); Garagem360 2024: https://garagem360.com.br/?p=220298"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Cronos Drive 1.3 AT 2024",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=220298"
+  }
+ },
+ {
+  "id": "toyota-yaris-xl-2024",
+  "make": "toyota",
+  "model": "yaris",
+  "version_includes": [
+   "xl"
+  ],
+  "version_excludes": [
+   "xls",
+   "xs ",
+   "live"
+  ],
+  "year_from": 2024,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Yaris 2025 (lista completa de série): carregador de celular sem fio não é citado em nenhuma versão; XL sem ADAS"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Toyota Yaris Sedã XL 2025",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/toyota-yaris-seda-xl-2025/"
+  },
+  "note": "Vale para hatch e sedã XL (mesma lista de equipamentos)."
+ },
+ {
+  "id": "jeep-renegade-13-turbo-2024",
+  "make": "jeep",
+  "model": "renegade",
+  "version_includes": [
+   "t270"
+  ],
+  "version_excludes": [
+   "longitude",
+   "sport",
+   "altitude",
+   "serie s",
+   "trailhawk",
+   "willys",
+   "night eagle",
+   "moab",
+   " s "
+  ],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Renegade 2024: “carregador do celular por Indução” é item só da Longitude; a 1.3 Turbo de entrada traz só “USB Tipo C”"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Jeep Renegade 2024",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=210269"
+  }
  }
 ]
