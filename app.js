@@ -328,10 +328,10 @@ function renderCards() {
       ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
       <div class="cardActions">
-        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
-          : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
         ${l.status !== "descartado" && l.available !== false ? `<button class="wide" data-msg="${l.id}">💬 Mensagem ao vendedor${askList(l).length ? ` <span class="small">(+${askList(l).length} pergunta${askList(l).length > 1 ? "s" : ""})</span>` : ""}</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
+        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
+          : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
       </div></article>`;
   }).join("");
 }
