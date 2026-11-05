@@ -1692,5 +1692,52 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=210269"
   }
+ },
+ {
+  "id": "fiat-pulse-audace-hybrid-2026",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "audace",
+   "hybrid"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2026,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "carregador de celular por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "conexão sem fio com Android Auto e Apple CarPlay"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.0 turbo T200 flex, híbrido leve 12 V",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 13.4,
+   "road_g": 14.4,
+   "city_e": 9.3,
+   "road_e": 10.2,
+   "trunk_l": 370,
+   "source": {
+    "title": "Garagem360 — Fiat Pulse Audace Hybrid faz até 14,4 km/l, entrega 130 cv e custa R$ 136.990",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/fiat-pulse-audace-hybrid-faz-ate-144-kml-entrega-130-cv-e-custa-r-136990/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse Audace Hybrid faz até 14,4 km/l, entrega 130 cv e custa R$ 136.990",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/fiat-pulse-audace-hybrid-faz-ate-144-kml-entrega-130-cv-e-custa-r-136990/"
+  },
+  "note": "ADAS não citado na fonte para a Audace Hybrid 2026 (fica pendente)."
  }
 ]
