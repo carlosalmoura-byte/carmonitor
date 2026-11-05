@@ -65,6 +65,31 @@ let saveTimer = null;
 function persist() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => saveState(S).catch((e) => toast("Falha ao salvar: " + e.message)), 150);
+  scheduleWatchSync();
+}
+/** Lista de acompanhamento (favoritos + aprovados por você) enviada à pesquisa em data/acompanhar.json:
+ *  a pesquisa diária reconfere esses anúncios primeiro e marca os que saíram do ar. Não é pedido de pesquisa. */
+let watchTimer = null;
+function watchPayload() {
+  const keep = S.listings.filter((l) => !l.archived && l.available !== false && (l.favorite || l.user_approve));
+  return [...new Set(keep.map((l) => l.url))].sort();
+}
+function scheduleWatchSync() {
+  if (!S?.settings?.github_token) return;
+  clearTimeout(watchTimer);
+  watchTimer = setTimeout(() => syncWatch().catch(() => { /* tenta de novo na próxima alteração */ }), 5000);
+}
+async function syncWatch() {
+  const urls = watchPayload(), sig = JSON.stringify(urls);
+  if (S.meta.watch_sig === sig) return;
+  const api = `https://api.github.com/repos/${REPO}/contents/data/acompanhar.json`;
+  const h = { Authorization: `Bearer ${S.settings.github_token}`, Accept: "application/vnd.github+json" };
+  const g = await fetch(`${api}?ref=main`, { headers: h, cache: "no-store" });
+  const sha = g.ok ? (await g.json()).sha : null;
+  const doc = { updated_at: new Date().toISOString(), origem: "app CarMonitor", nota: "favoritos e aprovados — reconferir todo dia", urls };
+  const r = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: "Lista de acompanhamento do app", content: b64(JSON.stringify(doc, null, 1) + "\n"), branch: "main", ...(sha ? { sha } : {}) }) });
+  if (r.ok) { S.meta.watch_sig = sig; saveState(S).catch(() => {}); }
 }
 async function act(btn, fn) {
   if (btn) btn.disabled = true;

@@ -6,7 +6,9 @@
   const flat = body.replace(/\s+/g, " ");
   if (/Pressione e segure|Access to this page has been denied/i.test(flat)) return { ok: false, blocked: true, url: location.href };
   const title = (document.title.split(" - WebMotors")[0] || "").trim();
-  if (!/\d{6,}$/.test(location.pathname) || !title) return { ok: false, blocked: false, url: location.href, reason: "não é página de anúncio (ainda carregando ou saiu do ar)" };
+  // anúncio removido/vendido: o WebMotors redireciona para a lista de estoque da versão (/carros/estoque/...)
+  if (!/\d{6,}$/.test(location.pathname) && /^\/carros\//.test(location.pathname)) return { ok: false, blocked: false, removed: true, url: location.href, reason: "anúncio saiu do ar (redirecionou para a lista de estoque)" };
+  if (!/\d{6,}$/.test(location.pathname) || !title) return { ok: false, blocked: false, url: location.href, reason: "não é página de anúncio (ainda carregando)" };
   const lines = body.split("\n").map(s => s.trim()).filter(Boolean);
   const after = (label) => { const i = lines.findIndex(l => l.toLowerCase() === label.toLowerCase()); return i >= 0 ? lines[i + 1] : null; };
   const sec = (start, end) => { const m = body.match(new RegExp(start + "\\n([\\s\\S]*?)\\n" + end)); return m ? m[1].split("\n").map(s => s.trim()).filter(Boolean) : []; };

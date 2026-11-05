@@ -15,7 +15,7 @@ const feedPath = "data/anuncios.json", statusPath = "data/status.json";
 const feed = fs.existsSync(feedPath) ? JSON.parse(fs.readFileSync(feedPath, "utf8")) : { listings: [] };
 const incoming = JSON.parse(fs.readFileSync(file, "utf8"));
 const byUrl = new Map(feed.listings.map((l) => [norm(l.url), l]));
-let novos = 0, atualizados = 0, fora = 0;
+let novos = 0, atualizados = 0, fora = 0, conferidos = 0;
 for (const it of incoming) {
   if (!it.url) continue;
   const url = norm(it.url);
@@ -27,7 +27,7 @@ for (const it of incoming) {
     continue;
   }
   if (!it.text || it.text.length < 20) { console.warn("sem texto, ignorado:", url); continue; }
-  if (prev && prev.text === it.text && prev.available !== false) continue; // nada mudou
+  if (prev && prev.text === it.text && prev.available !== false) { prev.checked_at = now; conferidos++; continue; } // conferido, nada mudou
   byUrl.set(url, { url, checked_at: now, text: it.text, available: true });
   prev ? atualizados++ : novos++;
 }
@@ -41,8 +41,8 @@ const issues = String(arg("--issue") || "").split(",").map(Number).filter(Boolea
 const filtro = fs.existsSync("data/filtro.json") ? JSON.parse(fs.readFileSync("data/filtro.json", "utf8")) : null;
 delete status.running;
 status.last_attempt = { at: now, ok: true };
-Object.assign(status, { filter_used_at: rest.includes("--sem-filtro") ? null : filtro?.updated_at ?? null, processed_at: now, novos, atualizados, sairam_do_ar: fora, note: arg("--note") || null,
+Object.assign(status, { filter_used_at: rest.includes("--sem-filtro") ? null : filtro?.updated_at ?? null, processed_at: now, novos, atualizados, sairam_do_ar: fora, conferidos_sem_mudanca: conferidos, note: arg("--note") || null,
   last_issue: issues.length ? Math.max(...issues) : status.last_issue ?? null,
   processed_issues: [...new Set([...(status.processed_issues || []), ...issues])] });
 fs.writeFileSync(statusPath, JSON.stringify(status, null, 1));
-console.log(JSON.stringify({ novos, atualizados, sairam_do_ar: fora, total: feed.listings.length }));
+console.log(JSON.stringify({ novos, atualizados, sairam_do_ar: fora, conferidos_sem_mudanca: conferidos, total: feed.listings.length }));

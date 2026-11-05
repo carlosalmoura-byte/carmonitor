@@ -497,6 +497,10 @@
    "android_auto_sem_fio": {
     "state": "ausente",
     "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Kicks 1ª geração (linha 2024): “carregador de celular por indução” é item só da versão Exclusive"
    }
   },
   "tech": {
@@ -521,7 +525,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=209798"
   },
-  "note": "Fonte cita \"Apple CarPlay® e Android Auto®\" sem dizer se é sem fio; carregador por indução não citado na versão Sense; nenhum ADAS na lista de série (só piloto automático convencional) — itens deixados sem confirmação. Android Auto sem fio: https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
+  "note": "Fonte cita \"Apple CarPlay® e Android Auto®\" sem dizer se é sem fio; carregador por indução não citado na versão Sense; nenhum ADAS na lista de série (só piloto automático convencional) — itens deixados sem confirmação. Android Auto sem fio: https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/ Indução: https://garagem360.com.br/?p=182245"
  },
  {
   "id": "fiat-cronos-drive-cvt-2025",
@@ -1580,6 +1584,10 @@
    "android_auto_sem_fio": {
     "state": "ausente",
     "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Kicks 1ª geração (linha 2024): “carregador de celular por indução” é item só da versão Exclusive"
    }
   },
   "source": {
@@ -1587,7 +1595,7 @@
    "quality": "secundária",
    "url": "https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
   },
-  "note": "Vale para as versões Sense/Active/Play da 1ª geração."
+  "note": "Vale para as versões Sense/Active/Play da 1ª geração. Indução: https://garagem360.com.br/?p=182245"
  },
  {
   "id": "nissan-kicks-play-2025",
@@ -1600,6 +1608,10 @@
    "android_auto_sem_fio": {
     "state": "ausente",
     "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Kicks 1ª geração (linha 2024): “carregador de celular por indução” é item só da versão Exclusive"
    }
   },
   "source": {
@@ -1607,7 +1619,7 @@
    "quality": "secundária",
    "url": "https://canaltech.com.br/carros/5-motivos-para-nao-comprar-o-nissan-kicks-2024/"
   },
-  "note": "Kicks Play = Kicks de 1ª geração mantido em linha (multimídia de 7″/8″).",
+  "note": "Kicks Play = Kicks de 1ª geração mantido em linha (multimídia de 7″/8″). Indução: https://garagem360.com.br/?p=182245",
   "version_excludes": []
  },
  {

@@ -39,6 +39,34 @@ sessão/cookies dele, e o WebMotors abre as listagens e os anúncios completos (
 **Nuvem (reserva).** Sem essas ferramentas (computador desligado/não vinculado), use o método das seções 3 em diante
 (WebSearch/WebFetch). Ele cobre menos e é bloqueado com frequência; registre no `--note` "pesquisa pela nuvem (reserva)".
 
+**Preparação do navegador (uma vez por execução):** rode `node tools/wm-setup.mjs` e cole a saída no
+`javascript_tool` numa página do webmotors.com.br. Ela grava os extratores (`cmx`, `cmc`) e o acumulador (`cms`) no
+localStorage. Depois: cartões com `eval(localStorage.getItem("cmc"))`; anúncios com
+`window.__exp = "<url>"; eval(localStorage.getItem("cms"))`; no fim leia `JSON.parse(localStorage.getItem("cmres"))`
+em blocos de ~15 e converta para o JSON da publicação (`removed: true` → `available: false`).
+
+## 0.1 Reconferência diária — obrigatória, PRIMEIRO passo da pesquisa das 6h21
+
+Todo dia, antes de procurar anúncios novos, confira se os anúncios que o usuário acompanha ainda estão no ar:
+
+1. `node tools/recheck-list.mjs 40` lista, em ordem: **todos** os favoritos e aprovados do usuário
+   (`data/acompanhar.json`, gravado pelo app) e depois os demais anúncios do feed ainda no ar que passam no filtro,
+   do conferido há mais tempo para o mais recente (pula os conferidos nas últimas 20 h).
+2. Abra cada URL no navegador (mesmo ritmo da seção 0) e rode o extrator. Na chamada, informe a URL esperada:
+   `window.__exp = "<url>"; eval(localStorage.getItem("cms"))` — o acumulador grava `{u: __exp, removed: true}`
+   quando o extrator devolver `removed: true`.
+3. Resultado de cada um no JSON da publicação:
+   - página do anúncio abriu → `{ "url", "text", "available": true }` (o texto novo atualiza preço/km; texto igual só
+     registra a conferência);
+   - `removed: true` (o WebMotors **redirecionou para a lista de estoque** `/carros/estoque/...`) →
+     `{ "url", "available": false }`. O app descarta o anúncio com o motivo "Anúncio indisponível (removido ou
+     vendido)" e avisa se era favorito;
+   - verificação "Pressione e segure" → pare tudo (regra da seção 0); o que não foi conferido fica para amanhã;
+   - qualquer outra falha (não carregou) → não marque nada.
+4. Só depois disso siga para a busca de anúncios novos, com o limite que sobrar (total ~60 páginas). Na pesquisa das
+   13h21 a reconferência é opcional (só favoritos/aprovados, se sobrar limite).
+5. No `--note`, informe quantos foram reconferidos e quantos saíram do ar.
+
 ## 1. Qual filtro usar e existe pedido pendente?
 
 **Regra principal: nunca pesquise sem antes ler o filtro que está no app.** O app grava o filtro atual do usuário
