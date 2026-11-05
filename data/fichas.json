@@ -17,6 +17,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Polo 2024 (Comfortline e Highline): lista de série sem frenagem autônoma, ACC, alerta de faixa ou ponto cego — só piloto automático convencional e frenagem pós-colisão"
    }
   },
   "tech": {
@@ -41,7 +45,7 @@
    "quality": "concessionária",
    "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/09/Polo-2023-versoes-e-equipamentos.pdf"
   },
-  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022)."
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022). ADAS: https://garagem360.com.br/?p=248084"
  },
  {
   "id": "vw-virtus-highline-2023",
@@ -359,6 +363,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Polo 2024 (Comfortline e Highline): lista de série sem frenagem autônoma, ACC, alerta de faixa ou ponto cego — só piloto automático convencional e frenagem pós-colisão"
    }
   },
   "tech": {
@@ -385,7 +393,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=214846"
   },
-  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022); a ficha da versão cita só “App-Connect”. Sem frenagem autônoma."
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022); a ficha da versão cita só “App-Connect”. Sem frenagem autônoma. ADAS: https://garagem360.com.br/?p=248084"
  },
  {
   "id": "vw-nivus-comfortline-2024",
@@ -395,7 +403,7 @@
    "comfortline"
   ],
   "version_excludes": [],
-  "year_from": 2024,
+  "year_from": 2023,
   "year_to": 2024,
   "items": {
    "inducao": {
@@ -439,7 +447,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/vw-nivus-comfortline-2024/"
   },
-  "note": "Android Auto sem fio não comprovado: a Comfortline 2024 usa o rádio “Composition Touch” com App-Connect, não o VW Play. AA sem fio: Garagem360 Nivus 2024 (https://garagem360.com.br/?p=185577) + Garagem360 T-Cross perde VW Play (https://garagem360.com.br/?p=181015)."
+  "note": "Android Auto sem fio não comprovado: a Comfortline 2024 usa o rádio “Composition Touch” com App-Connect, não o VW Play. AA sem fio: Garagem360 Nivus 2024 (https://garagem360.com.br/?p=185577) + Garagem360 T-Cross perde VW Play (https://garagem360.com.br/?p=181015). Vale também para 2023 (página “VW Nivus 2023 Comfortline”, mesma lista)."
  },
  {
   "id": "citroen-basalt-shine-2025",
@@ -796,6 +804,10 @@
    "inducao": {
     "state": "ausente",
     "quote": "Polo 2025: “Carregador de smartphone sem fio” só aparece na versão Highline"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Polo 2024 (Comfortline e Highline): lista de série sem frenagem autônoma, ACC, alerta de faixa ou ponto cego — só piloto automático convencional e frenagem pós-colisão"
    }
   },
   "tech": {
@@ -822,7 +834,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=279696"
   },
-  "note": "Fontes de 2025 (Garagem360, Carro.blog, MotorAgora) citam o carregador por indução só na Highline, mas a fonte do Polo 2024 lista o item na Comfortline — conflito, indução deixada sem confirmação. Android Auto sem fio sem fonte para 2025 (só \"App-Connect\"/\"VW Play\"). Sem ADAS ativo citado (só frenagem pós-colisão e piloto automático convencional). Indução: Garagem360 Polo 2025 https://garagem360.com.br/?p=279696"
+  "note": "Fontes de 2025 (Garagem360, Carro.blog, MotorAgora) citam o carregador por indução só na Highline, mas a fonte do Polo 2024 lista o item na Comfortline — conflito, indução deixada sem confirmação. Android Auto sem fio sem fonte para 2025 (só \"App-Connect\"/\"VW Play\"). Sem ADAS ativo citado (só frenagem pós-colisão e piloto automático convencional). Indução: Garagem360 Polo 2025 https://garagem360.com.br/?p=279696 ADAS: https://garagem360.com.br/?p=248084"
  },
  {
   "id": "fiat-cronos-drive-cvt-2023",
@@ -1076,6 +1088,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; Highline com VW Play de 10,1″"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Polo 2024 (Comfortline e Highline): lista de série sem frenagem autônoma, ACC, alerta de faixa ou ponto cego — só piloto automático convencional e frenagem pós-colisão"
    }
   },
   "source": {
@@ -1083,7 +1099,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=279696"
   },
-  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022), como nas fichas Polo Highline 2023. Sem ADAS (só frenagem pós-colisão e piloto automático convencional)."
+  "note": "Android Auto sem fio pela regra do VW Play (produção a partir de 2022), como nas fichas Polo Highline 2023. Sem ADAS (só frenagem pós-colisão e piloto automático convencional). ADAS: https://garagem360.com.br/?p=248084"
  },
  {
   "id": "vw-polo-sense-2025",
@@ -1751,5 +1767,38 @@
    "url": "https://garagem360.com.br/fiat-pulse-audace-hybrid-faz-ate-144-kml-entrega-130-cv-e-custa-r-136990/"
   },
   "note": "ADAS não citado na fonte para a Audace Hybrid 2026 (fica pendente)."
+ },
+ {
+  "id": "fiat-fastback-turbo-2024",
+  "make": "fiat",
+  "model": "fastback",
+  "version_includes": [
+   "turbo 200 flex cvt"
+  ],
+  "version_excludes": [
+   "audace",
+   "impetus",
+   "limited",
+   "abarth",
+   "hybrid"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Fastback Turbo 2024: “Apple Car Play e Android Auto sem fio”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Fastback Turbo 2024: ADAS só é acrescentado a partir da Audace (“A lista de segurança adiciona o sistema ADAS”)"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Fastback Turbo 2024: ficha técnica e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=215634"
+  },
+  "note": "Carregador por indução: a fonte se contradiz (não aparece na lista da Turbo, mas o texto da Audace diz que herda o carregador da entrada) — fica pendente."
  }
 ]
