@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T11:00:18.090Z",
+ "generated_at": "2026-11-05T13:17:50.706Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -198,9 +198,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/toyota/yaris/15-16v-flex-xl-multidrive/4-portas/2022-2023/80844686",
-   "checked_at": "2026-11-01T08:57:55.087Z",
-   "text": "TOYOTA YARIS 1.5 16V FLEX XL MULTIDRIVE\nPreço: R$ 95.900\nAno: 2022/2023\nKM: 39.912\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 83.428 (Tabela Fipe no WebMotors, ago/2026)\nOrigem: cartão da listagem (página do anúncio não abriu)",
-   "available": true
+   "checked_at": "2026-11-05T13:17:50.706Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/toyota/yaris/15-16v-flex-xls-connect-multidrive/4-portas/2022-2023/79523604",
