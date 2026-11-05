@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-05T13:17:50.706Z",
+ "generated_at": "2026-11-05T16:59:20.977Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -174,9 +174,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-comfortline-automatico/4-portas/2023-2024/79616736",
-   "checked_at": "2026-10-31T18:19:36.898Z",
-   "text": "VOLKSWAGEN POLO 1.0 170 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 86.990\nAno: 2023/2024\nKM: 31.163\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 87.300 (Tabela Fipe no WebMotors, set/2026)\nOrigem: cartão da listagem do WebMotors em 31/10/2026 (página do anúncio não abriu)",
-   "available": true
+   "checked_at": "2026-11-05T16:59:20.977Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/citroen/basalt/10-turbo-200-flex-shine-cvt/4-portas/2025/77504923",
