@@ -11,14 +11,9 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-06T09:23:25.929Z",
+  "at": "2026-11-06T12:52:38.761Z",
   "ok": false,
-  "reason": "WebMotors pediu verificação: abra o navegador do app Claude no computador e pressione e segure"
+  "reason": "pesquisa pela nuvem (reserva): acesso ao webmotors.com.br não autorizado nesta execução (permissão do WebFetch sem resposta)"
  },
- "conferidos_sem_mudanca": 0,
- "running": {
-  "since": "2026-11-06T12:47:03.823Z",
-  "kind": "agendada",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 0
 }
