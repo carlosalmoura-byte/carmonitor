@@ -1053,7 +1053,7 @@
    "power_g": 105,
    "power_e": 110,
    "torque_g": 14.3,
-   "torque_e": 15.0,
+   "torque_e": 15,
    "gearbox": "CVT, 7 marchas simuladas",
    "city_g": 12.2,
    "road_g": 13.9,
@@ -1894,5 +1894,55 @@
    "url": "https://www.motoragora.com.br/?p=47818"
   },
   "note": "Android Auto/CarPlay citados sem dizer se são sem fio — fica pendente (pergunte ao vendedor)."
+ },
+ {
+  "id": "citroen-c3-aircross-shine-2025",
+  "make": "citroen",
+  "model": "c3 aircross",
+  "version_includes": [
+   "shine"
+  ],
+  "version_excludes": [
+   "7l"
+  ],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Central multimídia touchscreen de 10 polegadas com espelhamento sem fio via Android Auto e Apple CarPlay"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de série do C3 Aircross Shine 2025 só traz recarga por cabo: “1 porta USB de recarga e dados e tomada 12v no painel” e “2 portas USB de rápido carregamento para 2ª fileira” — sem carregador sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Lista de série do C3 Aircross Shine 2025 sem frenagem autônoma, alerta de colisão, faixa ou ponto cego; só “Controlador de velocidade com limitador integrado” e câmera de ré"
+   }
+  },
+  "tech": {
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_e": 130,
+   "power_g": 125,
+   "torque_e": 20.4,
+   "torque_g": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_e": 7.4,
+   "city_g": 10.6,
+   "trunk_l": 493,
+   "tank_l": 47,
+   "source": {
+    "title": "Garagem360 — Citroën C3 Aircross Shine 2025 combina conforto e tecnologia",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/citroen-c3-aircross-shine-2025/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Citroën C3 Aircross 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
+  },
+  "note": "Versão Shine 5 lugares. Indução e ADAS ausentes da lista de série (Garagem360)."
  }
 ]
