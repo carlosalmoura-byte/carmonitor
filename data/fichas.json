@@ -1944,5 +1944,43 @@
    "url": "https://garagem360.com.br/citroen-c3-aircross-2025"
   },
   "note": "Versão Shine 5 lugares. Indução e ADAS ausentes da lista de série (Garagem360)."
+ },
+ {
+  "id": "fiat-pulse-drive-cvt-2026",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [
+   "turbo"
+  ],
+  "year_from": 2026,
+  "year_to": 2026,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "central multimídia de 8,4 polegadas com espelhamento sem fio (Android Auto e Apple CarPlay)"
+   }
+  },
+  "tech": {
+   "body": "SUV compacto",
+   "engine": "1.3 Firefly flex",
+   "power_e": 107,
+   "torque_e": 13.7,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "source": {
+    "title": "Garagem360 — Fiat Pulse 2026: Versão Drive 1.3 automática entra no ano com preço agressivo para PcD",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/fiat-pulse-2026-versao-drive-13-automatica-entra-no-ano-com-preco-agressivo-para-pcd/"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse 2026: Versão Drive 1.3 automática entra no ano com preço agressivo para PcD",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/fiat-pulse-2026-versao-drive-13-automatica-entra-no-ano-com-preco-agressivo-para-pcd/"
+  },
+  "note": "Fonte não cita carregador por indução nem ADAS (só 4 airbags, controle de estabilidade, hill holder e piloto automático) — itens ficam pendentes."
  }
 ]

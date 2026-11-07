@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-07T12:56:31.974Z",
- "novos": 3,
+ "processed_at": "2026-11-07T16:24:22.028Z",
+ "novos": 10,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa pela nuvem (reserva): WebMotors acessível via WebSearch/WebFetch, mas só parte das listagens (corte ~40 mil caracteres) e vários anúncios recusados por permissão; 7 listagens nível A abertas (Polo CL, Pulse Impetus, Basalt Shine, Nivus CL, Virtus HL, Creta Limited, C3 Aircross Shine), 3 anúncios novos de loja (5 descartados por pessoa física); reconferência de favoritos não feita (links recusados) — fica para o computador",
+ "note": "pesquisa agendada pelo navegador do computador: WebMotors pediu verificação humana logo na 2ª página da listagem (São Paulo); 10 anúncios novos só pelos cartões da 1ª página (vendedor e FIPE a verificar); reconferência de favoritos não feita",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,13 +11,8 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-07T12:56:31.974Z",
+  "at": "2026-11-07T16:24:22.028Z",
   "ok": true
  },
- "conferidos_sem_mudanca": 0,
- "running": {
-  "since": "2026-11-07T16:22:06.546Z",
-  "kind": "agendada",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 0
 }
