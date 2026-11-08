@@ -14,5 +14,10 @@
   "at": "2026-11-08T17:23:33.537Z",
   "ok": true
  },
- "conferidos_sem_mudanca": 0
+ "conferidos_sem_mudanca": 0,
+ "running": {
+  "since": "2026-11-08T17:49:49.190Z",
+  "kind": "pedido",
+  "filter_at": "2026-11-01T17:15:57.181Z"
+ }
 }
