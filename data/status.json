@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-08T17:23:33.537Z",
+ "processed_at": "2026-11-08T18:04:04.794Z",
  "novos": 0,
- "atualizados": 0,
- "sairam_do_ar": 1,
- "note": "reconferência a pedido (08/11 14h): Fastback Audace 77384432 saiu do ar; WebMotors bloqueou o anúncio seguinte",
+ "atualizados": 3,
+ "sairam_do_ar": 4,
+ "note": "reconferência a pedido pelo navegador do computador (08/11, ritmo ~27s/página, sem bloqueio): 17 anúncios acompanhados conferidos; 4 saíram do ar (Fastback 77384432, Renegade Longitude 81573575, Tracker Premier 81845569, Creta Limited 81916487). Busca de novos: SP págs. 1–2 sem candidatos novos.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,13 +11,8 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-08T17:23:33.537Z",
+  "at": "2026-11-08T18:04:04.794Z",
   "ok": true
  },
- "conferidos_sem_mudanca": 0,
- "running": {
-  "since": "2026-11-08T17:49:49.190Z",
-  "kind": "pedido",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 10
 }
