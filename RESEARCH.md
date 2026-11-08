@@ -256,6 +256,13 @@ title, url e quality "oficial" | "concessionária" | "secundária"; `tech` opcio
 porta-malas, tanque). **Nunca preencha item sem fonte**: o que a fonte não disser fica fora de `items`.
 Item que é opcional/pacote na versão = "opcional".
 
+**Ficha completa (regra do usuário): nenhum item obrigatório (indução, Android Auto sem fio) nem o ADAS pode ficar
+sem estado se houver como resolver.** "A fonte não cita" não basta: procure a **lista completa de itens de série e
+opcionais** da versão (catálogo da montadora, PDF de concessionária, matéria "ficha técnica, preço e itens de série").
+Se a lista completa não tem o item → `"ausente"` com a citação "lista completa de série sem …". Se aparece só em
+pacote/opcional → `"opcional"`. Use até 3 fontes por versão; só deixe o item fora quando nenhuma lista completa for
+encontrada, e diga isso no `note`.
+
 **Antes de publicar fichas, rode `node tests/core.test.mjs`**: um teste valida cada ficha com a mesma regra do app
 (marca, modelo, **pelo menos um termo em `version_includes`**, faixa de ano, fonte com link, nome do ADAS quando
 confirmado). Ficha inválida é ignorada pelo app sem aviso — corrija antes do push.

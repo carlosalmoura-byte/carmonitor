@@ -597,6 +597,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "Apple Car Play e Android Auto wireless"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Lista de série e opcionais do Pulse 1.3 Drive: sem frenagem autônoma ou alerta de faixa (só ESS e Lane Change, de seta)"
    }
   },
   "tech": {
@@ -617,7 +621,7 @@
    "quality": "concessionária",
    "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/07/Pulse-1.3-Drive-MT-e-AT-Lista-de-equipamentos-serie-e-opcionais.pdf"
   },
-  "note": "Lista de jul/2022 não informa o ano-modelo; a página da Garagem360 (Pulse 2024) traz o mesmo Android Auto wireless e o carregador só nas versões S-Design/Audace/Impetus. Nenhum ADAS (AEB, faixa, ponto cego, ACC) citado para a Drive — item deixado sem confirmação."
+  "note": "Lista de jul/2022 não informa o ano-modelo; a página da Garagem360 (Pulse 2024) traz o mesmo Android Auto wireless e o carregador só nas versões S-Design/Audace/Impetus. Nenhum ADAS (AEB, faixa, ponto cego, ACC) citado para a Drive — item deixado sem confirmação. ADAS: https://carroscomcamanzi.com.br/wp-content/uploads/2022/07/Pulse-1.3-Drive-MT-e-AT-Lista-de-equipamentos-serie-e-opcionais.pdf"
  },
  {
   "id": "hyundai-creta-limited-2022",
@@ -637,6 +641,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "Central multimídia touchscreen de 8” com conexão sem fio para Apple CarPlay® e Google Android Auto®"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Catálogo Creta 2022: frenagem autônoma, assistente de faixa, ponto cego e ACC só na Ultimate; a Limited tem só “Controle de velocidade de cruzeiro com limitador de velocidade”"
    }
   },
   "tech": {
@@ -659,7 +667,7 @@
    "quality": "oficial",
    "url": "https://hyundai.com.br/content/dam/hmb/cars/creta/2022/catalogos/catalogo_digital_creta_2022.pdf"
   },
-  "note": "Na Limited o catálogo lista só HAC, ESS e piloto automático convencional; controle de velocidade adaptativo aparece apenas na Ultimate — ADAS deixado sem confirmação."
+  "note": "Na Limited o catálogo lista só HAC, ESS e piloto automático convencional; controle de velocidade adaptativo aparece apenas na Ultimate — ADAS deixado sem confirmação. ADAS: catálogo oficial https://hyundai.com.br/content/dam/hmb/cars/creta/2022/catalogos/catalogo_digital_creta_2022.pdf"
  },
  {
   "id": "nissan-kicks-active-2024",
@@ -1752,6 +1760,10 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "conexão sem fio com Android Auto e Apple CarPlay"
+   },
+   "adas": {
+    "state": "opcional",
+    "quote": "Pulse 2026: ADAS é “opcional” a partir da Audace; de série só na Impetus T200 Hybrid"
    }
   },
   "tech": {
@@ -1778,7 +1790,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/fiat-pulse-audace-hybrid-faz-ate-144-kml-entrega-130-cv-e-custa-r-136990/"
   },
-  "note": "ADAS não citado na fonte para a Audace Hybrid 2026 (fica pendente)."
+  "note": "ADAS não citado na fonte para a Audace Hybrid 2026 (fica pendente). ADAS: https://www.comprecar.com.br/revista/fiat-pulse-2026-chega-com-diversas-novidades"
  },
  {
   "id": "fiat-fastback-turbo-2024",
@@ -1962,6 +1974,14 @@
    "android_auto_sem_fio": {
     "state": "confirmado",
     "quote": "central multimídia de 8,4 polegadas com espelhamento sem fio (Android Auto e Apple CarPlay)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Pulse 2026 Drive 1.3 AT: carregador por indução não consta na lista de série (aparece só a partir da Audace)"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Pulse 2026 Drive 1.3 AT: sem frenagem autônoma, permanência em faixa ou farol alto automático (ADAS só opcional a partir da Audace)"
    }
   },
   "tech": {
@@ -1981,6 +2001,6 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/fiat-pulse-2026-versao-drive-13-automatica-entra-no-ano-com-preco-agressivo-para-pcd/"
   },
-  "note": "Fonte não cita carregador por indução nem ADAS (só 4 airbags, controle de estabilidade, hill holder e piloto automático) — itens ficam pendentes."
+  "note": "Fonte não cita carregador por indução nem ADAS (só 4 airbags, controle de estabilidade, hill holder e piloto automático) — itens ficam pendentes. Indução/ADAS: Comprecar https://www.comprecar.com.br/revista/fiat-pulse-2026-chega-com-diversas-novidades e Garagem360 https://garagem360.com.br/?p=299863"
  }
 ]
