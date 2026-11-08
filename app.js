@@ -471,22 +471,8 @@ function restoreUi() {
 }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") saveUi(); });
 window.addEventListener("pagehide", saveUi);
-/** Ao voltar de um anúncio do WebMotors: pergunta se ele abriu; "Não abriu" marca como saiu do ar (e avisa a pesquisa).
- *  Guardado no localStorage porque o Android pode recarregar o app ao voltar. */
-function checkReturnFromAd() {
-  let last = null; try { last = JSON.parse(localStorage.getItem("lastAdOpen") || "null"); localStorage.removeItem("lastAdOpen"); } catch { /* ok */ }
-  if (!last || Date.now() - last.t > 15 * 60000 || !S) return;
-  const l = byId(last.id); if (!l || l.available === false) return;
-  setTimeout(() => toast("O anúncio abriu? Se deu erro ou caiu numa lista de carros, ele saiu do ar.", () => act(null, async () => {
-    const rep = { kind: "nao_abre", kind_label: REPORT_KINDS.nao_abre, text: "marcado ao voltar do anúncio", at: new Date().toISOString(), sent: false };
-    l.reports = [...(l.reports || []), rep];
-    E.reconfirm(S, l, { available: false, note: "Reportado por você: o anúncio não abre / saiu do ar" }, deps);
-    rep.sent = await sendProblemReport(l, rep);
-    renderCards(); if (ui.openId === l.id) renderDetail(l);
-    toast("Marcado como fora do ar (foi para Descartados).");
-  }), "Não abriu", 10000), 600);
-}
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkReturnFromAd(); });
+/** Ao voltar de um anúncio: só limpa a marca (sem perguntar nada — pedido do usuário). Anúncio que não abre: botão "Reportar problema" no detalhe. */
+function checkReturnFromAd() { try { localStorage.removeItem("lastAdOpen"); } catch { /* ok */ } }
 function openExternal(url) {
   saveUi();
   const ad = S?.listings?.find((x) => x.url === url);
