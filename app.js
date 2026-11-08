@@ -48,7 +48,7 @@ window.addEventListener("error", (e) => { try { toast(`Erro no app: ${e.message}
 window.addEventListener("unhandledrejection", (e) => { const m = String(e.reason?.message || e.reason || "");
   if (/fetch|network|load failed|abort/i.test(m)) return; try { toast(`Erro no app: ${m}`); } catch { /* ok */ } });
 let S = null;                        // estado (persistido no IndexedDB)
-const ui = { status: "aprovado", compare: new Set(), openId: null, since: null };
+const ui = { status: "pendente", compare: new Set(), openId: null, since: null };
 const deps = {
   distance: makeDistance(),
   onNotify: (n) => systemNotify(n),
@@ -1539,8 +1539,8 @@ function handleShare() {
   if (migrate || S.listings.some((l) => !l.score)) { E.reclassifyAll(S, deps); persist(); } // versões antigas
   try { ui.compare = new Set(JSON.parse(localStorage.getItem("cmp") || "[]").filter((id) => byId(id))); } catch { /* ok */ }
   ui.since = S.meta.last_visit || null; S.meta.last_visit = new Date().toISOString(); persist(); // "NOVO" = chegou desde a última abertura
-  const hasApproved = S.listings.some((l) => !l.archived && shown(l) === "aprovado");
-  saveCompare(); updateTitle(); selectTab(hasApproved ? "aprovado" : "pendente"); handleShare(); renderResearchStatus();
+  const hasPending = S.listings.some((l) => !l.archived && ["pendente", "atende"].includes(shown(l)));
+  saveCompare(); updateTitle(); selectTab(hasPending ? "pendente" : "aprovado"); handleShare(); renderResearchStatus();
   restoreUi(); checkReturnFromAd(); // voltou do WebMotors (ou o Android recarregou o app): reabre onde você estava
   const h = location.hash.match(/listing=(\d+)/);
   if (h) { history.replaceState(null, "", location.pathname); openDetail(+h[1]); }
