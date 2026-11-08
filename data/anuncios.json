@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-08T16:24:22.492Z",
+ "generated_at": "2026-11-08T17:23:33.537Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -339,9 +339,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023/77384432",
-   "checked_at": "2026-11-03T13:27:38.138Z",
-   "text": "FIAT FASTBACK 1.0 TURBO 200 FLEX AUDACE CVT\nPreço: R$ 99.890\nAno: 2023/2023\nKM: 23.000\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: R1 Blindados (Loja)\nFIPE: R$ 99.272 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 0\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; GPS; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
-   "available": true
+   "checked_at": "2026-11-08T17:23:33.537Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/nissan/kicks/16-16v-flexstart-advance-xtronic/4-portas/2023-2024/81775273",

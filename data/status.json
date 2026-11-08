@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-08T16:24:22.492Z",
- "novos": 3,
+ "processed_at": "2026-11-08T17:23:33.537Z",
+ "novos": 0,
  "atualizados": 0,
- "sairam_do_ar": 0,
- "note": "pesquisa agendada 13h21 pelo navegador do computador: WebMotors pediu verificação humana na 2ª página da listagem (São Paulo); 47 cartões da 1ª página conferidos, 3 anúncios novos só pelos cartões (vendedor a verificar); reconferência de favoritos não feita",
+ "sairam_do_ar": 1,
+ "note": "reconferência a pedido (08/11 14h): Fastback Audace 77384432 saiu do ar; WebMotors bloqueou o anúncio seguinte",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,7 +11,7 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-08T16:24:22.492Z",
+  "at": "2026-11-08T17:23:33.537Z",
   "ok": true
  },
  "conferidos_sem_mudanca": 0
