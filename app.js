@@ -546,8 +546,8 @@ $("#importResult").addEventListener("click", (e) => {
 const FIELD_LABELS = [["make", "Marca"], ["model", "Modelo"], ["version", "Versão"], ["year_fab", "Ano fabricação"],
   ["year_model", "Ano-modelo"], ["price", "Preço"], ["km", "Quilometragem"], ["transmission", "Câmbio"],
   ["condition", "Tipo"], ["city", "Cidade"], ["state", "UF"], ["address", "Endereço/CEP"], ["seller", "Vendedor"], ["seller_type", "Tipo de vendedor"], ["fipe", "Valor FIPE"],
-  ["body", "Carroceria"], ["color", "Cor"], ["plate_end", "Final da placa"], ["auction", "Passagem por leilão"], ["armored", "Blindado"]];
-const FIELD_EDIT = FIELD_LABELS.filter(([k]) => !["body", "color", "plate_end", "auction", "armored"].includes(k)); // estes vêm só da pesquisa
+  ["body", "Carroceria"], ["color", "Cor"], ["plate_end", "Final da placa"], ["auction", "Passagem por leilão"], ["armored", "Blindado"], ["photos", "Fotos"], ["preparing", "Em preparação"]];
+const FIELD_EDIT = FIELD_LABELS.filter(([k]) => !["body", "color", "plate_end", "auction", "armored", "photos", "preparing"].includes(k)); // estes vêm só da pesquisa
 const fmtField = (k, v) => v == null || v === "" ? "—" : k === "auction" || k === "armored" ? (v === true || v === "true" ? "sim" : "não") : k === "body" ? (BODY[v] || v) : k === "seller_type" ? (SELLER[v] || v) : k === "price" || k === "fipe" ? brl(v) : k === "km" ? num(v, " km") : k === "transmission" ? (TR[v] || v) : v;
 
 function chart(snaps) {
@@ -987,6 +987,7 @@ function renderSettings() {
   $$("input[name=body]", f).forEach((i) => i.checked = (c.body_types || []).includes(i.value));
   $$("input[name=avoid_color]", f).forEach((i) => i.checked = (c.avoid_colors || []).includes(i.value));
   f.no_auction.checked = c.no_auction !== false; f.no_armored.checked = c.no_armored !== false;
+  f.min_photos.value = String(c.min_photos ?? 2);
   const cf = $("#contactForm"); cf.my_car.value = S.settings.my_car || ""; cf.template.value = S.settings.contact_template || "";
   f.adas_required.checked = !!c.adas_required;
   f.accept_specs.checked = S.settings.accept_specs; f.only_official_specs.checked = S.settings.only_official_specs;
@@ -1052,7 +1053,7 @@ $("#criteriaForm").addEventListener("submit", (e) => {
       transmissions: $$("input[name=tr]:checked", f).map((i) => i.value), conditions: $$("input[name=cond]:checked", f).map((i) => i.value),
       seller_types: $$("input[name=seller]:checked", f).map((i) => i.value),
       body_types: $$("input[name=body]:checked", f).map((i) => i.value), avoid_colors: $$("input[name=avoid_color]:checked", f).map((i) => i.value),
-      no_auction: f.no_auction.checked, no_armored: f.no_armored.checked });
+      no_auction: f.no_auction.checked, no_armored: f.no_armored.checked, min_photos: Number(f.min_photos.value) || 2 });
     if (!S.settings.criteria.seller_types.length) S.settings.criteria.seller_types = ["particular", "loja", "concessionaria"];
     S.settings.criteria.adas_required = f.adas_required.checked;
     S.settings.accept_specs = f.accept_specs.checked; S.settings.only_official_specs = f.only_official_specs.checked;
@@ -1254,7 +1255,7 @@ function filterPayload() {
     criteria: { min_price: c.min_price, max_price: c.max_price, year_min: c.year_min, year_max: c.year_max, min_km: c.min_km, max_km: c.max_km,
       transmissions: c.transmissions, conditions: c.conditions, seller_types: c.seller_types, ref_location: c.ref_location, max_distance_km: c.max_distance_km,
       adas_required: !!c.adas_required, no_auction: c.no_auction !== false, no_armored: c.no_armored !== false,
-      body_types: c.body_types || [], avoid_colors: c.avoid_colors || [] },
+      body_types: c.body_types || [], avoid_colors: c.avoid_colors || [], min_photos: c.min_photos ?? 2 },
     exclusions: S.exclusions.map((r) => ({ make: r.make || null, model: r.model || null, version_includes: r.version_includes || null, version_excludes: r.version_excludes || null })),
   };
 }

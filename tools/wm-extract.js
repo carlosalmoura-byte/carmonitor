@@ -34,6 +34,12 @@
   f.vendedor = nome ? `${nome} (${temLoja ? "Loja" : "Pessoa Física"})` : null;
   f.whatsapp = /whatsapp/i.test(vend.join(" ")) || !!document.querySelector('a[href*="wa.me"],a[href*="whatsapp"]');
   f.selo = /Abaixo da Fipe/i.test(flat);
+  // fotos: itens do carrossel do anúncio com imagem enviada pelo vendedor (/_fotos/); placeholder do site não conta
+  const slides = [...document.querySelectorAll('[class*="DetailCarousel__container__items"]')];
+  const src = (i) => [i.currentSrc, i.src, i.getAttribute("data-src"), i.getAttribute("srcset")].join(" ");
+  f.fotos = slides.length ? slides.filter((s) => [...s.querySelectorAll("img")].some((i) => /\/_fotos\//.test(src(i)))).length
+    : new Set([...document.querySelectorAll("img")].map((i) => (src(i).match(/\/_fotos\/[^ ]*?(wmimagem\d+)/) || [])[1]).filter(Boolean)).size;
+  f.preparacao = /an[úu]ncio em prepara[çc][ãa]o|fotos em prepara[çc][ãa]o/i.test(flat);
   const obs = sec("(Observações do vendedor|Sobre o veículo)", "(Itens de veículo|Sobre o vendedor|Compare os preços)");
   const mes = new Date().toLocaleDateString("pt-BR", { month: "short", year: "numeric" }).replace(". de ", "/").replace(" de ", "/");
   const t = [title];
@@ -48,6 +54,7 @@
   if (f.carroceria) t.push(`Carroceria: ${f.carroceria}`);
   if (f.cor) t.push(`Cor: ${f.cor}`);
   if (f.placa) t.push(`Final de placa: ${f.placa}`);
+  t.push(`Fotos: ${f.fotos}${f.preparacao ? " (em preparação)" : ""}`);
   if (f.leilao) t.push(`Leilão: ${f.leilao}`);
   if (f.blindado) t.push(`Blindado: ${f.blindado}`);
   if (f.caracteristicas.length) t.push(`Características: ${f.caracteristicas.join("; ")}`);

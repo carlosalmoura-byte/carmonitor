@@ -411,3 +411,16 @@ test("todas as fichas publicadas (data/fichas.json) passam na validação do app
   const bad = fichas.map((s) => [s.id, validateSpec(s)]).filter(([, e]) => e.length);
   assert.deepEqual(bad, []);
 });
+
+test("fotos: mínimo do filtro, sem foto e anúncio em preparação", () => {
+  const r = (l, c = {}) => classify(l, {}, { ...DEFAULT_CRITERIA, ...c }).reasons.find((x) => x.field === "photos");
+  assert.equal(r({ photos: 1 }).level, "fail");
+  assert.equal(r({ photos: 1 }, { min_photos: 1 }).level, "ok");
+  assert.equal(r({ photos: 0 }, { min_photos: 1 }).level, "fail");
+  assert.equal(r({ photos: 8 }).level, "ok");
+  assert.equal(r({ photos: null }).level, "info");
+  assert.equal(r({ photos: 5, preparing: true }, { min_photos: 1 }).level, "fail");
+  const ex = extractFromText("VW POLO\nFotos: 1 (em preparação)\nCor: Branco");
+  assert.ok(JSON.stringify(ex).includes('"photos"'));
+  assert.ok(JSON.stringify(ex).includes('"preparing"'));
+});

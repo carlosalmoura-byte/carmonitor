@@ -139,6 +139,10 @@
           <label class="chk"><input type="checkbox" name="no_auction"> Excluir carros com passagem por leilão</label>
           <label class="chk"><input type="checkbox" name="no_armored"> Excluir carros blindados</label>
         </fieldset>
+        <fieldset><legend>Fotos do anúncio</legend>
+          <label>Mínimo de fotos<select name="min_photos"><option value="2">2 ou mais fotos</option><option value="1">Pelo menos 1 foto</option></select></label>
+          <p class="hint" style="margin:.2rem 0">Anúncio sem foto nunca entra. Anúncio “em preparação” (foto genérica, que não é do carro) também fica de fora.</p>
+        </fieldset>
         <fieldset><legend>Cores a evitar (opcional)</legend>
           <div class="chkRow"><label class="chk"><input type="checkbox" name="avoid_color" value="preto"> Preto</label>
           <label class="chk"><input type="checkbox" name="avoid_color" value="branco"> Branco</label>
@@ -305,6 +309,6 @@
 </div>
 
 <div id="toast" class="toast" role="status"></div>
-<script type="module" src="app.js?v=54"></script>
+<script type="module" src="app.js?v=55"></script>
 </body>
 </html>

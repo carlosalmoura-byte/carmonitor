@@ -11,7 +11,7 @@ export const DEFAULT_CRITERIA = {
   min_price: null, max_price: 100000, year_min: 2022, year_max: 2025, min_km: null, max_km: 35000,
   transmissions: ["automatico"], conditions: ["usado", "seminovo"], seller_types: ["particular", "loja", "concessionaria"], adas_required: false,
   ref_location: "Barueri, SP", max_distance_km: 60,
-  no_auction: true, no_armored: true, body_types: [], avoid_colors: [],
+  no_auction: true, no_armored: true, body_types: [], avoid_colors: [], min_photos: 2,
 };
 export const BODY_LABEL = { hatch: "Hatch", sedan: "Sedã", suv: "SUV", picape: "Picape", outro: "Outra" };
 
@@ -90,6 +90,14 @@ export function classify(l, checks, criteria, exclusion = null) {
   if (c.no_armored !== false) {
     if (l.armored === true) add("fail", "armored", "Carro blindado.");
     else if (l.armored === false) add("ok", "armored", "Não blindado.");
+  }
+  // fotos (contadas na página do anúncio pela pesquisa). "Em preparação" = foto genérica, não é do carro → sempre fora.
+  const minPh = c.min_photos ?? 2;
+  if (l.preparing === true) add("fail", "photos", "Anúncio em preparação: as fotos não são do carro.");
+  else if (minPh > 0) {
+    if (l.photos == null) add("info", "photos", "Fotos: quantidade ainda não conferida pela pesquisa.");
+    else if (l.photos < minPh) add("fail", "photos", l.photos === 0 ? "Anúncio sem foto." : `Só ${l.photos} foto${l.photos === 1 ? "" : "s"} (mínimo ${minPh}).`);
+    else add("ok", "photos", `${l.photos} fotos no anúncio.`);
   }
   const body = l.body || l.body_ficha, bt = c.body_types || [];
   if (bt.length) {

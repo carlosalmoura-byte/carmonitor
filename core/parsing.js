@@ -128,6 +128,8 @@ export function extractFromText(text, source = "texto_colado", p = new Parsed())
   m = text.match(/(?:^|\n)\s*Cor\s*:\s*([^\n;]+)/i); if (m) p.put("color", m[1].trim().toLowerCase(), source);
   m = text.match(/(?:^|\n)\s*Final (?:da|de) placa\s*:\s*(\d)/i); if (m) p.put("plate_end", +m[1], source);
   m = text.match(/(?:^|\n)\s*Caracter[íi]sticas\s*:\s*([^\n]+)/i); if (m) p.put("features", featureKeys(m[1]), source);
+  m = text.match(/(?:^|\n)\s*Fotos\s*:\s*(\d+)/i); if (m) p.put("photos", +m[1], source);
+  if (/(?:^|\n)\s*Fotos\s*:[^\n]*prepara/i.test(text) || /\b(an[úu]ncio|ve[íi]culo|carro|fotos?)\s+em\s+prepara[çc][ãa]o\b/i.test(text)) p.put("preparing", true, source);
   m = text.match(/(?:^|\n)\s*WhatsApp\s*:\s*([^\n]+)/i); if (m) p.put("whatsapp", /^\s*sim/i.test(m[1]), source);
   return p;
 }
