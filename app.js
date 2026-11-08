@@ -307,7 +307,8 @@ function renderCards() {
     const chips = fipeChip(l) + Object.keys(ITEMS).map((k) => {
       const c = l.checks[k] || { state: "pendente" };
       const cls = k === "adas" && optAdas && c.state !== "confirmado" ? "info" : c.state;
-      return `<span class="chip ${cls}" title="${esc(ITEMS[k])}">${EQ_ICON[c.state]} ${SHORT[k]}${k === "adas" && optAdas ? " (desejável)" : ""}${c.method === "ficha" ? " ·ficha" : ""}</span>`;
+      const opt = c.state === "pendente" && c.optional; // a ficha diz que é opcional/pacote: depende do carro
+      return `<span class="chip ${cls}" title="${esc(opt ? `${ITEMS[k]}: opcional nesta versão — pergunte ao vendedor` : ITEMS[k])}">${opt ? "◐" : EQ_ICON[c.state]} ${SHORT[k]}${opt ? " (opcional)" : k === "adas" && optAdas ? " (desejável)" : ""}${c.method === "ficha" ? " ·ficha" : ""}</span>`;
     }).join("");
     const extra = [
       l.excluded ? `<span class="chip ausente">modelo ignorado</span>` : "",

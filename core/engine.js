@@ -115,7 +115,7 @@ export function runChecks(state, l) {
           source_url: spec.source.url, evidence: s.quote || null,
           note: ["Não está escrito no anúncio; confirmado pela ficha da mesma versão e ano-modelo.", spec.note].filter(Boolean).join(" ") };
       } else if (s.state === SPEC_OPTIONAL) {
-        out = { ...out, source: specSrc, source_url: spec.source.url, evidence: s.quote || out.evidence, note: "Opcional nesta versão segundo a ficha; confirme se o carro tem." };
+        out = { ...out, source: specSrc, source_url: spec.source.url, evidence: s.quote || out.evidence, optional: true, note: "Opcional nesta versão segundo a ficha; confirme se o carro tem." };
       } else if (s.state === SPEC_ABSENT) {
         out = { state: ABSENT, method: "ficha", detail: null, source: specSrc, source_url: spec.source.url, evidence: s.quote || null, note: "A ficha da versão indica que o item não existe nesta versão." };
       }
