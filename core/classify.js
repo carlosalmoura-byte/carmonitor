@@ -97,7 +97,7 @@ export function classify(l, checks, criteria, exclusion = null) {
   else if (minPh > 0) {
     if (l.photos == null) add("info", "photos", "Fotos: quantidade ainda não conferida pela pesquisa.");
     else if (l.photos < minPh) add("fail", "photos", l.photos === 0 ? "Anúncio sem foto." : `Só ${l.photos} foto${l.photos === 1 ? "" : "s"} (mínimo ${minPh}).`);
-    else add("ok", "photos", `${l.photos} fotos no anúncio.`);
+    else add("ok", "photos", l.photos >= 8 ? "8 ou mais fotos no anúncio." : `${l.photos} fotos no anúncio.`);
   }
   const body = l.body || l.body_ficha, bt = c.body_types || [];
   if (bt.length) {

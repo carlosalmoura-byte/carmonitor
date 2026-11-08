@@ -34,7 +34,7 @@
   f.vendedor = nome ? `${nome} (${temLoja ? "Loja" : "Pessoa Física"})` : null;
   f.whatsapp = /whatsapp/i.test(vend.join(" ")) || !!document.querySelector('a[href*="wa.me"],a[href*="whatsapp"]');
   f.selo = /Abaixo da Fipe/i.test(flat);
-  // fotos: itens do carrossel do anúncio com imagem enviada pelo vendedor (/_fotos/); placeholder do site não conta
+  // fotos: itens do carrossel (o carrossel mostra no máximo 8 — "8" quer dizer 8 ou mais) do anúncio com imagem enviada pelo vendedor (/_fotos/); placeholder do site não conta
   const slides = [...document.querySelectorAll('[class*="DetailCarousel__container__items"]')];
   const src = (i) => [i.currentSrc, i.src, i.getAttribute("data-src"), i.getAttribute("srcset")].join(" ");
   f.fotos = slides.length ? slides.filter((s) => [...s.querySelectorAll("img")].some((i) => /\/_fotos\//.test(src(i)))).length
