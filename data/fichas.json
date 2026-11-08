@@ -2002,5 +2002,70 @@
    "url": "https://garagem360.com.br/fiat-pulse-2026-versao-drive-13-automatica-entra-no-ano-com-preco-agressivo-para-pcd/"
   },
   "note": "Fonte não cita carregador por indução nem ADAS (só 4 airbags, controle de estabilidade, hill holder e piloto automático) — itens ficam pendentes. Indução/ADAS: Comprecar https://www.comprecar.com.br/revista/fiat-pulse-2026-chega-com-diversas-novidades e Garagem360 https://garagem360.com.br/?p=299863"
+ },
+ {
+  "id": "honda-city-touring-2022",
+  "make": "honda",
+  "model": "city",
+  "version_includes": [
+   "touring"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "EXL e Touring: “Multimídia 8” touchscreen com interface sem fio para smartphones com Apple CarPlay e Android Auto”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Ficha técnica completa New City Hatchback 2022 (EXL/Touring): carregador de celular por indução não consta"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem para mitigação de colisão (CMBS)",
+     "Permanência de faixa (LKAS)",
+     "Controle de cruzeiro adaptativo (ACC)",
+     "Mitigação de evasão de pista (RDM)",
+     "Farol alto automático (AHB)"
+    ],
+    "quote": "Touring: ACC, CMBS, LKAS, RDM e AHB (Honda SENSING)"
+   }
+  },
+  "source": {
+   "title": "Ficha Técnica New City Hatchback 2022 (Honda, via concessionária)",
+   "quality": "oficial",
+   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2022/02/Ficha-Tecnica-New-City-Hatchback-2022.pdf"
+  },
+  "note": "Honda SENSING é exclusivo da Touring (EXL só tem piloto automático comum). Indução também ausente no City 2023/2024 (ver ficha da EXL)."
+ },
+ {
+  "id": "toyota-yaris-xs-2023",
+  "make": "toyota",
+  "model": "yaris",
+  "version_includes": [
+   "xs"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Yaris 2023: “o multimídia de 7″ dotado de Android Auto/Apple CarPlay com fio está presente em toda a gama”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de série do Yaris XS (hatch e sedã): só entradas USB; carregador por indução não consta em nenhuma versão"
+   }
+  },
+  "source": {
+   "title": "Motor Show — Toyota Yaris 2023 ganha visual atualizado e novos equipamentos",
+   "quality": "secundária",
+   "url": "https://motorshow.com.br/toyota-yaris-2023-ganha-visual-atualizado-e-novos-equipamentos"
+  },
+  "note": "Lista de série da XS: Garagem360 https://garagem360.com.br/?p=205950 (hatch) e https://garagem360.com.br/toyota-yaris-seda-xs-2023/ (sedã). XS 2024 traz pré-colisão com alerta e alerta de mudança de faixa; ADAS da XS 2022/2023 sem fonte."
  }
 ]
