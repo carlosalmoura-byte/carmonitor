@@ -1183,7 +1183,7 @@
   "items": {
    "inducao": {
     "state": "confirmado",
-    "quote": "Exclusive: “Carregador sem fio com indicador no console”"
+    "quote": "Exclusive: “Carregador sem fio com indicador no console”; Manual do Proprietário Versa 2024, p. 2-48/2-51: “Carregador de celular sem-fio por indução (se equipado)”, padrão Qi"
    },
    "adas": {
     "state": "confirmado",
@@ -1195,7 +1195,7 @@
    },
    "android_auto_sem_fio": {
     "state": "ausente",
-    "quote": "Versa 2024: “A versão Exclusive ganhou nova central com tela de 8 polegadas, mas a conectividade ainda é via cabo”"
+    "quote": "Versa 2024: espelhamento “é feito com cabo” e o recurso sem fio “não está disponível nem como opcional” (Auto+ TV); AutoPapo: central de 8″ da Exclusive “ainda é via cabo”"
    }
   },
   "source": {
@@ -1203,7 +1203,7 @@
    "quality": "concessionária",
    "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2024/02/Lista-de-equipamentos-de-serie-Novo-Versa-2024.pdf"
   },
-  "note": "Android Auto com fio: AutoPapo https://autopapo.com.br/noticia/nissan-versa-2024/"
+  "note": "Android Auto com fio: Auto+ TV https://www.automaistv.com.br/nissan-versa-2024/ e AutoPapo https://autopapo.com.br/noticia/nissan-versa-2024/. Indução também no Manual do Proprietário 2024 (enviado pelo usuário em 08/11)."
  },
  {
   "id": "jeep-renegade-longitude-2024",
