@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-07T16:24:22.028Z",
+ "generated_at": "2026-11-08T16:24:22.492Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -652,6 +652,24 @@
    "url": "https://www.webmotors.com.br/comprar/nissan/kicks/16-16v-flexstart-sense-xtronic/4-portas/2024/81050711",
    "checked_at": "2026-11-07T16:24:22.028Z",
    "text": "NISSAN KICKS 16 16V FLEXSTART SENSE XTRONIC\nPreço: R$ 98.880\nAno: 2024/2024\nKM: 26.900\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: não encontrada\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/toyota/yaris/15-16v-flex-xl-multidrive/4-portas/2025/80522469",
+   "checked_at": "2026-11-08T16:24:22.492Z",
+   "text": "TOYOTA YARIS 1.5 16V FLEX XL MULTIDRIVE\nPreço: R$ 93.000\nAno: 2025/2025\nKM: 32.000\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 90.708 (Tabela Fipe via ValorFinal, nov/2026)\nOrigem: cartão da listagem do WebMotors em 08/11/2026 (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/nissan/kicks/16-16v-flexstart-sense-xtronic/4-portas/2024/80861602",
+   "checked_at": "2026-11-08T16:24:22.492Z",
+   "text": "NISSAN KICKS 1.6 16V FLEXSTART SENSE XTRONIC\nPreço: R$ 94.990\nAno: 2024/2024\nKM: 19.241\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 100.900 (página de outro anúncio da mesma versão/ano no WebMotors, nov/2026)\nSelo: Abaixo da Fipe (listagem de 08/11/2026)\nOrigem: cartão da listagem do WebMotors em 08/11/2026 (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/nivus/10-200-tsi-total-flex-comfortline-automatico/4-portas/2024/80938949",
+   "checked_at": "2026-11-08T16:24:22.492Z",
+   "text": "VOLKSWAGEN NIVUS 1.0 200 TSI TOTAL FLEX COMFORTLINE AUTOMÁTICO\nPreço: R$ 99.990\nAno: 2024/2024\nKM: 39.069\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 101.430 (página de outro anúncio da mesma versão/ano no WebMotors, nov/2026)\nSelo: Abaixo da Fipe (listagem de 08/11/2026)\nOrigem: cartão da listagem do WebMotors em 08/11/2026 (página do anúncio não abriu)",
    "available": true
   }
  ]
