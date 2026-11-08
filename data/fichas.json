@@ -1546,11 +1546,11 @@
    "sense"
   ],
   "year_from": 2025,
-  "year_to": 2025,
+  "year_to": 2026,
   "items": {
    "inducao": {
     "state": "confirmado",
-    "quote": "Itens de série de todas as versões do Virtus 2025: “Carregamento de celular por indução”"
+    "quote": "Itens de série de todas as versões do Virtus 2025: “Carregamento de celular por indução”; Virtus 2026: “Carregador por indução” já na TSI MT (a TSI AT fica acima e soma ACC e frenagem autônoma)"
    },
    "android_auto_sem_fio": {
     "state": "confirmado",
@@ -1570,7 +1570,7 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=251133"
   },
-  "note": "Versão de entrada automática (TSI AT, anunciada como “170 TSI Automático”). Android Auto sem fio pela regra do VW Play."
+  "note": "Versão de entrada automática (TSI AT, anunciada como “170 TSI Automático”). Android Auto sem fio pela regra do VW Play. Linha 2026: Motor Agora https://www.motoragora.com.br/?p=186068"
  },
  {
   "id": "fiat-cronos-drive-cvt-2026",
@@ -2067,5 +2067,166 @@
    "url": "https://motorshow.com.br/toyota-yaris-2023-ganha-visual-atualizado-e-novos-equipamentos"
   },
   "note": "Lista de série da XS: Garagem360 https://garagem360.com.br/?p=205950 (hatch) e https://garagem360.com.br/toyota-yaris-seda-xs-2023/ (sedã). XS 2024 traz pré-colisão com alerta e alerta de mudança de faixa; ADAS da XS 2022/2023 sem fonte."
+ },
+ {
+  "id": "fiat-argo-13-cvt-2023",
+  "make": "fiat",
+  "model": "argo",
+  "version_includes": [
+   "cvt"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Argo 2024 (Trekking/Drive 1.3 CVT): “Central Multimídia UCONNECT de 7″ Touchscreen com Android Auto e Apple Car Play” — sem conexão sem fio (só veio na linha 2026)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista completa de série do Argo 2024: carregador por indução não consta em nenhuma versão"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Argo Trekking AT 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/fiat-argo-trekking-at-2024/"
+  },
+  "note": "Espelhamento sem fio chegou na linha 2026 (Revista Carro, mar/2025)."
+ },
+ {
+  "id": "fiat-argo-13-cvt-2026",
+  "make": "fiat",
+  "model": "argo",
+  "version_includes": [
+   "cvt"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2027,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Argo 2026: Drive “adiciona … espelhamento sem fio”; Drive 1.3 AT herda; Trekking 1.3 CVT com “espelhamento wireless”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de equipamentos da linha Argo 2026 por versão: carregador por indução não citado em nenhuma versão"
+   }
+  },
+  "source": {
+   "title": "Revista Carro — Fiat Argo 2026 ganha faróis full LED e espelhamento sem fio",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/?p=69133"
+  }
+ },
+ {
+  "id": "nissan-kait-active-2026",
+  "make": "nissan",
+  "model": "kait",
+  "version_includes": [
+   "active"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2027,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kait: “central multimídia Pioneer de 9” com Android Auto e Apple CarPlay sem fio” só na Advance Plus"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Kait: “carregador de celular por indução” só na Advance Plus; Active traz airbags, ESP, câmera de ré e sensor traseiro"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Kait Active: sem frenagem autônoma, alerta de faixa ou ponto cego (Sense Plus/Exclusive)"
+   }
+  },
+  "source": {
+   "title": "Itatiaia — Nissan Kait: veja preços e equipamentos das versões",
+   "quality": "secundária",
+   "url": "https://www.itatiaia.com.br/auto/nissan-kait-veja-precos-e-equipamentos-das-versoes-do-novo-suv-de-entrada/"
+  },
+  "note": "Active 2027 perdeu até a central multimídia de série (Vrum, out/2026)."
+ },
+ {
+  "id": "citroen-c4-cactus-live-2022",
+  "make": "citroen",
+  "model": "c4 cactus",
+  "version_includes": [
+   "live"
+  ],
+  "version_excludes": [],
+  "year_from": 2021,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Live: “Citroën Connect Radio com tela touch de 7’’ + Bluetooth + 6 alto-falantes + Tomada USB + 12V” — sem carregador por indução"
+   }
+  },
+  "source": {
+   "title": "TNH1 — C4 Cactus: conheça as versões e os preços",
+   "quality": "secundária",
+   "url": "https://www.tnh1.com.br/noticia/nid/conheca-o-c4-cactus-o-novo-suv-da-citroen/"
+  },
+  "note": "Lista de itens por versão; Android Auto sem fio não confirmado."
+ },
+ {
+  "id": "citroen-c3-you-2026",
+  "make": "citroen",
+  "model": "c3",
+  "version_includes": [
+   "you"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2027,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "C3: central de 10,25″ “oferece conexão sem fio com Android Auto e Apple CarPlay”, a partir da Live Pack (YOU! é a versão topo)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "C3: carregador por indução só como acessório — “um carregador por indução sem fio Mopar”; não é item de fábrica"
+   }
+  },
+  "source": {
+   "title": "Mecânica Online — Citroën C3 (fev/2025)",
+   "quality": "secundária",
+   "url": "https://mecanicaonline.com.br/?p=207270"
+  },
+  "note": "YOU! = topo da linha com Turbo 200 + CVT (ClubAlfa). Indução Mopar é acessório de concessionária; confirmar com o vendedor se instalado."
+ },
+ {
+  "id": "kia-stonic-2024",
+  "make": "kia",
+  "model": "stonic",
+  "version_includes": [
+   "mhev"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de série do Stonic 2024 (versão única): carregador por indução não consta"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Stonic 2024: só “Piloto automático convencional”, ESP, controle de tração, câmera de ré e assistente de partida em rampa — sem frenagem autônoma, faixa ou ponto cego"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Kia Stonic 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=236904"
+  },
+  "note": "Android Auto: fontes divergem (Garagem360 diz “conectividade com fio”; AutoPapo diz que a linha 2024 ganhou espelhamento sem fio) — mantido sem confirmação."
  }
 ]
