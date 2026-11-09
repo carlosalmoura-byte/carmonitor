@@ -346,7 +346,9 @@ function renderCards() {
       <div class="cardActions">
         ${l.status !== "descartado" && l.available !== false ? `<button class="wide" data-msg="${l.id}">💬 Mensagem ao vendedor${askList(l).length ? ` <span class="small">(+${askList(l).length} pergunta${askList(l).length > 1 ? "s" : ""})</span>` : ""}</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
-        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>`
+        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>` : ""}
+        ${l.excluded && exclRulesOf(l).length ? `<button class="wide" data-unexcl="${l.id}">↺ Desfazer: voltar a considerar ${esc(exclusionLabel(exclRulesOf(l)[0]).toLowerCase())}</button>` : ""}
+        ${l.user_discard || l.user_approve ? ""
           : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
       </div></article>`;
   }).join("");
@@ -354,7 +356,8 @@ function renderCards() {
 /** Motivo do descarte em destaque no cartão (os motivos de reprovação, em ordem). */
 function whyBox(l) {
   if (l.status !== "descartado") return "";
-  const fails = (l.reasons || []).filter((r) => r.level === "fail").map((r) => r.msg);
+  const all = (l.reasons || []).filter((r) => r.level === "fail");
+  const fails = [...all.filter((r) => ["user", "excluded"].includes(r.field)), ...all.filter((r) => !["user", "excluded"].includes(r.field))].map((r) => r.msg);
   if (!fails.length) return "";
   const more = fails.length > 2 ? ` <span class="small">+${fails.length - 2} motivo(s)</span>` : "";
   return `<div class="why">✕ ${fails.slice(0, 2).map(esc).join("<br>✕ ")}${more}</div>`;
@@ -401,6 +404,18 @@ $("#discardSheet").addEventListener("submit", (e) => {
     }
   });
 });
+/** Regras de "modelo ignorado" que pegam este anúncio (para desfazer pelo cartão). */
+const exclRulesOf = (l) => S.exclusions.filter((r) => findExcl([r], l));
+function unexclude(id) {
+  const l = byId(id); if (!l) return;
+  const rules = exclRulesOf(l); if (!rules.length) return;
+  const n = S.listings.filter((x) => !x.archived && rules.some((r) => findExcl([r], x))).length;
+  if (!confirm(`Voltar a considerar ${rules.map(exclusionLabel).join(", ").toLowerCase()}?\n${n} anúncio(s) voltam para a classificação automática.`)) return;
+  act(null, async () => {
+    S.exclusions = S.exclusions.filter((r) => !rules.includes(r)); E.reclassifyAll(S, deps); renderCards(); renderSettings(); if (ui.openId === id) renderDetail(l); filterChanged();
+    toast("Modelo voltou a ser considerado.", () => act(null, async () => { S.exclusions.push(...rules); E.reclassifyAll(S, deps); renderCards(); renderSettings(); filterChanged(); toast("Desfeito."); }));
+  });
+}
 function undiscard(id) {
   const l = byId(id); if (!l) return;
   act(null, async () => { delete l.user_discard; delete l.user_approve; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Decisão desfeita: voltou à classificação automática."); });
@@ -417,6 +432,8 @@ $("#cards").addEventListener("click", (e) => {
   if (dc) { openDiscard(+dc.dataset.discard); return; }
   const ud = e.target.closest("[data-undiscard]");
   if (ud) { undiscard(+ud.dataset.undiscard); return; }
+  const ux = e.target.closest("[data-unexcl]");
+  if (ux) { unexclude(+ux.dataset.unexcl); return; }
   const f = e.target.closest("[data-fav]");
   if (f) { toggleFav(+f.dataset.fav); return; }
   const cf = e.target.closest("[data-cmpflag]");
@@ -644,7 +661,8 @@ function messageSeller(id) {
 }
 /** Bloco de decisão no topo do detalhe: o que falta, por que foi descartado, e as ações. */
 function decisionBox(d) {
-  const undo = d.user_discard || d.user_approve ? `<button id="dUndo">↺ Desfazer ${d.user_approve ? "aprovação" : "descarte"}</button>` : "";
+  const undo = (d.user_discard || d.user_approve ? `<button id="dUndo">↺ Desfazer ${d.user_approve ? "aprovação" : "descarte"}</button>` : "") +
+    (d.excluded && exclRulesOf(d).length ? `<button id="dUnexcl">↺ Voltar a considerar ${esc(exclusionLabel(exclRulesOf(d)[0]).toLowerCase())}</button>` : "");
   if (d.status === "descartado") {
     const fails = (d.reasons || []).filter((r) => r.level === "fail").map((r) => `<li>✕ ${esc(r.msg)}</li>`).join("");
     return `<div class="decide bad"><b>Por que foi descartado</b><ul>${fails}</ul>${undo ? `<div class="cardActions">${undo}</div>` : ""}</div>`;
@@ -819,6 +837,7 @@ function renderDetail(d) {
   const da = $("#dApprove"); if (da) da.onclick = () => approve(d.id);
   const dd = $("#dDiscard"); if (dd) dd.onclick = () => openDiscard(d.id);
   const du = $("#dUndo"); if (du) du.onclick = () => undiscard(d.id);
+  const dx = $("#dUnexcl"); if (dx) dx.onclick = () => unexclude(d.id);
   $("#dCompare").onclick = () => addToCompare(d.id);
   const el = $("#detail");
   $("#reconfForm").onsubmit = (e) => { e.preventDefault(); const f = e.target; act($("button", f), async () => {
@@ -1071,13 +1090,20 @@ const sameRule = (a, b) => JSON.stringify([normKey(a.make), normKey(a.model), no
   JSON.stringify([normKey(b.make), normKey(b.model), normKey(b.version_includes), [].concat(b.version_excludes || []).map(normKey).sort()]);
 let SUGG = [];
 function renderIgnoreSuggestions() {
-  SUGG = ignoreSuggestions(S.listings.filter((l) => !l.archived));
+  const live = S.listings.filter((l) => !l.archived);
+  const mine = ignoreSuggestions(live.filter((l) => l.user_discard));
+  const mk = (g) => normKey(g.make) + "|" + normKey(g.model);
+  const mineKeys = new Set(mine.map(mk));
+  // modelos que você já descartou vêm primeiro (com quantos descartou); depois os demais dos anúncios
+  SUGG = [...mine.map((g) => ({ ...ignoreSuggestions(live.filter((l) => normKey(l.make) + "|" + normKey(l.model) === mk(g)))[0], mineCount: g.count })),
+    ...ignoreSuggestions(live).filter((g) => !mineKeys.has(mk(g)))];
+  if (mine.length && !S.meta?.excl_fold_seen) { $("#exclSuggestFold").open = true; }
   const chip = (rule, text, key) => {
     const done = S.exclusions.some((r) => sameRule(r, rule));
     return `<button type="button" class="${done ? "done" : ""}" data-sugg="${key}" ${done ? "disabled" : ""}>${done ? "✓ " : "⊘ "}${esc(text)}</button>`;
   };
   $("#exclSuggest").innerHTML = SUGG.length ? SUGG.map((g, i) => `<details class="sugg"><summary>
-      <b>${esc(cap(g.make))} ${esc(cap(g.model))}</b> <span class="small">${g.count} anúncio(s)</span></summary>
+      <b>${esc(cap(g.make))} ${esc(cap(g.model))}</b> <span class="small">${g.count} anúncio(s)</span>${g.mineCount ? ` <span class="chip ausente">você descartou ${g.mineCount}</span>` : ""}</summary>
       <span class="lvl">Mais amplo</span><div class="chips">
         ${chip(g.ruleMake, `Toda a marca ${cap(g.make)}`, `${i}:make`)}
         ${chip(g.ruleModel, `Todos os ${cap(g.model)} (${g.count})`, `${i}:model`)}</div>
@@ -1085,6 +1111,7 @@ function renderIgnoreSuggestions() {
     </details>`).join("") : `<p class="small">Quando houver anúncios no app, os modelos aparecem aqui para escolher.</p>`;
 }
 $("#exclSuggest").addEventListener("click", (e) => {
+  if (e.target.closest("summary")) return;
   const b = e.target.closest("[data-sugg]"); if (!b) return;
   const [i, kind, j] = b.dataset.sugg.split(":"); const g = SUGG[+i]; if (!g) return;
   const rule = kind === "make" ? { ...g.ruleMake, label: `${cap(g.make)} (marca inteira)`.toUpperCase() }

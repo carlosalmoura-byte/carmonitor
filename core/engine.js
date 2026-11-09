@@ -175,7 +175,7 @@ export function reclassify(state, l) {
   const ex = findExclusion(state.exclusions, l);
   const spec = l.spec_id ? allSpecs(state).find((s) => s.id === l.spec_id) : null;
   l.body_ficha = spec?.tech?.body ? bodyKind(spec.tech.body) : null; // carroceria pela ficha quando o anúncio não diz
-  const r = classify(l, l.checks, state.settings.criteria, ex ? { label: exclusionLabel(ex) } : null);
+  const r = classify(l, l.checks, state.settings.criteria, ex ? { label: exclusionLabel(ex), reason: ex.reason || "" } : null);
   l.status = r.status; l.reasons = r.reasons; l.excluded = !!ex;
   l.score = scoreListing(l, state.settings.criteria, spec);
   return [old, r.status];
