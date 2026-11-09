@@ -257,7 +257,9 @@ const stale = (l) => E.isStale(l, S.settings.stale_days);
 /** Descartados que não precisam aparecer: saíram do ar ou a ficha/anúncio comprova que falta item obrigatório.
  *  Ficam ocultos (não apagados) — dá para ver tocando em "mostrar" no fim da lista. Favoritos sempre aparecem. */
 function hiddenDiscard(l) {
-  if (l.status !== "descartado" || l.favorite || l.user_discard) return null;
+  if (l.status !== "descartado" || l.favorite) return null;
+  if (l.discarded_at && Date.now() - new Date(l.discarded_at) > 3 * 86400000) return "há mais de 3 dias";
+  if (l.user_discard) return null;
   if (l.available === false) return "saiu do ar";
   const mand = ["inducao", "android_auto_sem_fio", ...(S.settings.criteria.adas_required ? ["adas"] : [])];
   if ((l.reasons || []).some((r) => r.level === "fail" && mand.includes(r.field))) return "sem item obrigatório";
@@ -291,9 +293,11 @@ function renderCards() {
   const ranking = S.listings.filter((l) => !l.archived).sort(byAdherence).map((l) => l.id);
   $("#unread").textContent = S.notifications.filter((n) => !n.read && alertRelevant(n)).length;
   const el = $("#cards");
-  const nOut = hidden.filter((l) => l.available === false).length, nMiss = hidden.length - nOut;
+  const hc = (k) => hidden.filter((l) => hiddenDiscard(l) === k).length;
+  const parts = [hc("há mais de 3 dias") && `${hc("há mais de 3 dias")} descartados há mais de 3 dias`, hc("saiu do ar") && `${hc("saiu do ar")} que saíram do ar`,
+    hc("sem item obrigatório") && `${hc("sem item obrigatório")} sem item obrigatório (indução/Android Auto sem fio comprovadamente ausentes)`].filter(Boolean);
   const hiddenNote = ui.status === "descartado" && hidden.length
-    ? `<div class="empty small">${ui.showHidden ? "Mostrando também" : "Ocultos"}: ${nOut ? `${nOut} que saíram do ar` : ""}${nOut && nMiss ? " e " : ""}${nMiss ? `${nMiss} sem item obrigatório (indução/Android Auto sem fio comprovadamente ausentes)` : ""}.
+    ? `<div class="empty small">${ui.showHidden ? "Mostrando também" : "Ocultos"}: ${parts.join("; ")}.
         <button class="ghost" data-togglehidden>${ui.showHidden ? "Ocultar" : "Mostrar"}</button></div>` : "";
   if (!items.length) {
     el.innerHTML = `<div class="empty">${S.listings.length ? "Nada neste filtro." :
@@ -326,7 +330,9 @@ function renderCards() {
     const cmpOn = ui.compare.has(l.id);
     const isNew = ui.since && l.first_seen && new Date(l.first_seen) > new Date(ui.since);
     return `<article class="card st-${l.status}" data-card="${l.id}">
-      <div class="cardTop"><span>${isNew ? `<span class="newTag">NOVO</span> ` : ""}<span class="badge ${shown(l)}">${STATUS[shown(l)]}</span>
+      <div class="cardTop"><span>${isNew ? `<span class="newTag">NOVO</span> ` : ""}<span class="badge ${shown(l)}">${STATUS[shown(l)]}</span>${l.user_discard || l.user_approve
+          ? ` <button class="undoMini" data-undiscard="${l.id}" title="Desfazer ${l.user_approve ? "aprovação" : "descarte"}">↺ Voltar</button>`
+          : l.excluded && exclRulesOf(l).length ? ` <button class="undoMini" data-unexcl="${l.id}" title="Voltar a considerar este modelo">↺ Voltar</button>` : ""}
         <button class="scoreBtn ${sc.level}" data-score="${l.id}" aria-label="${sc.total == null ? "Sem nota (descartado)" : `Nota ${sc.total} de 100`}. Toque para detalhes">🎯 ${sc.total ?? "—"}</button></span><span class="topIcons">
         <label class="cmpFlag ${cmpOn ? "on" : ""}" title="Marcar para comparar"><input type="checkbox" data-cmpflag="${l.id}" ${cmpOn ? "checked" : ""}> ⇆</label>
         <button class="favBtn ${l.favorite ? "on" : ""}" data-fav="${l.id}" aria-label="${l.favorite ? "Remover dos favoritos" : "Favoritar"}">${l.favorite ? "★" : "☆"}</button></span></div>
@@ -346,8 +352,6 @@ function renderCards() {
       <div class="cardActions">
         ${l.status !== "descartado" && l.available !== false ? `<button class="wide" data-msg="${l.id}">💬 Mensagem ao vendedor${askList(l).length ? ` <span class="small">(+${askList(l).length} pergunta${askList(l).length > 1 ? "s" : ""})</span>` : ""}</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
-        ${l.user_discard || l.user_approve ? `<button class="wide" data-undiscard="${l.id}">↺ Desfazer ${l.user_approve ? "aprovação" : "descarte"}</button>` : ""}
-        ${l.excluded && exclRulesOf(l).length ? `<button class="wide" data-unexcl="${l.id}">↺ Desfazer: voltar a considerar ${esc(exclusionLabel(exclRulesOf(l)[0]).toLowerCase())}</button>` : ""}
         ${l.user_discard || l.user_approve ? ""
           : l.status !== "descartado" ? `<button class="okBtn" data-approve="${l.id}">✓ Aprovar</button><button class="danger" data-discard="${l.id}">✕ Descartar</button>` : ""}
       </div></article>`;
@@ -418,6 +422,7 @@ function unexclude(id) {
 }
 function undiscard(id) {
   const l = byId(id); if (!l) return;
+  if (!confirm(`Desfazer ${l.user_approve ? "a aprovação" : "o descarte"} de ${title(l)}?\nEle volta para a classificação automática.`)) return;
   act(null, async () => { delete l.user_discard; delete l.user_approve; E.reclassify(S, l); renderCards(); if (ui.openId === id) renderDetail(l); toast("Decisão desfeita: voltou à classificação automática."); });
 }
 function approve(id) {

@@ -177,6 +177,9 @@ export function reclassify(state, l) {
   l.body_ficha = spec?.tech?.body ? bodyKind(spec.tech.body) : null; // carroceria pela ficha quando o anúncio não diz
   const r = classify(l, l.checks, state.settings.criteria, ex ? { label: exclusionLabel(ex), reason: ex.reason || "" } : null);
   l.status = r.status; l.reasons = r.reasons; l.excluded = !!ex;
+  // quando foi para Descartados (o app oculta os descartados há mais de 3 dias)
+  if (r.status === DISCARDED) { if (old !== DISCARDED || !l.discarded_at) l.discarded_at = old === DISCARDED || old == null ? (l.user_discard?.at || l.unavailable_since || l.first_seen || new Date().toISOString()) : new Date().toISOString(); }
+  else delete l.discarded_at;
   l.score = scoreListing(l, state.settings.criteria, spec);
   return [old, r.status];
 }
