@@ -1452,6 +1452,7 @@ function renderResearchSheet() {
     <h3 class="rsub">Próximas pesquisas</h3>
     <ul class="rnext">${next.join("")}</ul>
     <p class="small">Automáticas todo dia às 6h21 e 13h21, pelo navegador do app Claude no seu computador (precisa estar ligado, com o app Claude aberto). Pedidos (“Pesquisar com este filtro”) são atendidos aos 21 min de cada hora, das 7h às 22h. Se o computador estiver desligado, a nuvem faz uma pesquisa reserva às 9h46, com menos cobertura.</p>
+    ${st.fichas_pendentes?.versoes?.length ? `<p class="small">⚠ Versões ainda sem ficha (itens com “?”): ${esc(st.fichas_pendentes.versoes.join("; "))}${st.fichas_pendentes.motivo ? ` — ${esc(st.fichas_pendentes.motivo)}` : ""}</p>` : ""}
     ${st.note ? `<details><summary class="small">Detalhes técnicos da última pesquisa</summary><p class="small">${esc(st.note)}</p></details>` : ""}`;
 }
 function setResearchBtnLabel() { $("#researchBtn").textContent = filterDirty() && S.settings.github_token ? "🔎 Pesquisar com este filtro" : "🔎 Pedir nova pesquisa agora"; }

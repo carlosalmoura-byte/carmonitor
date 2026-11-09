@@ -239,11 +239,20 @@ Para cada modelo:
 **Regra fixa do usuário: toda versão candidata que ainda não tem ficha tem a ficha pesquisada automaticamente, na
 mesma execução — sem perguntar e sem deixar para depois.** Candidata = anúncio que entrou no feed e não foi descartado
 por preço, ano, km, câmbio, vendedor, modelo ignorado ou outro critério que não dependa da ficha. Reserve tempo para
-isso: se o limite de anúncios apertar, abra menos anúncios, mas não pule fichas. Se a execução terminar antes de todas,
-publique o que tiver e cite no `--note` as versões que ficaram sem ficha (a próxima execução começa por elas).
+isso: se o limite de anúncios apertar, abra menos anúncios, mas não pule fichas.
 
-Antes de publicar, rode `node tools/missing-fichas.mjs` (depois do merge-feed). Ele lista cada versão/ano-modelo do
-feed sem ficha. **Pesquise a ficha de cada linha listada que seja candidata** (catálogo da montadora; senão imprensa especializada) e
+**Ordem obrigatória (trava no merge-feed):** 1) leia os anúncios e grave o JSON de entrada; 2) rode
+`node tools/missing-fichas.mjs` passando antes os anúncios novos para o feed **ou** simplesmente rode o
+`merge-feed` — **o `merge-feed.mjs` se recusa a publicar (sai com código 2, sem gravar nada) enquanto houver anúncio
+candidato sem ficha da mesma versão/ano**, e mostra a lista; 3) pesquise a ficha de cada versão listada e acrescente em
+`data/fichas.json`; 4) `node --test tests/core.test.mjs`; 5) rode o `merge-feed` de novo; 6) commit único com anúncios
+**e** fichas. Nunca publique os anúncios num commit e as fichas depois — o usuário vê os "?" no intervalo.
+Só se for impossível pesquisar agora (fonte não encontrada após buscar, tempo esgotado), rode o merge-feed com
+`--fichas-pendentes "<versões> — <motivo>"`: ele publica e registra a pendência em data/status.json (a próxima execução
+começa por elas). `node tools/missing-fichas.mjs` (sem argumentos) lista as versões candidatas sem ficha do feed atual;
+`--todos` inclui as já reprovadas por outro critério.
+
+Para cada linha listada, pesquise a ficha (catálogo da montadora; senão imprensa especializada) e
 acrescente em `data/fichas.json`. Se não achar fonte para algum item, deixe o item fora (fica pendente no app) e cite a
 versão/ano no `--note` como "ficha sem fonte para <item>".
 

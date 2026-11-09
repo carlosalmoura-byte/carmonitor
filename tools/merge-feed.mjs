@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 // Mescla o resultado de uma pesquisa em data/anuncios.json e grava data/status.json.
-// Uso: node tools/merge-feed.mjs <novos.json> [--issue N] [--note "texto"]
+// Uso: node tools/merge-feed.mjs <novos.json> [--issue N] [--note "texto"] [--fichas-pendentes "versões e motivo"]
+// TRAVA: se, depois de mesclar, algum anúncio candidato ficar sem ficha da versão/ano, NADA é gravado (sai com código 2)
+// e a lista é mostrada. Pesquise as fichas (data/fichas.json) e rode de novo. Só se não houver mesmo como pesquisar
+// agora (fonte não encontrada, tempo acabou), passe --fichas-pendentes "<versões> — <motivo>": publica e registra.
 // novos.json: [{ "url": "...", "text": "transcrição da página", "available": true|false }]
 // Regras: só entra o que foi lido na página; available:false só quando a página mostrou que saiu do ar.
 import fs from "node:fs";
+import { missingFichas } from "./lib-fichas.mjs";
 
 const [, , file, ...rest] = process.argv;
 if (!file) { console.error("uso: node tools/merge-feed.mjs <novos.json> [--issue N] [--note texto]"); process.exit(1); }
@@ -32,6 +36,15 @@ for (const it of incoming) {
   prev ? atualizados++ : novos++;
 }
 feed.listings = [...byUrl.values()];
+const pendJust = arg("--fichas-pendentes");
+const miss = await missingFichas(feed.listings);
+if (miss.length && !pendJust) {
+  console.error(`\nNÃO PUBLICADO: ${miss.length} versão(ões)/ano(s) de anúncios candidatos sem ficha:`);
+  for (const m of miss) console.error(`  ${m.key}   (anúncios: ${m.ids.join(", ")})`);
+  console.error(`\nPesquise a ficha de cada uma (RESEARCH.md, "Fichas de versões novas"), acrescente em data/fichas.json, rode` +
+    ` node --test tests/core.test.mjs e repita este comando. Sem fonte possível agora: --fichas-pendentes "<versões> — <motivo>".`);
+  process.exit(2);
+}
 feed.generated_at = now;
 feed.by = "Claude (pesquisa a pedido)";
 feed.nota = "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.";
@@ -42,6 +55,7 @@ const filtro = fs.existsSync("data/filtro.json") ? JSON.parse(fs.readFileSync("d
 delete status.running;
 status.last_attempt = { at: now, ok: true };
 Object.assign(status, { filter_used_at: rest.includes("--sem-filtro") ? null : filtro?.updated_at ?? null, processed_at: now, novos, atualizados, sairam_do_ar: fora, conferidos_sem_mudanca: conferidos, note: arg("--note") || null,
+  fichas_pendentes: miss.length ? { versoes: miss.map((m) => m.key), motivo: pendJust } : null,
   last_issue: issues.length ? Math.max(...issues) : status.last_issue ?? null,
   processed_issues: [...new Set([...(status.processed_issues || []), ...issues])] });
 fs.writeFileSync(statusPath, JSON.stringify(status, null, 1));
