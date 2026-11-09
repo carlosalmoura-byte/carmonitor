@@ -2228,5 +2228,289 @@
    "url": "https://garagem360.com.br/?p=236904"
   },
   "note": "Android Auto: fontes divergem (Garagem360 diz “conectividade com fio”; AutoPapo diz que a linha 2024 ganhou espelhamento sem fio) — mantido sem confirmação."
+ },
+ {
+  "id": "chevrolet-tracker-at-2025",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "turbo flex automatico"
+  ],
+  "version_excludes": [
+   "lt",
+   "ltz",
+   "premier",
+   "rs",
+   "midnight",
+   "activ"
+  ],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "lista completa de série sem carregador por indução — 'Carregador de celular por indução' só aparece na RS e 'Carregador sem fio' só na Premier"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Projeção da tela do smartphone sem o uso de cabo / Integração com smartphones através do Android Auto e Apple CarPlay"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "lista completa de série sem ADAS — 'Frenagem automática de emergência em baixa velocidade', 'Alerta de Colisão Frontal' e 'Aviso de Ponto Cego' só nas LTZ/RS/Premier"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Tracker AT 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=244958"
+  }
+ },
+ {
+  "id": "chevrolet-tracker-lt-2024",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "lt"
+  ],
+  "version_excludes": [
+   "ltz"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "lista completa de série sem carregador por indução — 'Carregador sem fio' só aparece na Premier"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Projeção da tela do smartphone sem o uso de cabo"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "lista completa de série sem ADAS — 'Frenagem automática de emergência em baixa velocidade', 'Alerta de Colisão Frontal', 'Aviso de Ponto Cego' só nas LTZ e Premier"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Tracker LT 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=216179"
+  }
+ },
+ {
+  "id": "vw-polo-highline-2024",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "highline"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "carregamento de celular por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "central multimídia VW Play de 10 polegadas com Android Auto e Apple CarPlay sem fio"
+   }
+  },
+  "source": {
+   "title": "Motor Agora — VW Polo 2024 Versões: destaques de cada versão",
+   "quality": "secundária",
+   "url": "https://www.motoragora.com.br/vw-polo-2024-versoes/"
+  },
+  "note": "ADAS: a lista completa da Garagem360 (https://garagem360.com.br/vw-polo-2024/) não traz frenagem autônoma, faixa nem ponto cego (só Post Collision Brake) — ADAS ausente pela fonte secundária; indução também confirmada lá."
+ },
+ {
+  "id": "renault-duster-intense-plus-2025",
+  "make": "renault",
+  "model": "duster",
+  "version_includes": [
+   "intense plus"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Catálogo: 'Carregador de smartphone por indução – • •' (– na coluna Intense Plus)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Multimídia Display Link de 8\" com espelhamento sem fio de smartphone / Android Auto® e Apple CarPlay® sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "lista completa de série sem ADAS: 'Sensor de ponto cego – • •' (– no Intense Plus); só 'Auxílio à frenagem de urgência (AFU)'"
+   }
+  },
+  "source": {
+   "title": "Catálogo Renault Duster (mar/2025, gama 2025/2026)",
+   "quality": "oficial",
+   "url": "https://cdn.group.renault.com/ren/br/renault-new-cars/editorial/2025/catalogo/mar/AF-RMA000425A-Catalogo-Duster-mar.pdf.asset.pdf/b67e4b909e.pdf"
+  }
+ },
+ {
+  "id": "renault-duster-iconic-2024",
+  "make": "renault",
+  "model": "duster",
+  "version_includes": [
+   "iconic"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Carregador de smartphone por indução – • •"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Android Auto® e Apple CarPlay® sem fio • • •"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Sensor de ponto cego – • •",
+    "names": [
+     "Sensor de ponto cego"
+    ]
+   }
+  },
+  "source": {
+   "title": "Catálogo Renault Duster JAN24",
+   "quality": "oficial",
+   "url": "https://cdn.group.renault.com/ren/br/renault-new-cars/editorial/2024/catalogos/duster/AF-RMA002023H-Catalogo-Duster-JAN24.pdf"
+  },
+  "note": "Catálogo chama a versão de 'Iconic Plus 1.6 CVT'; sem frenagem autônoma nem assistente de faixa."
+ },
+ {
+  "id": "jeep-renegade-sport-2024",
+  "make": "jeep",
+  "model": "renegade",
+  "version_includes": [
+   "sport"
+  ],
+  "version_excludes": [
+   "serie s"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "lista de série do Sport sem indução; 'carregador de smartphone por indução' listado só na Longitude"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "central multimídia com tela de 7 polegadas ... Android Auto e Apple CarPlay sem fio"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "frenagem autônoma de emergência ... alerta de mudança de faixa",
+    "names": [
+     "Frenagem autônoma de emergência",
+     "Alerta de mudança de faixa"
+    ]
+   }
+  },
+  "source": {
+   "title": "AutoPapo — Jeep Renegade 2024: versão Longitude ganha opcionais",
+   "quality": "secundária",
+   "url": "https://autopapo.com.br/noticia/jeep-renegade-2024/"
+  }
+ },
+ {
+  "id": "toyota-yaris-xl-live-2023",
+  "make": "toyota",
+  "model": "yaris",
+  "version_includes": [
+   "xl live"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "porém com conexão via cabo e sem carregador de bateria do telefone celular por indução."
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "porém com conexão via cabo e sem carregador de bateria do telefone celular por indução."
+   }
+  },
+  "source": {
+   "title": "AutoEntusiastas — Linha Toyota Yaris 2023 é apresentada",
+   "quality": "secundária",
+   "url": "https://autoentusiastas.com.br/2022/01/linha-toyota-yaris-2023-e-apresentada/"
+  },
+  "note": "A linha 2023 não tem 'XL Live' (só XL, XS, XLS); ficha usa a lista do XL 2023 — o anúncio pode ser um XL 2023 ou um 2022."
+ },
+ {
+  "id": "fiat-pulse-audace-hybrid-2025",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "audace",
+   "hybrid"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "carregador de celular por indução"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "suporta Apple CarPlay e Android Auto sem fio"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse Audace Hybrid 2025 se destaca pelo motor híbrido leve",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=265159"
+  },
+  "note": "ADAS: outra matéria da Garagem360 (?p=264932) diz que o ADAS começa na Impetus — provável ausente na Audace, mantido sem estado."
+ },
+ {
+  "id": "fiat-pulse-drive-cvt-2025",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [
+   "turbo"
+  ],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "lista completa de série (itens de série + 'Drive AT 2025') sem 'Carregador do Celular por Indução', que aparece só em S-Design, Audace e Impetus"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Central multimídia com tela de 8,4″ touchscreen, Apple Car Play e Android Auto wireless"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "lista completa de série sem 'AEB (Frenagem autônoma de emergência)' e 'LDW', listados só na Impetus"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Pulse Drive AT 2025: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=249000"
+  }
  }
 ]
