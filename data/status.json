@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-09T10:43:41.771Z",
- "novos": 37,
+ "processed_at": "2026-11-10T13:17:13.649Z",
+ "novos": 34,
  "atualizados": 0,
  "sairam_do_ar": 0,
- "note": "pesquisa completa (disparo manual) pelo navegador do computador: 5 favoritos reconferidos (todos no ar), 4 listagens (São Paulo p1-3, Barueri p1), 37 anúncios novos abertos",
+ "note": "pesquisa pela nuvem (reserva): WebMotors abriu só listagens (páginas de anúncio recusadas por permissão), 34 anúncios novos só pelo cartão (vendedor a verificar); 11 listagens de versões-alvo (3 não abriram: C3 Aircross Shine, Virtus Comfortline, Creta Limited); FIPE não encontrada p/ Basalt 2025, Pulse Impetus 2023, Fastback Audace 2024, Cronos Drive 2025; favoritos não reconferidos; 4 fichas novas (Polo Comfortline 2023, Pulse Drive Turbo 2022, Fastback Audace 2024, Yaris XL 2023)",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,14 +11,9 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-10T09:23:37.310Z",
-  "ok": false,
-  "reason": "WebMotors pediu verificação: abra o navegador do app Claude no computador e pressione e segure"
+  "at": "2026-11-10T13:17:13.649Z",
+  "ok": true
  },
- "conferidos_sem_mudanca": 5,
- "running": {
-  "since": "2026-11-10T12:47:27.877Z",
-  "kind": "agendada",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 0,
+ "fichas_pendentes": null
 }

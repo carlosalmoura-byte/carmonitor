@@ -2512,5 +2512,202 @@
    "quality": "secundária",
    "url": "https://garagem360.com.br/?p=249000"
   }
+ },
+ {
+  "id": "vw-polo-comfortline-2023",
+  "make": "volkswagen",
+  "model": "polo",
+  "version_includes": [
+   "comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Tabela do Novo Polo 2023: “Carregador de bateria de celular por indução” — “–” na Comfortline (só “•” na Highline)"
+   },
+   "android_auto_sem_fio": {
+    "state": "opcional",
+    "quote": "Comfortline 2023: de série “Composition Touch com tela tátil e App-Connect”; “PACOTE OPCIONAL: VW Play … tela tátil de 10,1 pol.” com “APP Connect (Android Auto e Apple CarPlay sem fio)”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Comfortline 2023: segurança só com “Alerta de frenagem de emergência” e “Frenagem automática pós-colisão”; tabela sem frenagem autônoma, ACC ou alerta de faixa (piloto automático convencional)"
+   }
+  },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.0 TSI 170 (3 cil.)",
+   "power_g": 109,
+   "power_e": 116,
+   "torque_g": 17.3,
+   "torque_e": 17.3,
+   "gearbox": "Automático (Aisin), 6 marchas",
+   "city_g": 12.5,
+   "road_g": 15.3,
+   "city_e": 8.7,
+   "road_e": 10.8,
+   "source": {
+    "title": "Car.Blog.Br — Novo Polo 2023 Comfortline automático (dez/2022)",
+    "quality": "secundária",
+    "url": "https://www.car.blog.br/2022/12/novo-polo-2023-comfortline-automatico.html"
+   }
+  },
+  "source": {
+   "title": "Autoentusiastas — Novo Polo (ficha técnica e equipamentos Novo Polo 2023, out/2022)",
+   "quality": "secundária",
+   "url": "https://autoentusiastas.com.br/?p=192837"
+  },
+  "note": "Tabela da Autoentusiastas traz os “principais equipamentos” por versão (MPI/TSI/Comfortline/Highline). Confirmado por AutoPapo (Comfortline 2023 vem com rádio Composition Touch; VW Play pago à parte: https://autopapo.com.br/noticia/polo-comfortline-2023-x-2018/) e Motor Agora (indução só na Highline; “central multimídia VW Play (opcional)” na Comfortline: https://www.motoragora.com.br/?p=66777). Unidades com o pacote VW Play têm Android Auto sem fio. Torque citado como 170 Nm (≈17,3 kgfm)."
+ },
+ {
+  "id": "fiat-pulse-drive-turbo-2022",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "drive",
+   "turbo"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Drive Turbo 200 AT: “Carregador de bateria de celular por indução” marcado “–”; carregador só no Pack Plus da Drive 1.3 AT (packs da Turbo 200: Connect////Me e Plus II, sem carregador)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Drive Turbo 200 AT (central de 8,4″): “Apple Car Play e Android Auto sem fio” — “•”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Drive Turbo 200 AT: “Auxílio ao motorista: frenagem autônoma de emergência” (e alerta de faixa) marcado “–”; só “Controle automático de velocidade de cruzeiro”"
+   }
+  },
+  "tech": {
+   "engine": "1.0 Turbo 200 (T200) flex, 3 cil.",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 12.0,
+   "road_g": 14.6,
+   "city_e": 8.5,
+   "road_e": 10.2,
+   "trunk_l": 370,
+   "tank_l": 47,
+   "source": {
+    "title": "Ficha Completa — Fiat Pulse Drive 1.0 Turbo 2022",
+    "quality": "secundária",
+    "url": "https://www.fichacompleta.com.br/carros/fiat/pulse-drive-1-0-turbo-2022-flex"
+   }
+  },
+  "source": {
+   "title": "Autoentusiastas — Pulse, o primeiro SUV nacional da Fiat (lançamento, tabela de equipamentos e packs por versão, out/2021)",
+   "quality": "secundária",
+   "url": "https://autoentusiastas.com.br/2021/10/pulse-o-primeiro-suve-nacional-da-fiat/"
+  },
+  "note": "Tabela do lançamento (linha 2022) por versão: Drive 1.3 MT, Drive 1.3 AT, Drive Turbo 200 AT, Audace, Impetus. iCarros confirma indução só nas duas versões mais caras (https://www.icarros.com.br/noticias/lancamentos/fiat-pulse-e-lancado-com-versoes-a-partir-de-r$-79.990/29602.html). Atenção: a Ficha Completa lista “carregador de celular por indução” sem separar série/opcional — não usado para o item."
+ },
+ {
+  "id": "fiat-fastback-audace-2024",
+  "make": "fiat",
+  "model": "fastback",
+  "version_includes": [
+   "audace"
+  ],
+  "version_excludes": [
+   "hybrid"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Audace 2024: “volante com revestimento em couro, retrovisor interno eletrocrômico e carregador de celular por Indução”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Itens de série da parte interna do Fastback 2024: “Apple Car Play e Android Auto sem fio” (central de 8,4″); Audace “traz os mesmos equipamentos da versão de entrada”"
+   },
+   "adas": {
+    "state": "confirmado",
+    "quote": "Audace 2024: “A lista de segurança adiciona o sistema ADAS” — “AEB (Frenagem autônoma de emergência)”, “LDW (Alerta de mudança involuntária de faixa)”, “AHB (Comutação automática de farol alto)”",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Alerta de mudança involuntária de faixa (LDW)",
+     "Comutação automática de farol alto (AHB)"
+    ]
+   }
+  },
+  "tech": {
+   "body": "SUV cupê",
+   "engine": "1.0 Turbo 200 (T200) flex, 3 cil.",
+   "power_g": 125,
+   "power_e": 130,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "CVT, 7 marchas simuladas",
+   "city_g": 11.9,
+   "road_g": 14.6,
+   "city_e": 8.4,
+   "road_e": 10.2,
+   "source": {
+    "title": "Garagem360 — Fiat Fastback Audace 2024: ficha técnica, preço e itens de série",
+    "quality": "secundária",
+    "url": "https://garagem360.com.br/?p=215640"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Fiat Fastback Audace 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=215640"
+  },
+  "note": "Sem ACC (só piloto automático convencional). Diferente da linha 2023, a lista de série interna de 2024 já traz Android Auto sem fio na central de 8,4″."
+ },
+ {
+  "id": "toyota-yaris-xl-2023",
+  "make": "toyota",
+  "model": "yaris",
+  "version_includes": [
+   "xl"
+  ],
+  "version_excludes": [
+   "xls",
+   "xs ",
+   "live",
+   "sedan"
+  ],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Yaris 2023 (itens de série XL, XS e XLS): carregador sem fio não citado em nenhuma versão — só “3 entradas USB (duas na traseira)”"
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Yaris Hatch XL 2023: “espelhamento via cabo de Android Auto e Apple CarPlay”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "XS: “equipamentos da versão XL + assistente de pré-colisão” e “alerta de mudança involuntária de faixa” — XL sem esses itens"
+   }
+  },
+  "tech": {
+   "body": "Hatch compacto",
+   "engine": "1.5 flex (4 cil.)",
+   "gearbox": "CVT, 7 marchas simuladas"
+  },
+  "source": {
+   "title": "Revista Carro — Toyota Yaris 2023 estreia novo visual e parte de R$ 92.190 (jan/2022)",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/toyota-yaris-2023-estreia-novo-visual-e-parte-de-r-92-190/"
+  },
+  "note": "Lista da Revista Carro é de “principais itens de série” por versão; nenhuma versão da linha 2023 cita carregador por indução (coerente com a ficha 2024/2025). A página Garagem360 do Yaris Hatch XL 2023 (?p=205936) hoje mostra a linha 2024 e não foi usada."
  }
 ]
