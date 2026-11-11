@@ -367,11 +367,13 @@ function whyBox(l) {
   return `<div class="why">✕ ${fails.slice(0, 2).map(esc).join("<br>✕ ")}${more}</div>`;
 }
 const prettyVer = (v) => cap(String(v || "").replace(/^(\d)(\d)\b/, "$1.$2").toLowerCase());
-const DISCARD_REASONS = ["Vendedor particular", "Preço alto", "Km alta", "Não gostei do modelo/versão", "Cor", "Longe demais", "Estado do carro / fotos", "Já foi vendido"];
+const DISCARD_REASONS = ["Vendedor particular", "Preço alto", "Km alta", "Não gostei do modelo/versão", "Cor", "Longe demais", "Estado do carro / fotos"];
 function openDiscard(id) {
   const l = byId(id); if (!l) return;
   $("#discardBody").innerHTML = `<p><b>${esc(title(l))} ${esc(l.year_model || "")}</b><br><span class="small">${esc(l.version || "")} · ${brl(l.price)}</span></p>
-    <p class="small">Por que descartar? (opcional)</p>
+    ${l.available !== false ? `<button type="button" class="wide danger" id="discardGone">🚫 Anúncio não está mais disponível <span class="small">(vendido, removido ou não abre)</span></button>
+    <p class="small" style="margin:.2rem 0 .6rem">Marca como fora do ar e avisa a pesquisa. Sai da lista sem precisar de motivo.</p>` : ""}
+    <p class="small">Outro motivo? (opcional)</p>
     <div class="chips">${DISCARD_REASONS.map((r) => `<button type="button" class="chipBtn" data-reason="${esc(r)}">${esc(r)}</button>`).join("")}</div>
     <form id="discardForm" data-id="${id}"><label>Motivo<input name="reason" maxlength="120" placeholder="Escolha acima ou escreva"></label>
     <fieldset class="scope"><legend>Descartar</legend>
@@ -382,7 +384,22 @@ function openDiscard(id) {
     <div class="cardActions"><button class="danger" type="submit">✕ Descartar</button><button type="button" class="ghost" data-close>Cancelar</button></div></form>`;
   openSheet("#discardSheet"); history.pushState({ sheet: 4 }, "");
 }
+/** Descarte por "anúncio não está mais disponível": tira da análise como fora do ar e avisa a pesquisa (issue no GitHub). */
+function markGone(l) {
+  act(null, async () => {
+    closeSheet("#discardSheet");
+    const prevAvail = l.available;
+    const rep = { kind: "vendido", kind_label: REPORT_KINDS.vendido, text: "marcado por você no app (descarte: anúncio indisponível)", at: new Date().toISOString(), sent: false };
+    l.reports = [...(l.reports || []), rep];
+    E.reconfirm(S, l, { available: false, note: "Reportado por você: o anúncio não está mais disponível" }, deps);
+    renderCards(); if (ui.openId === l.id) renderDetail(l);
+    rep.sent = await sendProblemReport(l, rep);
+    toast(`Marcado como fora do ar${rep.sent ? " e avisado à pesquisa" : ""}.`, () => act(null, async () => {
+      E.reconfirm(S, l, { available: prevAvail !== false, note: "Aviso desfeito" }, deps); renderCards(); if (ui.openId === l.id) renderDetail(l); toast("Desfeito."); }));
+  });
+}
 $("#discardSheet").addEventListener("click", (e) => {
+  if (e.target.closest("#discardGone")) { const l = byId(+$("#discardForm").dataset.id); if (l) markGone(l); return; }
   const b = e.target.closest("[data-reason]"); if (!b) return;
   const inp = $("#discardForm").reason;
   inp.value = inp.value && !inp.value.includes(b.dataset.reason) ? `${inp.value}; ${b.dataset.reason}` : b.dataset.reason;

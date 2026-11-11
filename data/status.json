@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-11T19:07:00.133Z",
- "novos": 10,
+ "processed_at": "2026-11-11T20:00:47.159Z",
+ "novos": 0,
  "atualizados": 0,
- "sairam_do_ar": 0,
- "note": "pesquisa a pedido pelo navegador do computador (11/11 ~16h): São Paulo págs. 1–3 (uma verificação humana, liberada pelo usuário); 34 anúncios novos nos cartões, 10 abertos (os demais já são reprovados pela ficha da versão ou são manuais); 6 fichas novas: Kicks Advance 2023, Kicks Exclusive 2024, Tracker LT 2023, Spin Premier 2024, Tiggo 5X Sport 2024, Virtus TSI AT 2023.",
+ "sairam_do_ar": 1,
+ "note": "reconferência a pedido (11/11 ~17h): Virtus TSI 2023 da Localiza (82153835) saiu do ar menos de 1 h depois de entrar.",
  "last_issue": 2,
  "processed_issues": [
   1,
@@ -11,7 +11,7 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-11T19:07:00.133Z",
+  "at": "2026-11-11T20:00:47.159Z",
   "ok": true
  },
  "conferidos_sem_mudanca": 0,
