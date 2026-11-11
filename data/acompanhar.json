@@ -1,13 +1,17 @@
 {
- "updated_at": "2026-11-11T20:24:20.134Z",
+ "updated_at": "2026-11-11T21:56:13.048Z",
  "origem": "app CarMonitor",
  "nota": "favoritos e aprovados — reconferir todo dia",
  "urls": [
   "https://www.webmotors.com.br/comprar/caoa-chery/tiggo-5x-pro/15-vvt-turbo-iflex-cvt/4-portas/2022-2023/80613467",
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81770636",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81890197",
   "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023/80769504",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2024/82032671",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
+  "https://www.webmotors.com.br/comprar/renault/duster/16-16v-sce-flex-iconic-x-tronic/4-portas/2023-2024/82092607",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
  ],
  "favoritos": [
@@ -16,10 +20,14 @@
  "aprovados": [
   "https://www.webmotors.com.br/comprar/caoa-chery/tiggo-5x-pro/15-vvt-turbo-iflex-cvt/4-portas/2022-2023/80613467",
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81770636",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81890197",
   "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023/80769504",
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2024/82032671",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81573575",
+  "https://www.webmotors.com.br/comprar/renault/duster/16-16v-sce-flex-iconic-x-tronic/4-portas/2023-2024/82092607",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
  ]
 }
