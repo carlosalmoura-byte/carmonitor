@@ -2594,7 +2594,7 @@
    "torque_g": 20.4,
    "torque_e": 20.4,
    "gearbox": "CVT, 7 marchas simuladas",
-   "city_g": 12.0,
+   "city_g": 12,
    "road_g": 14.6,
    "city_e": 8.5,
    "road_e": 10.2,
@@ -2709,5 +2709,186 @@
    "url": "https://revistacarro.com.br/toyota-yaris-2023-estreia-novo-visual-e-parte-de-r-92-190/"
   },
   "note": "Lista da Revista Carro é de “principais itens de série” por versão; nenhuma versão da linha 2023 cita carregador por indução (coerente com a ficha 2024/2025). A página Garagem360 do Yaris Hatch XL 2023 (?p=205936) hoje mostra a linha 2024 e não foi usada."
+ },
+ {
+  "id": "nissan-kicks-advance-2023",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "advance"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Linha 2023: só a Exclusive Pack Tech “traz de série, agora, um carregador para celular por indução” — a Advance não tem"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Kicks 2023: alertas de colisão, mudança de faixa e ponto cego (Pack Tech) só na Exclusive"
+   }
+  },
+  "source": {
+   "title": "Motor Show — Nissan lança Kicks 2023 com mais equipamentos",
+   "quality": "secundária",
+   "url": "https://motorshow.com.br/nissan-lanca-kicks-2023-com-mais-equipamentos-veja-o-que-mudou"
+  },
+  "note": "Android Auto com fio em toda a 1ª geração do Kicks (ver ficha nissan-kicks-sense-2024)."
+ },
+ {
+  "id": "nissan-kicks-exclusive-2024",
+  "make": "nissan",
+  "model": "kicks",
+  "version_includes": [
+   "exclusive"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Kicks (1ª geração): “É uma das poucas, por exemplo, a não espelhar o Android Auto e o Apple CarPlay sem fio” (Canaltech, Kicks 2024)"
+   },
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Kicks 1ª geração (linha 2024): “carregador de celular por indução” é item da versão Exclusive"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Nissan Kicks 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/?p=209798"
+  },
+  "note": "Sem Android Auto sem fio em nenhuma versão da 1ª geração."
+ },
+ {
+  "id": "chevrolet-tracker-lt-2023",
+  "make": "chevrolet",
+  "model": "tracker",
+  "version_includes": [
+   "lt"
+  ],
+  "version_excludes": [
+   "ltz"
+  ],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Tracker: espelhamento sem fio do Android Auto e Apple CarPlay “item de série a partir da versão LT” desde a linha 2022"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Tracker: carregador de celular por indução só na Premier (linhas 2022 a 2024)"
+   }
+  },
+  "source": {
+   "title": "Revista Carro — Chevrolet Tracker 2022 estreia espelhamento sem fio",
+   "quality": "secundária",
+   "url": "https://revistacarro.com.br/chevrolet-tracker-2022-estreia-espelhamento-sem-fio/"
+  },
+  "note": "Mesma lista das linhas 2022 e 2024 (fichas chevrolet-tracker-lt-2022 e -2024). ADAS da LT 2023 sem fonte específica."
+ },
+ {
+  "id": "chevrolet-spin-premier-2024",
+  "make": "chevrolet",
+  "model": "spin",
+  "version_includes": [
+   "premier"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de série da Spin Premier 2024: nenhum carregador por indução/sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Spin Premier 2024: só “Alerta de frenagem de emergência”; sem frenagem autônoma, faixa ou ponto cego"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Chevrolet Spin Premier 2024: ficha técnica, preço e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/chevrolet-spin-premier-2024-ficha-tecnica-preco-e-itens-de-serie"
+  },
+  "note": "Android Auto: a lista diz só “Integração com smartphones através do Android Auto e Apple CarPlay”, sem dizer se é sem fio."
+ },
+ {
+  "id": "caoa-chery-tiggo-5x-sport-2024",
+  "make": "caoa chery",
+  "model": "tiggo 5x",
+  "version_includes": [
+   "sport"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Tiggo 5X Sport: para chegar ao preço, “alguns equipamentos da versão Pro foram removidos”, entre eles “o carregador por indução”"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Tiggo 5X 2024: ACC, frenagem automática e ponto cego só na Pro Hybrid Max Drive"
+   }
+  },
+  "source": {
+   "title": "AutoPapo — Caoa Chery Tiggo 5X 2024 ganha novas versões",
+   "quality": "secundária",
+   "url": "https://autopapo.com.br/noticia/caoa-chery-tiggo-5x-2024/"
+  },
+  "note": "Android Auto sem fio da Sport sem fonte."
+ },
+ {
+  "id": "vw-virtus-tsi-at-2023",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "170 tsi automatico"
+  ],
+  "version_excludes": [
+   "comfortline",
+   "highline",
+   "exclusive",
+   "sense"
+  ],
+  "year_from": 2023,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "De série em todas as versões, o sedã ganhou carregador de celular por indução"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Controle adaptativo de velocidade (ACC)"
+    ],
+    "quote": "[AEB e ACC] são funções de série em todas as versões com câmbio automático"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
+   }
+  },
+  "source": {
+   "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos",
+   "quality": "secundária",
+   "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
+  },
+  "note": "Virtus 2023: indução de série em todas as versões e AEB+ACC em todas as automáticas — vale para a TSI AT (anunciada como “170 TSI Automático”)."
  }
 ]
