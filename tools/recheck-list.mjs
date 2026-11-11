@@ -27,9 +27,12 @@ for (const l of alive) {
 }
 const id = (u) => (u.match(/(\d{6,})$/) || [])[1];
 for (const x of s.listings) status.set(feed.listings.find((l) => id(l.url) === id(x.url))?.url, x.status);
-const first = alive.filter((l) => watch.has(l.url) && (!noPhotos || !/\nFotos:/.test(l.text)));
-const rest = alive.filter((l) => !watch.has(l.url) && status.get(l.url) !== "descartado" && (noPhotos ? !/\nFotos:/.test(l.text) : !recent(l)))
+// anúncios que entraram só pelo cartão da busca (sem vendedor/FIPE/fotos/itens) vêm antes de tudo: abrir a página
+const cardOnly = alive.filter((l) => /Vendedor:\s*\(não verificado\)/.test(l.text) && status.get(l.url) !== "descartado");
+const first0 = alive.filter((l) => watch.has(l.url) && (!noPhotos || !/\nFotos:/.test(l.text)));
+const first = first0.filter((l) => !cardOnly.includes(l));
+const rest = alive.filter((l) => !cardOnly.includes(l) && !watch.has(l.url) && status.get(l.url) !== "descartado" && (noPhotos ? !/\nFotos:/.test(l.text) : !recent(l)))
   .sort((a, b) => new Date(a.checked_at || 0) - new Date(b.checked_at || 0));
-const out = [...first, ...rest].slice(0, limit);
-for (const l of out) console.log(l.url + (watch.has(l.url) ? "   # favorito/aprovado" : ""));
+const out = [...cardOnly, ...first, ...rest].slice(0, limit);
+for (const l of out) console.log(l.url + (cardOnly.includes(l) ? "   # só cartão: abrir a página" : watch.has(l.url) ? "   # favorito/aprovado" : ""));
 console.error(`${out.length} para reconferir (${first.length} favoritos/aprovados; ${rest.length} outros ativos no filtro)`);

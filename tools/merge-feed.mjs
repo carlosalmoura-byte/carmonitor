@@ -32,6 +32,9 @@ for (const it of incoming) {
   }
   if (!it.text || it.text.length < 20) { console.warn("sem texto, ignorado:", url); continue; }
   if (prev && prev.text === it.text && prev.available !== false) { prev.checked_at = now; conferidos++; continue; } // conferido, nada mudou
+  // leitura só pelo cartão da busca ("Vendedor: (não verificado)") nunca substitui a transcrição completa da página
+  const cardOnly = (t) => /Vendedor:\s*\(não verificado\)/.test(t || "");
+  if (prev?.text && prev.available !== false && cardOnly(it.text) && !cardOnly(prev.text)) { prev.checked_at = now; conferidos++; continue; }
   byUrl.set(url, { url, checked_at: now, text: it.text, available: true });
   prev ? atualizados++ : novos++;
 }

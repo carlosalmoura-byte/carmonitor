@@ -47,6 +47,11 @@ em blocos de ~15 e converta para o JSON da publicação (`removed: true` → `av
 
 ## 0.1 Reconferência diária — obrigatória, PRIMEIRO passo da pesquisa das 6h21
 
+**Anúncios "só cartão" primeiro (regra do usuário, 11/11):** anúncio que entrou só pelo cartão da busca
+(`Vendedor: (não verificado)`, sem FIPE/cor/fotos/itens) aparece no app sem informações. `node tools/recheck-list.mjs`
+lista esses no topo ("# só cartão: abrir a página") — abra a página de cada um que ainda passa no filtro antes de
+qualquer outra reconferência. O `merge-feed` nunca deixa uma leitura só pelo cartão substituir a transcrição completa.
+
 Todo dia, antes de procurar anúncios novos, confira se os anúncios que o usuário acompanha ainda estão no ar:
 
 1. `node tools/recheck-list.mjs 40` lista, em ordem: **todos** os favoritos e aprovados do usuário
