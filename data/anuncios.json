@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-12T13:07:07.679Z",
+ "generated_at": "2026-11-12T14:23:04.616Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -1179,9 +1179,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/renault/duster/16-16v-sce-flex-iconic-x-tronic/4-portas/2023-2024/82092607",
-   "checked_at": "2026-11-11T19:07:00.133Z",
-   "text": "RENAULT DUSTER 1.6 16V SCE FLEX ICONIC X-TRONIC\nPreço: R$ 91.990\nAno: 2023/2024\nKM: 37.949\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Fiat Ventuno Nações (Loja)\nFIPE: R$ 96.361 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Prata\nFinal de placa: 5\nFotos: 8\nCaracterísticas: IPVA pago\nItens de veículo: Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de ponto cego; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
-   "available": true
+   "checked_at": "2026-11-12T14:23:04.616Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
