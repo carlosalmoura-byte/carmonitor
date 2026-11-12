@@ -443,3 +443,14 @@ test("roteiro: horário do mapa, ordem que cabe no funcionamento e loja fechada"
   const sun = planRoute({ stops, matrix: { min, km }, date: new Date(2026, 10, 15), startMin: 9 * 60, visit: 30 });
   assert.equal(sun.ok, 0); assert.ok(sun.legs.every((l) => l.status === "fechada no dia"));
 });
+
+test("roteiro com mais de 8 lojas usa busca por trocas e visita todas que cabem", async () => {
+  const { parseHours, planRoute } = await import("../core/route.js");
+  const N = 11, h = parseHours("Mo-Fr 08:00-20:00");
+  const pos = Array.from({ length: N + 1 }, (_, i) => i * 7 % 13);
+  const min = pos.map((a) => pos.map((b) => Math.abs(a - b) * 4));
+  const stops = Array.from({ length: N }, (_, i) => ({ id: i, hours: h }));
+  const t0 = Date.now();
+  const r = planRoute({ stops, matrix: { min, km: min }, date: new Date(2026, 10, 16), startMin: 8 * 60, visit: 20 });
+  assert.equal(r.ok, N); assert.ok(Date.now() - t0 < 3000);
+});

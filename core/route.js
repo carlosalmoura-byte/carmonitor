@@ -76,7 +76,7 @@ function* permutations(a) {
 /**
  * stops: [{ id, hours (parseHours) }]; matrix: { min, km } (N+1)x(N+1), índice 0 = origem;
  * date: Date do dia (usa só o dia da semana); startMin: minutos desde 00:00; visit: minutos em cada loja.
- * Escolhe a ordem que visita mais lojas dentro do horário e, empatando, termina mais cedo (até 8 lojas: todas as ordens).
+ * Escolhe a ordem que visita mais lojas dentro do horário e, empatando, termina mais cedo (até 8 lojas: todas as ordens; acima disso, busca por trocas).
  */
 export function planRoute({ stops, matrix, date, startMin, visit = 40, back = true }) {
   const dow = date.getDay();
@@ -84,13 +84,20 @@ export function planRoute({ stops, matrix, date, startMin, visit = 40, back = tr
   let best = null;
   const better = (a, b) => !b || a.ok > b.ok || (a.ok === b.ok && (a.end < b.end || (a.end === b.end && a.wait < b.wait)));
   if (idx.length <= 8) for (const p of permutations(idx)) { const r = simulate(p, stops, matrix, startMin, dow, visit, back); if (better(r, best)) best = r; }
-  else { // muitas lojas: vizinho mais próximo que ainda dá tempo
-    const left = new Set(idx), order = []; let at = 0, t = startMin;
-    while (left.size) {
-      const next = [...left].sort((a, b) => matrix.min[at][a + 1] - matrix.min[at][b + 1])[0];
-      order.push(next); left.delete(next); t += matrix.min[at][next + 1] + visit; at = next + 1;
-    }
+  else { // muitas lojas: vizinho mais próximo + melhoria por trocas (2-opt e troca de pares) até não melhorar
+    const left = new Set(idx); let order = [], at = 0;
+    while (left.size) { const next = [...left].sort((a, b) => matrix.min[at][a + 1] - matrix.min[at][b + 1])[0]; order.push(next); left.delete(next); at = next + 1; }
     best = simulate(order, stops, matrix, startMin, dow, visit, back);
+    for (let improved = true, guard = 0; improved && guard < 200; guard++) {
+      improved = false;
+      for (let i = 0; i < order.length - 1; i++) for (let j = i + 1; j < order.length; j++) {
+        for (const cand of [[...order.slice(0, i), ...order.slice(i, j + 1).reverse(), ...order.slice(j + 1)],
+          order.map((x, k) => (k === i ? order[j] : k === j ? order[i] : x))]) {
+          const r = simulate(cand, stops, matrix, startMin, dow, visit, back);
+          if (better(r, best)) { best = r; order = cand; improved = true; }
+        }
+      }
+    }
   }
   const km = best.legs.reduce((s, l) => s + (l.km || 0), 0) + (best.backKm || 0);
   return { ...best, dow, km: Math.round(km * 10) / 10 };

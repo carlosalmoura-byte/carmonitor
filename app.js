@@ -306,7 +306,7 @@ function renderCards() {
     return;
   }
   const routeBar = ["aprovado", "favoritos"].includes(ui.status) && items.some((l) => l.available !== false)
-    ? `<div class="routeBar"><button class="ghost wide" data-route>🗺 Planejar rota para visitar estes carros</button></div>` : "";
+    ? `<div class="routeBar"><button class="ghost wide" data-route="${ui.status === "favoritos" ? "favoritos" : "aprovados"}">🗺 Rota para visitar todos os ${ui.status === "favoritos" ? "favoritos" : "aprovados"}</button></div>` : "";
   el.innerHTML = routeBar + hiddenNote + items.map((l) => {
     const first = l.snapshots.find((s) => s.price)?.price;
     const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
@@ -465,7 +465,7 @@ $("#cards").addEventListener("click", (e) => {
   if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
   if (e.target.closest(".cmpFlag")) return;
   if (e.target.closest("[data-togglehidden]")) { ui.showHidden = !ui.showHidden; renderCards(); return; }
-  if (e.target.closest("[data-route]")) { openRoute(); return; }
+  const rb = e.target.closest("[data-route]"); if (rb) { openRoute(rb.dataset.route || null); return; }
   const ms = e.target.closest("[data-msg]");
   if (ms) { messageSeller(+ms.dataset.msg); return; }
   const ap = e.target.closest("[data-approve]");
@@ -539,7 +539,7 @@ function toggleCompare(id, input) {
   input?.closest(".cmpFlag")?.classList.toggle("on", ui.compare.has(id));
 }
 $("#cmpBarGo").onclick = () => showView("compare");
-$("#cmpBarRoute").onclick = () => openRoute();
+$("#cmpBarRoute").onclick = () => openRoute("marcados");
 $("#cmpBarClear").onclick = () => { ui.compare.clear(); saveCompare(); renderCards(); };
 function saveCompare() {
   $("#cmpCount").textContent = ui.compare.size;
@@ -562,27 +562,80 @@ function storeHours(l, osm) {
   for (const [d, v] of Object.entries(fix)) out[d] = v === "off" ? [] : (parseHours(`${d} ${v}`) || {})[d] || out[d];
   return { hours: out, src: Object.keys(fix).length ? "corrigido por você" : parseHours(osm) ? "OpenStreetMap" : "padrão de loja — confirme com o vendedor" };
 }
-function routeCandidates() {
-  const live = S.listings.filter((l) => !l.archived && l.available !== false && l.status !== "descartado");
-  const pre = ui.compare.size ? live.filter((l) => ui.compare.has(l.id)) : live.filter((l) => l.user_approve || l.favorite);
+const byScoreDesc = (a, b) => (b.score?.total ?? -1) - (a.score?.total ?? -1);
+const routeLive = () => S.listings.filter((l) => !l.archived && l.available !== false && l.status !== "descartado");
+const routeGroups = () => { const live = routeLive(); return {
+  aprovados: live.filter((l) => shown(l) === "aprovado").sort(byScoreDesc),
+  favoritos: live.filter((l) => l.favorite).sort(byScoreDesc),
+  marcados: live.filter((l) => ui.compare.has(l.id)) }; };
+/** scope: "aprovados" | "favoritos" | "marcados" | null (marcados se houver, senão aprovados+favoritos) */
+function routeCandidates(scope) {
+  const live = routeLive(), g = routeGroups();
+  const pre = scope ? g[scope] : ui.compare.size ? g.marcados : live.filter((l) => l.user_approve || l.favorite);
   const rest = live.filter((l) => !pre.includes(l)).sort((a, b) => (b.score?.total ?? -1) - (a.score?.total ?? -1));
-  return { list: [...pre, ...rest].slice(0, 30), pre: new Set(pre.slice(0, 8).map((l) => l.id)) };
+  return { list: [...pre, ...rest].slice(0, 30), pre: new Set(pre.slice(0, 12).map((l) => l.id)) };
 }
 let ROUTE = null;
-function openRoute() {
-  const f = $("#routeForm"), { list, pre } = routeCandidates();
+function setRouteSelection(ids, label) {
+  const want = ids.slice(0, 12);
+  $$("input[name=car]", $("#routeCars")).forEach((i) => { i.checked = want.includes(+i.value); });
+  if (ids.length > 12) toast(`${label}: ${ids.length} carros — marquei os 12 de maior nota (limite da rota).`);
+}
+function openRoute(scope = null) {
+  const f = $("#routeForm"), { list, pre } = routeCandidates(scope);
   if (!list.length) return toast("Nenhum carro disponível para visitar.");
   $("#routeCars").innerHTML = list.map((l) => `<label class="chk"><input type="checkbox" name="car" value="${l.id}" ${pre.has(l.id) ? "checked" : ""}>
     <span><b>${esc(title(l))} ${esc(l.year_model || "")}</b> · ${brl(l.price)} <span class="small">· ${esc(l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "vendedor ?")} · ${esc(l.city || "?")}${l.user_approve ? " · aprovado" : l.favorite ? " · ★" : ""}</span></span></label>`).join("");
+  const g = routeGroups();
+  $("#routeQuick").innerHTML = [g.aprovados.length && `<button type="button" class="ghost" data-rsel="aprovados">✓ Todos os aprovados (${g.aprovados.length})</button>`,
+    g.favoritos.length && `<button type="button" class="ghost" data-rsel="favoritos">★ Todos os favoritos (${g.favoritos.length})</button>`,
+    `<button type="button" class="ghost" data-rsel="nenhum">Limpar</button>`].filter(Boolean).join("");
+  if (scope && pre.size < g[scope].length) toast(`${g[scope].length} carros nesta aba — marquei os 12 de maior nota (limite da rota).`);
   const t = new Date(); t.setDate(t.getDate() + 1);
   if (!f.day.value) f.day.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
-  f.origin.value = S.settings.route_origin || f.origin.value || S.settings.criteria.ref_location || "";
+  f.origin.value = S.settings.route_origin || f.origin.value || "";
+  $("#routeOriginHint").textContent = S.settings.route_origin_label ? `Último ponto de partida: ${S.settings.route_origin_label}` : "Digite o CEP (só números ou com hífen) ou a rua com número e cidade.";
   $("#routeResult").innerHTML = "";
   openSheet("#routeSheet"); history.pushState({ sheet: 7 }, "");
 }
+$("#routeQuick").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-rsel]"); if (!b) return;
+  const k = b.dataset.rsel, g = routeGroups();
+  if (k === "nenhum") return setRouteSelection([], "");
+  // garante que todos do grupo estão na lista de escolha
+  const have = new Set($$("input[name=car]", $("#routeCars")).map((i) => +i.value));
+  if (g[k].some((l) => !have.has(l.id))) { openRoute(k); return; }
+  setRouteSelection(g[k].map((l) => l.id), k === "aprovados" ? "Aprovados" : "Favoritos");
+});
+$("#routeGps").addEventListener("click", () => {
+  if (!navigator.geolocation) return toast("Este aparelho não informa a localização.");
+  toast("Pegando sua localização…");
+  navigator.geolocation.getCurrentPosition((p) => {
+    const v = `${p.coords.latitude.toFixed(5)},${p.coords.longitude.toFixed(5)}`;
+    $("#routeForm").origin.value = v; $("#routeOriginHint").textContent = "Usando sua localização atual (GPS).";
+  }, () => toast("Não consegui a localização (permissão negada ou GPS desligado)."), { enableHighAccuracy: true, timeout: 15000 });
+});
+/** Ponto de partida: "lat,lon" (GPS) | CEP (ViaCEP → rua/bairro/cidade) | endereço livre. Devolve { coords, label }. */
+async function resolveOrigin(text) {
+  const t = text.trim();
+  const ll = t.match(/^(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)$/);
+  if (ll) return { coords: [Number(ll[1]), Number(ll[2])], label: "sua localização atual (GPS)" };
+  const cep = t.replace(/\D/g, "");
+  if (/^\d{5}-?\d{3}$/.test(t.replace(/\s/g, "")) && cep.length === 8) {
+    let v = null;
+    try { const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); if (r.ok) v = await r.json(); } catch { /* sem rede */ }
+    if (!v || v.erro) return { coords: null, label: null, err: `CEP ${t} não encontrado.` };
+    const street = [v.logradouro, v.localidade, v.uf].filter(Boolean).join(", ");
+    const label = [v.logradouro, v.bairro, `${v.localidade}/${v.uf}`].filter(Boolean).join(", ") + ` (CEP ${t})`;
+    const c = (v.logradouro && await deps.distance.geocodeText(S, street)) || (v.bairro && await deps.distance.geocodeText(S, `${v.bairro}, ${v.localidade}, ${v.uf}`))
+      || await deps.distance.geocodeText(S, `${v.localidade}, ${v.uf}`);
+    return { coords: c, label };
+  }
+  return { coords: await deps.distance.geocodeText(S, t), label: t };
+}
 $("#routeCars").addEventListener("change", (e) => {
   const on = $$("input[name=car]:checked", $("#routeCars"));
-  if (on.length > 8) { e.target.checked = false; toast("No máximo 8 carros por rota."); }
+  if (on.length > 12) { e.target.checked = false; toast("No máximo 12 carros por rota."); }
 });
 $("#routeForm").addEventListener("submit", (e) => {
   e.preventDefault(); const f = e.target;
@@ -591,10 +644,12 @@ $("#routeForm").addEventListener("submit", (e) => {
   act($("button[type=submit]", f), async () => {
     const out = $("#routeResult");
     out.innerHTML = `<p class="small">Localizando as lojas e calculando os trajetos… (o mapa gratuito responde 1 consulta por segundo)</p>`;
-    S.settings.route_origin = f.origin.value.trim(); persist();
     const D = deps.distance;
-    const origin = await D.geocodeText(S, S.settings.route_origin);
-    if (!origin) { out.innerHTML = `<div class="msg bad">Não achei o ponto de partida “${esc(S.settings.route_origin)}” no mapa. Tente com rua e cidade, ou o CEP.</div>`; return; }
+    const o = await resolveOrigin(f.origin.value);
+    const origin = o.coords;
+    if (!origin) { out.innerHTML = `<div class="msg bad">${esc(o.err || `Não achei o ponto de partida “${f.origin.value.trim()}” no mapa.`)} Tente o CEP, ou rua com número e cidade.</div>`; return; }
+    if (!/GPS/.test(o.label)) { S.settings.route_origin = f.origin.value.trim(); S.settings.route_origin_label = o.label; }
+    persist();
     const stops = [], skipped = [];
     for (const l of cars) {
       const loc = await D.locate(S, l.city, l.state, l.address, l.seller_type !== "particular" ? l.seller : null);
@@ -607,7 +662,7 @@ $("#routeForm").addEventListener("submit", (e) => {
     try { m = await D.matrix([origin, ...stops.map((s) => s.coords)]); }
     catch (err) { out.innerHTML = `<div class="msg bad">O serviço de rotas não respondeu (${esc(err.message || err.name)}). Tente de novo em instantes.</div>`; return; }
     const k = Number(f.traffic.value) || 1;
-    ROUTE = { f: { day: f.day.value, start: f.start.value, visit: Number(f.visit.value) || 45, back: f.back.checked, traffic: k, origin: S.settings.route_origin },
+    ROUTE = { f: { day: f.day.value, start: f.start.value, visit: Number(f.visit.value) || 45, back: f.back.checked, traffic: k, origin: o.label },
       originCoords: origin, stops, skipped, matrix: { min: m.min.map((r) => r.map((x) => x * k)), km: m.km } };
     renderRoute();
   });
@@ -641,7 +696,7 @@ function renderRoute() {
   const wp = okLegs.map((g) => stops[g.i].coords.join(","));
   const dest = R.f.back ? R.originCoords.join(",") : wp.pop();
   const gmaps = okLegs.length ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${R.originCoords.join(",")}&destination=${dest}${wp.length ? `&waypoints=${encodeURIComponent(wp.join("|"))}` : ""}` : null;
-  const summary = `${dayName[0].toUpperCase() + dayName.slice(1)} · saída ${R.f.start} · ${okLegs.length} de ${stops.length} loja(s) dentro do horário · ${R.f.back ? "volta" : "fim"} prevista ${fmtMin(plan.end)} · ${plan.km} km`;
+  const summary = `${dayName[0].toUpperCase() + dayName.slice(1)} · saída ${R.f.start} de ${R.f.origin} · ${okLegs.length} de ${stops.length} loja(s) dentro do horário · ${R.f.back ? "volta" : "fim"} prevista ${fmtMin(plan.end)} · ${plan.km} km`;
   ROUTE.text = [`Rota de visitas — ${summary}`, `Saída: ${R.f.origin}`, ...okLegs.map((g, n) => { const s = stops[g.i]; return `${n + 1}. ${fmtMin(g.start)} — ${s.l.seller || "Vendedor"} (${s.l.city}) — ${title(s.l)} ${s.l.year_model || ""} ${brl(s.l.price)} — ${s.l.url}`; }),
     ...(badLegs.length ? ["Fora do horário: " + badLegs.map((g) => `${stops[g.i].l.seller || title(stops[g.i].l)} (${g.status})`).join("; ")] : []), gmaps ? `Mapa: ${gmaps}` : ""].filter(Boolean).join("\n");
   $("#routeResult").innerHTML = `<div class="rsum"><b>${esc(summary)}</b>

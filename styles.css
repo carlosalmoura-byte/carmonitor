@@ -39,7 +39,7 @@ label.chk{display:flex;align-items:center;gap:.45rem;color:var(--ink);font-size:
 label.chk input{width:auto;margin:0}
 fieldset{border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem .3rem;margin:0 0 .7rem}
 legend{font-size:.8rem;color:var(--muted);padding:0 .3rem}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem}.row2>label{min-width:0}.row2 input,.row2 select{width:100%;max-width:100%;box-sizing:border-box;min-width:0}
 button,.btn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface2);color:var(--ink);padding:.45rem .85rem;border-radius:8px;text-decoration:none;display:inline-block;text-align:center}
 button.primary,.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
 button.ghost,.btn.ghost{background:none}
@@ -313,3 +313,6 @@ details>summary{scroll-margin-top:4rem}
 .rleg .rtime .small{font-size:.72rem}
 .rleg.bad{opacity:.75}
 .rfix{margin:.3rem 0}
+.routeQuick{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 .4rem}.routeQuick button{font-size:.85rem;padding:.3rem .6rem}
+.originRow{display:flex;gap:.4rem;align-items:center}.originRow input{flex:1;min-width:0}
+#routeForm input[type=date],#routeForm input[type=time]{min-height:2.6rem}
