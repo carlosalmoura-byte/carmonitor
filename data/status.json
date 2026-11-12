@@ -15,5 +15,10 @@
   "ok": true
  },
  "conferidos_sem_mudanca": 0,
- "fichas_pendentes": null
+ "fichas_pendentes": null,
+ "running": {
+  "since": "2026-11-12T14:22:19.564Z",
+  "kind": "pedido",
+  "filter_at": "2026-11-01T17:15:57.181Z"
+ }
 }
