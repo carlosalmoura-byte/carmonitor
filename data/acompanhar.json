@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-12T13:42:15.835Z",
+ "updated_at": "2026-11-12T14:26:06.024Z",
  "origem": "app CarMonitor",
  "nota": "favoritos e aprovados — reconferir todo dia",
  "urls": [
@@ -13,7 +13,9 @@
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
  ],
- "favoritos": [],
+ "favoritos": [
+  "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2024/82032671"
+ ],
  "aprovados": [
   "https://www.webmotors.com.br/comprar/caoa-chery/tiggo-5x-pro/15-vvt-turbo-iflex-cvt/4-portas/2022-2023/80613467",
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
