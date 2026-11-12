@@ -65,6 +65,7 @@ function toast(msg, action = null, label = "Desfazer", ms = 3400) {
 let saveTimer = null;
 function persist() {
   clearTimeout(saveTimer);
+  if (S?.listings) stampDecisions();
   saveTimer = setTimeout(() => saveState(S).catch((e) => toast("Falha ao salvar: " + e.message)), 150);
   scheduleWatchSync();
 }
@@ -79,37 +80,83 @@ const watchLists = () => ({
   favoritos: S.listings.filter((l) => !l.archived && l.favorite).map((l) => l.url).sort(),
   aprovados: S.listings.filter((l) => !l.archived && l.user_approve).map((l) => l.url).sort(),
 });
-/** Aparelho novo: traz favoritos e aprovados salvos por outro aparelho (só acrescenta, nunca remove). */
-async function importWatch() {
-  if (S.meta.watch_imported) return;
-  try {
-    const r = await fetch(`data/acompanhar.json?t=${Date.now()}`, { cache: "no-store" });
-    if (!r.ok) { if (r.status === 404) S.meta.watch_imported = true; return; }
-    const w = await r.json(), id = (u) => (String(u).match(/(\d{6,})\/?$/) || [])[1];
-    const fav = new Set((w.favoritos || []).map(id)), apr = new Set((w.aprovados || []).map(id));
-    let n = 0;
-    for (const l of S.listings) {
-      const k = id(l.url);
-      if (fav.has(k) && !l.favorite) { l.favorite = true; n++; }
-      if (apr.has(k) && !l.user_approve) { l.user_approve = true; E.refresh(S, l, deps); n++; }
-    }
-    S.meta.watch_imported = true; persist();
-    if (n) { renderCards(); toast(`${n} favorito(s)/aprovado(s) trazidos do seu outro aparelho.`); }
-  } catch { /* tenta na próxima abertura */ }
+// ---- decisões sincronizadas entre aparelhos (celular, navegador do computador)
+// Cada anúncio guarda dec_at = quando você mudou favorito/aprovação/descarte neste aparelho. Em data/acompanhar.json
+// ("decisoes") fica a versão mais recente de cada anúncio; ao abrir/voltar ao app, vale a mais nova (inclusive desfazer).
+const adId = (u) => (String(u).match(/(\d{6,})\/?$/) || [])[1];
+const decOf = (l) => ({ f: l.favorite ? 1 : 0, a: l.user_approve ? 1 : 0, d: l.user_discard ? (l.user_discard.reason || "") : null });
+/** Marca dec_at quando a decisão local muda (chamado em todo persist). */
+function stampDecisions() {
+  S.meta.dec_sig ||= {};
+  const now = new Date().toISOString();
+  for (const l of S.listings) {
+    const k = adId(l.url); if (!k) continue;
+    const sig = JSON.stringify(decOf(l));
+    if (S.meta.dec_sig[k] === undefined) { S.meta.dec_sig[k] = sig; if (sig !== JSON.stringify({ f: 0, a: 0, d: null }) && !l.dec_at) l.dec_at = l.user_discard?.at || l.user_approve?.at || "2026-01-01T00:00:00.000Z"; continue; }
+    if (S.meta.dec_sig[k] !== sig) { S.meta.dec_sig[k] = sig; l.dec_at = now; }
+  }
 }
+const localDecisions = () => {
+  const out = {};
+  for (const l of S.listings) { const k = adId(l.url); if (k && l.dec_at) out[k] = { ...decOf(l), at: l.dec_at }; }
+  return out;
+};
+/** Aplica decisões de outro aparelho que sejam mais novas que as daqui. Devolve quantos anúncios mudaram. */
+function applyRemoteDecisions(dec) {
+  let n = 0;
+  S.meta.dec_remote = { ...(S.meta.dec_remote || {}), ...dec };
+  for (const l of S.listings) {
+    const k = adId(l.url), r = dec[k]; if (!r) continue;
+    if (l.dec_at && new Date(l.dec_at) >= new Date(r.at)) continue;
+    const before = JSON.stringify(decOf(l));
+    l.favorite = !!r.f;
+    if (r.a) l.user_approve ||= { at: r.at }; else delete l.user_approve;
+    if (r.d != null) l.user_discard = { reason: r.d, at: r.at }; else delete l.user_discard;
+    l.dec_at = r.at; S.meta.dec_sig = { ...(S.meta.dec_sig || {}), [k]: JSON.stringify(decOf(l)) };
+    if (JSON.stringify(decOf(l)) !== before) { E.reclassify(S, l); n++; }
+  }
+  return n;
+}
+/** Lê a lista do GitHub (API quando há token — sem atraso; senão a cópia do site) e aplica o que for mais novo. */
+async function pullDecisions(silent = true) {
+  let w = null, sha = null;
+  try {
+    if (S.settings.github_token) {
+      const g = await fetch(`https://api.github.com/repos/${REPO}/contents/data/acompanhar.json?ref=main&t=${Date.now()}`, { headers: { Authorization: `Bearer ${S.settings.github_token}`, Accept: "application/vnd.github+json" }, cache: "no-store" });
+      if (g.ok) { const j = await g.json(); sha = j.sha; w = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, ""))))); }
+    }
+    if (!w) { const r = await fetch(`data/acompanhar.json?t=${Date.now()}`, { cache: "no-store" }); if (r.ok) w = await r.json(); }
+  } catch { return { w: null, sha: null, n: 0 }; }
+  if (!w) return { w: null, sha, n: 0 };
+  let n = 0;
+  if (w.decisoes) n = applyRemoteDecisions(w.decisoes);
+  else if (!S.meta.watch_imported) { // formato antigo (só listas): acrescenta uma vez
+    const fav = new Set((w.favoritos || []).map(adId)), apr = new Set((w.aprovados || []).map(adId));
+    for (const l of S.listings) { const k = adId(l.url);
+      if (fav.has(k) && !l.favorite) { l.favorite = true; n++; }
+      if (apr.has(k) && !l.user_approve) { l.user_approve = { at: new Date().toISOString() }; E.reclassify(S, l); n++; } }
+  }
+  S.meta.watch_imported = true;
+  if (n) { stampDecisions(); saveState(S).catch(() => {}); renderCards(); if (!silent || n) toast(`${n} decisão(ões) atualizada(s) com o seu outro aparelho.`); }
+  return { w, sha, n };
+}
+async function importWatch() { await pullDecisions(); }
 function scheduleWatchSync() {
   if (!S?.settings?.github_token) return;
-  clearTimeout(watchTimer);
-  watchTimer = setTimeout(() => syncWatch().catch(() => { /* tenta de novo na próxima alteração */ }), 5000);
+  if (watchTimer) return; // já agendado: não adia de novo (salvamentos seguidos não podem impedir o envio)
+  watchTimer = setTimeout(() => { watchTimer = null; syncWatch().catch(() => { /* tenta de novo na próxima alteração */ }); }, 5000);
 }
 async function syncWatch() {
-  const urls = watchPayload(), sig = JSON.stringify([urls, watchLists()]);
-  if (S.meta.watch_sig === sig) return;
+  // antes de gravar, traz o que o outro aparelho mudou (senão sobrescreveria decisões mais novas de lá)
+  const { w, sha } = await pullDecisions();
+  const remote = (w && w.decisoes) || {};
+  const dec = { ...remote };
+  for (const [k, v] of Object.entries(localDecisions())) if (!dec[k] || new Date(v.at) > new Date(dec[k].at)) dec[k] = v;
+  const urls = watchPayload(), sig = JSON.stringify([urls, watchLists(), dec]);
+  if (S.meta.watch_sig === sig && JSON.stringify(remote) === JSON.stringify(dec)) return;
   const api = `https://api.github.com/repos/${REPO}/contents/data/acompanhar.json`;
   const h = { Authorization: `Bearer ${S.settings.github_token}`, Accept: "application/vnd.github+json" };
-  const g = await fetch(`${api}?ref=main`, { headers: h, cache: "no-store" });
-  const sha = g.ok ? (await g.json()).sha : null;
-  const doc = { updated_at: new Date().toISOString(), origem: "app CarMonitor", nota: "favoritos e aprovados — reconferir todo dia", urls, ...watchLists() };
+  const doc = { updated_at: new Date().toISOString(), origem: "app CarMonitor", nota: "favoritos e aprovados — reconferir todo dia; decisoes = favorito/aprovação/descarte por anúncio (vale a mais recente entre aparelhos)", urls, ...watchLists(), decisoes: dec };
   const r = await fetch(api, { method: "PUT", headers: { ...h, "Content-Type": "application/json" },
     body: JSON.stringify({ message: "Lista de acompanhamento do app", content: b64(JSON.stringify(doc, null, 1) + "\n"), branch: "main", ...(sha ? { sha } : {}) }) });
   if (r.ok) { S.meta.watch_sig = sig; saveState(S).catch(() => {}); }
@@ -1758,7 +1805,7 @@ function handleShare() {
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
   syncResearch(false).then(() => ensureFilterPublished()).then(() => routine(false)).then(() => fillDistancesBg()).catch((e) => console.warn(e));
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") checkAppUpdate().then((upd) => upd || syncResearch(false).then(() => routine(false))).catch(() => {});
+    if (document.visibilityState === "visible") checkAppUpdate().then((upd) => upd || syncResearch(false).then(() => pullDecisions()).then(() => routine(false))).catch(() => {});
   });
   window.__cm = { get state() { return S; } }; // depuração/testes
 })();
