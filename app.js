@@ -8,6 +8,7 @@ import { SEED_SPECS, exclusionLabel, findExclusion as findExcl, validateSpec } f
 import { CATALOG, CITIES, ignoreSuggestions } from "./core/catalog.js";
 import { LEVEL_LABEL, byAdherence, fipeDiscount } from "./core/score.js";
 import { loadState, requestPersistence, saveState } from "./core/store.js";
+import { DAY_PT, DEFAULT_HOURS, fmtMin, hoursOn, hoursText, parseHours, planRoute } from "./core/route.js";
 
 // ---------------------------------------------------------------- utilidades
 const $ = (s, el = document) => el.querySelector(s);
@@ -304,7 +305,9 @@ function renderCards() {
       "Nenhum anúncio ainda. A pesquisa automática traz os anúncios por volta das 6h e das 13h."}</div>` + hiddenNote;
     return;
   }
-  el.innerHTML = hiddenNote + items.map((l) => {
+  const routeBar = ["aprovado", "favoritos"].includes(ui.status) && items.some((l) => l.available !== false)
+    ? `<div class="routeBar"><button class="ghost wide" data-route>🗺 Planejar rota para visitar estes carros</button></div>` : "";
+  el.innerHTML = routeBar + hiddenNote + items.map((l) => {
     const first = l.snapshots.find((s) => s.price)?.price;
     const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
     const optAdas = !S.settings.criteria.adas_required;
@@ -462,6 +465,7 @@ $("#cards").addEventListener("click", (e) => {
   if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
   if (e.target.closest(".cmpFlag")) return;
   if (e.target.closest("[data-togglehidden]")) { ui.showHidden = !ui.showHidden; renderCards(); return; }
+  if (e.target.closest("[data-route]")) { openRoute(); return; }
   const ms = e.target.closest("[data-msg]");
   if (ms) { messageSeller(+ms.dataset.msg); return; }
   const ap = e.target.closest("[data-approve]");
@@ -535,6 +539,7 @@ function toggleCompare(id, input) {
   input?.closest(".cmpFlag")?.classList.toggle("on", ui.compare.has(id));
 }
 $("#cmpBarGo").onclick = () => showView("compare");
+$("#cmpBarRoute").onclick = () => openRoute();
 $("#cmpBarClear").onclick = () => { ui.compare.clear(); saveCompare(); renderCards(); };
 function saveCompare() {
   $("#cmpCount").textContent = ui.compare.size;
@@ -545,6 +550,119 @@ function saveCompare() {
   $("#cmpBarGo").textContent = ui.compare.size >= 2 ? `⇆ Comparar ${ui.compare.size}` : "⇆ Comparar";
   try { localStorage.setItem("cmp", JSON.stringify([...ui.compare])); } catch { /* sem armazenamento */ }
 }
+
+// ---------------------------------------------------------------- rota de visitas
+/** Horário da loja: o que você corrigiu > OpenStreetMap > padrão de loja. Correção é por loja e dia da semana. */
+const DOW_KEY = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const storeKey = (l) => (l.seller || `${l.city}/${l.state}`).toLowerCase().trim();
+function storeHours(l, osm) {
+  const base = parseHours(osm) || parseHours(DEFAULT_HOURS);
+  const fix = (S.settings.store_hours || {})[storeKey(l)] || {};
+  const out = { ...base };
+  for (const [d, v] of Object.entries(fix)) out[d] = v === "off" ? [] : (parseHours(`${d} ${v}`) || {})[d] || out[d];
+  return { hours: out, src: Object.keys(fix).length ? "corrigido por você" : parseHours(osm) ? "OpenStreetMap" : "padrão de loja — confirme com o vendedor" };
+}
+function routeCandidates() {
+  const live = S.listings.filter((l) => !l.archived && l.available !== false && l.status !== "descartado");
+  const pre = ui.compare.size ? live.filter((l) => ui.compare.has(l.id)) : live.filter((l) => l.user_approve || l.favorite);
+  const rest = live.filter((l) => !pre.includes(l)).sort((a, b) => (b.score?.total ?? -1) - (a.score?.total ?? -1));
+  return { list: [...pre, ...rest].slice(0, 30), pre: new Set(pre.slice(0, 8).map((l) => l.id)) };
+}
+let ROUTE = null;
+function openRoute() {
+  const f = $("#routeForm"), { list, pre } = routeCandidates();
+  if (!list.length) return toast("Nenhum carro disponível para visitar.");
+  $("#routeCars").innerHTML = list.map((l) => `<label class="chk"><input type="checkbox" name="car" value="${l.id}" ${pre.has(l.id) ? "checked" : ""}>
+    <span><b>${esc(title(l))} ${esc(l.year_model || "")}</b> · ${brl(l.price)} <span class="small">· ${esc(l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "vendedor ?")} · ${esc(l.city || "?")}${l.user_approve ? " · aprovado" : l.favorite ? " · ★" : ""}</span></span></label>`).join("");
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  if (!f.day.value) f.day.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  f.origin.value = S.settings.route_origin || f.origin.value || S.settings.criteria.ref_location || "";
+  $("#routeResult").innerHTML = "";
+  openSheet("#routeSheet"); history.pushState({ sheet: 7 }, "");
+}
+$("#routeCars").addEventListener("change", (e) => {
+  const on = $$("input[name=car]:checked", $("#routeCars"));
+  if (on.length > 8) { e.target.checked = false; toast("No máximo 8 carros por rota."); }
+});
+$("#routeForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const f = e.target;
+  const cars = $$("input[name=car]:checked", f).map((i) => byId(+i.value)).filter(Boolean);
+  if (!cars.length) return toast("Escolha pelo menos um carro.");
+  act($("button[type=submit]", f), async () => {
+    const out = $("#routeResult");
+    out.innerHTML = `<p class="small">Localizando as lojas e calculando os trajetos… (o mapa gratuito responde 1 consulta por segundo)</p>`;
+    S.settings.route_origin = f.origin.value.trim(); persist();
+    const D = deps.distance;
+    const origin = await D.geocodeText(S, S.settings.route_origin);
+    if (!origin) { out.innerHTML = `<div class="msg bad">Não achei o ponto de partida “${esc(S.settings.route_origin)}” no mapa. Tente com rua e cidade, ou o CEP.</div>`; return; }
+    const stops = [], skipped = [];
+    for (const l of cars) {
+      const loc = await D.locate(S, l.city, l.state, l.address, l.seller_type !== "particular" ? l.seller : null);
+      if (!loc) { skipped.push(l); continue; }
+      stops.push({ l, coords: loc.coords, precision: loc.precision, osm: loc.hours });
+    }
+    persist(); // cache das coordenadas
+    if (!stops.length) { out.innerHTML = `<div class="msg bad">Não consegui localizar nenhuma das lojas no mapa.</div>`; return; }
+    let m;
+    try { m = await D.matrix([origin, ...stops.map((s) => s.coords)]); }
+    catch (err) { out.innerHTML = `<div class="msg bad">O serviço de rotas não respondeu (${esc(err.message || err.name)}). Tente de novo em instantes.</div>`; return; }
+    const k = Number(f.traffic.value) || 1;
+    ROUTE = { f: { day: f.day.value, start: f.start.value, visit: Number(f.visit.value) || 45, back: f.back.checked, traffic: k, origin: S.settings.route_origin },
+      originCoords: origin, stops, skipped, matrix: { min: m.min.map((r) => r.map((x) => x * k)), km: m.km } };
+    renderRoute();
+  });
+});
+function renderRoute() {
+  const R = ROUTE; if (!R) return;
+  const [y, mo, d] = R.f.day.split("-").map(Number); const date = new Date(y, mo - 1, d);
+  const [hh, mm] = R.f.start.split(":").map(Number);
+  const stops = R.stops.map((s) => { const h = storeHours(s.l, s.osm); return { ...s, hours: h.hours, hsrc: h.src }; });
+  const plan = planRoute({ stops, matrix: R.matrix, date, startMin: hh * 60 + mm, visit: R.f.visit, back: R.f.back });
+  const dow = plan.dow, dayName = date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
+  const okLegs = plan.legs.filter((g) => g.status === "ok"), badLegs = plan.legs.filter((g) => g.status !== "ok");
+  const PREC = { endereco: "endereço do anúncio", loja: "local da loja no mapa", cidade: "⚠ local aproximado (centro da cidade) — confirme o endereço com o vendedor" };
+  const legHtml = (g, n) => {
+    const s = stops[g.i], l = s.l, dk = DOW_KEY[dow], ok = g.status === "ok";
+    const r1 = hoursOn(s.hours, dow)[0];
+    return `<li class="rleg ${ok ? "" : "bad"}">
+      <div class="rtime">${ok ? `<b>${fmtMin(g.start)}</b>${g.wait > 4 ? `<span class="small">chega ${fmtMin(g.arrive)}, espera abrir</span>` : ""}` : "—"}</div>
+      <div><b>${n ? n + ". " : ""}${esc(l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "Vendedor")}</b> <span class="small">· ${esc(l.city || "")}</span><br>
+        ${esc(title(l))} ${esc(l.year_model || "")} · ${brl(l.price)} · ${num(l.km, " km")}<br>
+        <span class="small">${Math.round(g.travel)} min · ${g.km != null ? g.km.toFixed(1) + " km" : ""} desde o ponto anterior · ${PREC[s.precision]}</span><br>
+        <span class="small">Horário ${DAY_PT[dk]}: <b>${hoursText(s.hours, dow)}</b> (${esc(s.hsrc)})</span>
+        ${ok ? "" : `<div class="why">✕ ${esc(g.status === "fechada no dia" ? `Loja fechada neste dia (${DAY_PT[dk]})` : "Não dá tempo: chega depois do fechamento")}</div>`}
+        <details class="rfix"><summary class="small">corrigir horário de ${DAY_PT[dk]} desta loja</summary>
+          <div class="row2"><label>Abre<input type="time" data-hopen="${g.i}" value="${r1 ? fmtMin(r1[0]) : "09:00"}"></label><label>Fecha<input type="time" data-hclose="${g.i}" value="${r1 ? fmtMin(r1[1]) : "18:00"}"></label></div>
+          <div class="cardActions"><button type="button" data-hsave="${g.i}">Salvar e refazer rota</button><button type="button" class="ghost" data-hoff="${g.i}">Fechada neste dia</button></div>
+        </details>
+        <a class="small" href="https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}" target="_blank" rel="noopener">ver no mapa ↗</a> · <a class="small" href="#" data-open="${l.id}">ver anúncio no app</a>
+      </div></li>`;
+  };
+  const wp = okLegs.map((g) => stops[g.i].coords.join(","));
+  const dest = R.f.back ? R.originCoords.join(",") : wp.pop();
+  const gmaps = okLegs.length ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${R.originCoords.join(",")}&destination=${dest}${wp.length ? `&waypoints=${encodeURIComponent(wp.join("|"))}` : ""}` : null;
+  const summary = `${dayName[0].toUpperCase() + dayName.slice(1)} · saída ${R.f.start} · ${okLegs.length} de ${stops.length} loja(s) dentro do horário · ${R.f.back ? "volta" : "fim"} prevista ${fmtMin(plan.end)} · ${plan.km} km`;
+  ROUTE.text = [`Rota de visitas — ${summary}`, `Saída: ${R.f.origin}`, ...okLegs.map((g, n) => { const s = stops[g.i]; return `${n + 1}. ${fmtMin(g.start)} — ${s.l.seller || "Vendedor"} (${s.l.city}) — ${title(s.l)} ${s.l.year_model || ""} ${brl(s.l.price)} — ${s.l.url}`; }),
+    ...(badLegs.length ? ["Fora do horário: " + badLegs.map((g) => `${stops[g.i].l.seller || title(stops[g.i].l)} (${g.status})`).join("; ")] : []), gmaps ? `Mapa: ${gmaps}` : ""].filter(Boolean).join("\n");
+  $("#routeResult").innerHTML = `<div class="rsum"><b>${esc(summary)}</b>
+      <p class="small">Tempos de carro calculados pelo OSRM (sem trânsito em tempo real) ${R.f.traffic > 1 ? `com +${Math.round((R.f.traffic - 1) * 100)}% de margem para trânsito` : ""}; ${R.f.visit} min em cada loja. A ordem foi escolhida para caber no horário de cada loja e terminar mais cedo. Feriados não são considerados.</p></div>
+    <ol class="rlist">${okLegs.map((g, n) => legHtml(g, n + 1)).join("")}</ol>
+    ${badLegs.length ? `<h3 class="rsub">Não cabem neste dia</h3><ol class="rlist">${badLegs.map((g) => legHtml(g, 0)).join("")}</ol>` : ""}
+    ${R.skipped.length ? `<p class="small">Sem localização no mapa (não entraram): ${R.skipped.map((l) => esc(title(l))).join(", ")}.</p>` : ""}
+    ${stops.some((s) => s.hsrc.startsWith("padrão")) ? `<p class="small">⚠ Lojas com horário “padrão” (seg–sex 9h–18h, sáb 9h–14h) não têm horário no mapa: confirme com o vendedor e corrija acima se precisar. Vale ligar ou mandar mensagem antes para agendar e confirmar que o carro ainda está lá.</p>` : ""}
+    <div class="cardActions">${gmaps ? `<a class="btn primary wide" href="${esc(gmaps)}" target="_blank" rel="noopener">Abrir rota no Google Maps ↗</a>` : ""}<button type="button" class="wide" id="routeCopy">Copiar roteiro</button></div>`;
+}
+$("#routeResult").addEventListener("click", (e) => {
+  const o = e.target.closest("[data-open]"); if (o) { e.preventDefault(); history.back(); setTimeout(() => openDetail(+o.dataset.open), 150); return; }
+  if (e.target.closest("#routeCopy")) { (navigator.clipboard?.writeText(ROUTE.text) || Promise.reject()).then(() => toast("Roteiro copiado.")).catch(() => toast("Não consegui copiar.")); return; }
+  const sv = e.target.closest("[data-hsave],[data-hoff]"); if (!sv || !ROUTE) return;
+  const i = +(sv.dataset.hsave ?? sv.dataset.hoff), s = ROUTE.stops[i];
+  const [y, mo, d] = ROUTE.f.day.split("-").map(Number); const dk = DOW_KEY[new Date(y, mo - 1, d).getDay()];
+  S.settings.store_hours ||= {}; const fix = (S.settings.store_hours[storeKey(s.l)] ||= {});
+  if (sv.dataset.hoff != null) fix[dk] = "off";
+  else { const a = $(`[data-hopen="${i}"]`).value, b = $(`[data-hclose="${i}"]`).value; if (!a || !b || a >= b) return toast("Horário inválido."); fix[dk] = `${a}-${b}`; }
+  persist(); renderRoute(); toast("Horário salvo para esta loja; rota refeita.");
+});
 
 // ---------------------------------------------------------------- importar
 $("#addBtn").onclick = () => openImport();

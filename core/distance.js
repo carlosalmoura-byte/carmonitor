@@ -25,9 +25,12 @@ export function makeDistance(fetchFn = (...a) => fetch(...a)) {
       const wait = lastNominatim + 1100 - Date.now();
       if (wait > 0) await sleep(wait);
       lastNominatim = Date.now();
-      const d = await getJson(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=br&q=${encodeURIComponent(q)}`);
+      const d = await getJson(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=br&extratags=1&q=${encodeURIComponent(q)}`);
       // poiOnly: só aceita estabelecimento/endereço, nunca a cidade/bairro inteiro (sinal de que a loja não foi achada)
-      if (d[0] && !(poiOnly && ["boundary", "place"].includes(d[0].category))) coords = [Number(d[0].lat), Number(d[0].lon)];
+      if (d[0] && !(poiOnly && ["boundary", "place"].includes(d[0].category))) {
+        coords = [Number(d[0].lat), Number(d[0].lon)];
+        if (d[0].extratags?.opening_hours) state.geo_cache[`hours:${ck}`] = d[0].extratags.opening_hours; // horário da loja no OpenStreetMap
+      }
     }
     state.geo_cache[ck] = coords || false;
     return coords;
@@ -88,5 +91,29 @@ export function makeDistance(fetchFn = (...a) => fetch(...a)) {
       return { km: null, status: "nao_verificada", precision: null, note: `Falha no serviço de rotas (${e.message || e.name}). Sem internet? Tente de novo.` };
     }
   }
+  /** Coordenadas do carro: endereço do anúncio > loja achada no mapa (até 40 km do centro) > centro da cidade. Traz o horário do mapa se houver. */
+  async function locate(state, city, uf, address, store) {
+    const provider = "osrm"; // Nominatim (gratuito)
+    if (!city || !uf) return null;
+    if (address) { const c = await geocode(state, provider, `${address}, ${city}, ${uf}, Brasil`); if (c) return { coords: c, precision: "endereco", hours: null }; }
+    const center = await geocode(state, provider, `${city}, ${uf}, Brasil`);
+    const sq = storeQuery(store);
+    if (sq.length >= 4) {
+      const q = `${sq}, ${city}, ${uf}`;
+      const shop = await geocode(state, provider, q, true);
+      if (shop && center && straight(shop, center) <= 40) return { coords: shop, precision: "loja", hours: state.geo_cache[`hours:geo:${provider}:poi:${q.toLowerCase()}`] || null };
+    }
+    return center ? { coords: center, precision: "cidade", hours: null } : null;
+  }
+  /** Ponto de partida digitado (endereço, CEP ou cidade). */
+  const geocodeText = (state, q) => geocode(state, "osrm", /brasil/i.test(q) ? q : `${q}, Brasil`);
+  /** Matriz de tempos (min) e distâncias (km) de carro entre todos os pontos — OSRM /table (sem trânsito). */
+  async function matrix(points) {
+    const coords = points.map(([la, lo]) => `${lo},${la}`).join(";");
+    const d = await getJson(`https://router.project-osrm.org/table/v1/driving/${coords}?annotations=duration,distance`);
+    if (d.code !== "Ok") throw new Error(d.message || d.code);
+    return { min: d.durations.map((r) => r.map((s) => (s == null ? 9999 : s / 60))), km: d.distances.map((r) => r.map((m) => (m == null ? 0 : m / 1000))) };
+  }
+  distance.locate = locate; distance.geocodeText = geocodeText; distance.matrix = matrix;
   return distance;
 }

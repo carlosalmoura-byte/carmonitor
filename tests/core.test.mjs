@@ -424,3 +424,22 @@ test("fotos: mínimo do filtro, sem foto e anúncio em preparação", () => {
   assert.ok(JSON.stringify(ex).includes('"photos"'));
   assert.ok(JSON.stringify(ex).includes('"preparing"'));
 });
+
+test("roteiro: horário do mapa, ordem que cabe no funcionamento e loja fechada", async () => {
+  const { parseHours, planRoute, hoursText, DEFAULT_HOURS } = await import("../core/route.js");
+  const h = parseHours("Mo-Fr 09:00-18:00; Sa 09:00-13:00");
+  assert.deepEqual(h.Sa, [[540, 780]]); assert.deepEqual(h.Su, []);
+  assert.equal(hoursText(parseHours("Mo-Sa 08:00-12:00,13:00-18:00"), 3), "08:00–12:00, 13:00–18:00");
+  assert.equal(parseHours("bobagem"), null);
+  assert.ok(parseHours(DEFAULT_HOURS).Mo.length);
+  // origem + 3 lojas; loja B fecha cedo no sábado (11h) e fica longe de C
+  const min = [[0, 30, 20, 60], [30, 0, 25, 40], [20, 25, 0, 50], [60, 40, 50, 0]];
+  const km = min.map((r) => r.map((x) => x / 2));
+  const stops = [{ id: "A", hours: h }, { id: "B", hours: parseHours("Sa 09:00-11:00") }, { id: "C", hours: h }];
+  const sat = new Date(2026, 10, 14); // sábado
+  const r = planRoute({ stops, matrix: { min, km }, date: sat, startMin: 9 * 60, visit: 30 });
+  assert.equal(r.ok, 3);
+  assert.equal(stops[r.legs[0].i].id, "B"); // a que fecha mais cedo vem primeiro
+  const sun = planRoute({ stops, matrix: { min, km }, date: new Date(2026, 10, 15), startMin: 9 * 60, visit: 30 });
+  assert.equal(sun.ok, 0); assert.ok(sun.legs.every((l) => l.status === "fechada no dia"));
+});
