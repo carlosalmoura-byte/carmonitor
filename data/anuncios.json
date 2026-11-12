@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-11T20:18:50.389Z",
+ "generated_at": "2026-11-12T13:07:07.679Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -1229,6 +1229,48 @@
    "url": "https://www.webmotors.com.br/comprar/volkswagen/virtus/10-170-tsi-automatico/4-portas/2023/82153835",
    "checked_at": "2026-11-11T20:00:47.159Z",
    "available": false
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/citroen/basalt/10-turbo-200-flex-shine-cvt/4-portas/2025-2026/82119134",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "CITROËN BASALT 1.0 TURBO 200 FLEX SHINE CVT\nPreço: R$ 96.500\nAno: 2025/2026\nKM: 10.000\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 101.450 (Tabela Fipe no WebMotors, nov/2026)\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/citroen/basalt/10-turbo-200-flex-shine-cvt/4-portas/2025/82166642",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "CITROËN BASALT 1.0 TURBO 200 FLEX SHINE CVT\nPreço: R$ 100.000\nAno: 2025/2025\nKM: 11.000\nCidade: Guarulhos - SP\nVendedor: (não verificado)\nFIPE: R$ 98.046 (Tabela Fipe no WebMotors, ago/2026)\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-comfortline-automatico/4-portas/2025/82158132",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "VOLKSWAGEN POLO 1.0 170 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 88.990\nAno: 2025/2025\nKM: 37.300\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 94.705 (Tabela Fipe no WebMotors, out/2026)\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/nivus/10-200-tsi-total-flex-comfortline-automatico/4-portas/2024/82157994",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "VOLKSWAGEN NIVUS 1.0 200 TSI TOTAL FLEX COMFORTLINE AUTOMÁTICO\nPreço: R$ 96.990\nAno: 2024/2024\nKM: 35.300\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 101.430 (Tabela Fipe no WebMotors, nov/2026)\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/nivus/10-200-tsi-total-flex-comfortline-automatico/4-portas/2024/82096445",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "VOLKSWAGEN NIVUS 1.0 200 TSI TOTAL FLEX COMFORTLINE AUTOMÁTICO\nPreço: R$ 99.890\nAno: 2024/2024\nKM: 24.000\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 101.430 (Tabela Fipe no WebMotors, nov/2026)\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/toyota/yaris/15-16v-flex-xs-connect-multidrive/4-portas/2022-2023/82103400",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "TOYOTA YARIS 1.5 16V FLEX XS CONNECT MULTIDRIVE\nPreço: R$ 92.890\nAno: 2022/2023\nKM: 34.000\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: não encontrada\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/toyota/yaris/13-16v-flex-xl-live-multidrive/4-portas/2022-2023/81577460",
+   "checked_at": "2026-11-12T13:07:07.679Z",
+   "text": "TOYOTA YARIS 1.3 16V FLEX XL LIVE MULTIDRIVE\nPreço: R$ 84.000\nAno: 2022/2023\nKM: 28.000\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: não encontrada\nOrigem: cartão da listagem (página do anúncio não abriu)",
+   "available": true
   }
  ]
 }

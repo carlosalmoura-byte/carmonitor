@@ -2890,5 +2890,50 @@
    "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
   },
   "note": "Virtus 2023: indução de série em todas as versões e AEB+ACC em todas as automáticas — vale para a TSI AT (anunciada como “170 TSI Automático”)."
+ },
+ {
+  "id": "citroen-basalt-shine-2026",
+  "make": "citroen",
+  "model": "basalt",
+  "version_includes": [
+   "shine"
+  ],
+  "version_excludes": [],
+  "year_from": 2026,
+  "year_to": 2026,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Feel: \"Citroën Connect touchscreen 10,25\" + espelhamento Android Auto e Apple Car Play sem fio\"; Shine: \"Todos os itens da versão Feel Turbo mais\" (Feel Turbo: \"Todos os itens da versão Feel mais\")"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "lista completa de série da Shine 2026 (itens da Feel + Feel Turbo + Shine no release oficial) sem carregador por indução/sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "lista completa de série da Shine 2026 sem frenagem autônoma, faixa, ponto cego ou ACC — só \"Controlador e limitador de velocidade com comandos no volante\""
+   }
+  },
+  "tech": {
+   "body": "SUV cupê compacto",
+   "engine": "1.0 turbo T200 (3 cil.)",
+   "power_e": 130,
+   "torque_e": 20.4,
+   "gearbox": "CVT",
+   "city_g": 12.1,
+   "city_e": 8.4,
+   "source": {
+    "title": "WebMotors — Citroën Basalt Shine CVT 2026",
+    "quality": "secundária",
+    "url": "https://www.webmotors.com.br/citroen/basalt/2026/1-0-turbo-200-flex-shine-cvt/387666"
+   }
+  },
+  "source": {
+   "title": "Stellantis Media — Gama Citroën Basalt 2026 (set/2025)",
+   "quality": "oficial",
+   "url": "https://www.media.stellantis.com/br-pt/citroen/press/gama-citroen-basalt-2026-evolui-traz-versao-especial-e-se-mantem-como-o-suv-mais-acessivel-do-brasil"
+  },
+  "note": "Pesquisa pela nuvem (reserva) 12/11/2026. Porta-malas não informado na fonte."
  }
 ]
