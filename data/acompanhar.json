@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-13T15:01:44.423Z",
+ "updated_at": "2026-11-13T15:02:15.246Z",
  "origem": "app CarMonitor",
  "nota": "favoritos e aprovados — reconferir todo dia; decisoes = favorito/aprovação/descarte por anúncio (vale a mais recente entre aparelhos)",
  "urls": [
@@ -38,8 +38,8 @@
   "80613467": {
    "f": 0,
    "a": 0,
-   "d": null,
-   "at": "2026-11-13T15:01:22.908Z"
+   "d": "",
+   "at": "2026-11-13T15:02:09.710Z"
   },
   "80721542": {
    "f": 1,
