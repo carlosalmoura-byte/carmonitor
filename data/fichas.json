@@ -2935,5 +2935,47 @@
    "url": "https://www.media.stellantis.com/br-pt/citroen/press/gama-citroen-basalt-2026-evolui-traz-versao-especial-e-se-mantem-como-o-suv-mais-acessivel-do-brasil"
   },
   "note": "Pesquisa pela nuvem (reserva) 12/11/2026. Porta-malas não informado na fonte."
+ },
+ {
+  "id": "vw-virtus-comfortline-2025",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "200 tsi comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "O sistema de carregamento por indução também é uma conveniência presente em todas as versões. — Conexão Tocantins, Virtus 2025 (dez/2024)"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "central multimídia VW Play de 10 polegadas com conexão sem fio para Android Auto e Apple CarPlay — Motor Agora, linha Virtus 2025 (https://www.motoragora.com.br/?p=154486)"
+   }
+  },
+  "tech": {
+   "body": "Sedã compacto",
+   "engine": "1.0 TSI 200 (3 cil.)",
+   "power_g": 116,
+   "power_e": 128,
+   "torque_g": 20.4,
+   "torque_e": 20.4,
+   "gearbox": "Automático, 6 marchas",
+   "trunk_l": 521,
+   "source": {
+    "title": "Ficha Completa — Virtus Comfortline 1.0 TSI 2025",
+    "quality": "secundária",
+    "url": "https://www.fichacompleta.com.br/en/carros/comparativo/virtus-comfortline-1-0-tsi-2025-vs-virtus-1-0-tsi-2026"
+   }
+  },
+  "source": {
+   "title": "Conexão Tocantins — Volkswagen reforça versatilidade e inovação do Virtus 2025",
+   "quality": "secundária",
+   "url": "https://conexaoto.com.br/2024/12/19/volkswagen-reforca-versatilidade-e-inovacao-do-virtus-2025"
+  },
+  "note": "Fontes secundárias citam indução e AA sem fio em todas as versões 2025. ADAS sem fonte para a Comfortline (imprensa associa AEB/ACC às versões mais caras; lista completa de série não encontrada)."
  }
 ]
