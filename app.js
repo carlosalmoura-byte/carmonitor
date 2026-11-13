@@ -354,7 +354,7 @@ function renderCards() {
     return;
   }
   const routeBar = ["aprovado", "favoritos"].includes(ui.status) && items.some((l) => l.available !== false)
-    ? `<div class="routeBar"><button class="ghost wide" data-route="${ui.status === "favoritos" ? "favoritos" : "aprovados"}">🗺 Rota para visitar todos os ${ui.status === "favoritos" ? "favoritos" : "aprovados"}</button></div>` : "";
+    ? `<div class="routeBar">${S.saved_route?.stops?.length ? `<button class="primary wide" data-routesaved>🗺 Ver rota salva · ${esc(new Date(S.saved_route.f.day + "T12:00").toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" }))}</button>` : ""}<button class="ghost wide" data-route="${ui.status === "favoritos" ? "favoritos" : "aprovados"}">🗺 ${S.saved_route ? "Nova rota" : "Rota"} para visitar todos os ${ui.status === "favoritos" ? "favoritos" : "aprovados"}</button></div>` : "";
   el.innerHTML = routeBar + hiddenNote + items.map((l) => {
     const first = l.snapshots.find((s) => s.price)?.price;
     const delta = first && l.price && l.price !== first ? `<span class="delta ${l.price < first ? "down" : "up"}">${l.price < first ? "▼" : "▲"} ${brl(Math.abs(l.price - first))}</span>` : "";
@@ -513,7 +513,8 @@ $("#cards").addEventListener("click", (e) => {
   if (cf) { toggleCompare(+cf.dataset.cmpflag, cf); return; }
   if (e.target.closest(".cmpFlag")) return;
   if (e.target.closest("[data-togglehidden]")) { ui.showHidden = !ui.showHidden; renderCards(); return; }
-  const rb = e.target.closest("[data-route]"); if (rb) { openRoute(rb.dataset.route || null); return; }
+  if (e.target.closest("[data-routesaved]")) { openRoute(null, { showSaved: true }); return; }
+  const rb = e.target.closest("[data-route]"); if (rb) { ROUTE = null; openRoute(rb.dataset.route || null); $("#routeResult").innerHTML = ""; return; }
   const ms = e.target.closest("[data-msg]");
   if (ms) { messageSeller(+ms.dataset.msg); return; }
   const ap = e.target.closest("[data-approve]");
@@ -624,12 +625,18 @@ function routeCandidates(scope) {
   return { list: [...pre, ...rest].slice(0, 30), pre: new Set(pre.slice(0, 12).map((l) => l.id)) };
 }
 let ROUTE = null;
+/** Cópia dos dados do carro na rota (a rota salva continua legível mesmo se o anúncio sair do app). */
+const routeSnap = (l) => ({ id: l.id, make: l.make, model: l.model, title: l.title, version: l.version, year_fab: l.year_fab, year_model: l.year_model,
+  price: l.price, km: l.km, seller: l.seller, seller_type: l.seller_type, city: l.city, state: l.state, address: l.address, url: l.url, color: l.color });
+/** Dados atuais do carro (se ainda estiver no app) por cima da cópia salva. */
+const routeCar = (s) => { const live = byId(s.id); return live ? { ...s.l, ...routeSnap(live), gone: live.available === false } : { ...s.l, gone: true, missing: true }; };
+const sellerName = (l) => (l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "Vendedor");
 function setRouteSelection(ids, label) {
   const want = ids.slice(0, 12);
   $$("input[name=car]", $("#routeCars")).forEach((i) => { i.checked = want.includes(+i.value); });
   if (ids.length > 12) toast(`${label}: ${ids.length} carros — marquei os 12 de maior nota (limite da rota).`);
 }
-function openRoute(scope = null) {
+function openRoute(scope = null, opts = {}) {
   const f = $("#routeForm"), { list, pre } = routeCandidates(scope);
   if (!list.length) return toast("Nenhum carro disponível para visitar.");
   $("#routeCars").innerHTML = list.map((l) => `<label class="chk"><input type="checkbox" name="car" value="${l.id}" ${pre.has(l.id) ? "checked" : ""}>
@@ -643,8 +650,10 @@ function openRoute(scope = null) {
   if (!f.day.value) f.day.value = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
   f.origin.value = S.settings.route_origin || f.origin.value || "";
   $("#routeOriginHint").textContent = S.settings.route_origin_label ? `Último ponto de partida: ${S.settings.route_origin_label}` : "Digite o CEP (só números ou com hífen) ou a rua com número e cidade.";
-  $("#routeResult").innerHTML = "";
+  ROUTE = ROUTE || S.saved_route || null;
+  if (ROUTE?.stops?.length) { renderRoute(); } else $("#routeResult").innerHTML = "";
   openSheet("#routeSheet"); history.pushState({ sheet: 7 }, "");
+  if (ROUTE?.stops?.length && opts.showSaved) setTimeout(() => $("#routeResult").scrollIntoView({ block: "start" }), 120);
 }
 $("#routeQuick").addEventListener("click", (e) => {
   const b = e.target.closest("[data-rsel]"); if (!b) return;
@@ -701,8 +710,8 @@ $("#routeForm").addEventListener("submit", (e) => {
     const stops = [], skipped = [];
     for (const l of cars) {
       const loc = await D.locate(S, l.city, l.state, l.address, l.seller_type !== "particular" ? l.seller : null);
-      if (!loc) { skipped.push(l); continue; }
-      stops.push({ l, coords: loc.coords, precision: loc.precision, osm: loc.hours });
+      if (!loc) { skipped.push(routeSnap(l)); continue; }
+      stops.push({ id: l.id, l: routeSnap(l), coords: loc.coords, precision: loc.precision, osm: loc.hours });
     }
     persist(); // cache das coordenadas
     if (!stops.length) { out.innerHTML = `<div class="msg bad">Não consegui localizar nenhuma das lojas no mapa.</div>`; return; }
@@ -711,7 +720,8 @@ $("#routeForm").addEventListener("submit", (e) => {
     catch (err) { out.innerHTML = `<div class="msg bad">O serviço de rotas não respondeu (${esc(err.message || err.name)}). Tente de novo em instantes.</div>`; return; }
     const k = Number(f.traffic.value) || 1;
     ROUTE = { f: { day: f.day.value, start: f.start.value, visit: Number(f.visit.value) || 45, back: f.back.checked, traffic: k, origin: o.label },
-      originCoords: origin, stops, skipped, matrix: { min: m.min.map((r) => r.map((x) => x * k)), km: m.km } };
+      originCoords: origin, stops, skipped, matrix: { min: m.min.map((r) => r.map((x) => x * k)), km: m.km }, saved_at: new Date().toISOString() };
+    S.saved_route = ROUTE; persist(); // fica salva: reabre igual depois de fechar o app
     renderRoute();
   });
 });
@@ -719,7 +729,7 @@ function renderRoute() {
   const R = ROUTE; if (!R) return;
   const [y, mo, d] = R.f.day.split("-").map(Number); const date = new Date(y, mo - 1, d);
   const [hh, mm] = R.f.start.split(":").map(Number);
-  const stops = R.stops.map((s) => { const h = storeHours(s.l, s.osm); return { ...s, hours: h.hours, hsrc: h.src }; });
+  const stops = R.stops.map((s) => { const l = routeCar(s), h = storeHours(l, s.osm); return { ...s, l, hours: h.hours, hsrc: h.src }; });
   const plan = planRoute({ stops, matrix: R.matrix, date, startMin: hh * 60 + mm, visit: R.f.visit, back: R.f.back });
   const dow = plan.dow, dayName = date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
   const okLegs = plan.legs.filter((g) => g.status === "ok"), badLegs = plan.legs.filter((g) => g.status !== "ok");
@@ -729,7 +739,7 @@ function renderRoute() {
     const r1 = hoursOn(s.hours, dow)[0];
     return `<li class="rleg ${ok ? "" : "bad"}">
       <div class="rtime">${ok ? `<b>${fmtMin(g.start)}</b>${g.wait > 4 ? `<span class="small">chega ${fmtMin(g.arrive)}, espera abrir</span>` : ""}` : "—"}</div>
-      <div><b>${n ? n + ". " : ""}${esc(l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "Vendedor")}</b> <span class="small">· ${esc(l.city || "")}</span><br>
+      <div><b>${n ? n + ". " : ""}${esc(sellerName(l))}</b> <span class="small">· ${esc(l.city || "")}</span>${l.gone ? ` <span class="chip ausente">anúncio saiu do ar</span>` : ""}<br>
         ${esc(title(l))} ${esc(l.year_model || "")} · ${brl(l.price)} · ${num(l.km, " km")}<br>
         <span class="small">${Math.round(g.travel)} min · ${g.km != null ? g.km.toFixed(1) + " km" : ""} desde o ponto anterior · ${PREC[s.precision]}</span><br>
         <span class="small">Horário ${DAY_PT[dk]}: <b>${hoursText(s.hours, dow)}</b> (${esc(s.hsrc)})</span>
@@ -738,13 +748,14 @@ function renderRoute() {
           <div class="row2"><label>Abre<input type="time" data-hopen="${g.i}" value="${r1 ? fmtMin(r1[0]) : "09:00"}"></label><label>Fecha<input type="time" data-hclose="${g.i}" value="${r1 ? fmtMin(r1[1]) : "18:00"}"></label></div>
           <div class="cardActions"><button type="button" data-hsave="${g.i}">Salvar e refazer rota</button><button type="button" class="ghost" data-hoff="${g.i}">Fechada neste dia</button></div>
         </details>
-        <a class="small" href="https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}" target="_blank" rel="noopener">ver no mapa ↗</a> · <a class="small" href="#" data-open="${l.id}">ver anúncio no app</a>
+        <a class="small" href="https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}" target="_blank" rel="noopener">ver no mapa ↗</a> · ${l.missing ? `<a class="small" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">ver anúncio ↗</a>` : `<a class="small" href="#" data-open="${l.id}">ver anúncio no app</a>`}
       </div></li>`;
   };
   const wp = okLegs.map((g) => stops[g.i].coords.join(","));
   const dest = R.f.back ? R.originCoords.join(",") : wp.pop();
   const gmaps = okLegs.length ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${R.originCoords.join(",")}&destination=${dest}${wp.length ? `&waypoints=${encodeURIComponent(wp.join("|"))}` : ""}` : null;
   const summary = `${dayName[0].toUpperCase() + dayName.slice(1)} · saída ${R.f.start} de ${R.f.origin} · ${okLegs.length} de ${stops.length} loja(s) dentro do horário · ${R.f.back ? "volta" : "fim"} prevista ${fmtMin(plan.end)} · ${plan.km} km`;
+  ROUTE.view = { summary, gmaps, dayName, dow, plan, okLegs, badLegs, stops };
   ROUTE.text = [`Rota de visitas — ${summary}`, `Saída: ${R.f.origin}`, ...okLegs.map((g, n) => { const s = stops[g.i]; return `${n + 1}. ${fmtMin(g.start)} — ${s.l.seller || "Vendedor"} (${s.l.city}) — ${title(s.l)} ${s.l.year_model || ""} ${brl(s.l.price)} — ${s.l.url}`; }),
     ...(badLegs.length ? ["Fora do horário: " + badLegs.map((g) => `${stops[g.i].l.seller || title(stops[g.i].l)} (${g.status})`).join("; ")] : []), gmaps ? `Mapa: ${gmaps}` : ""].filter(Boolean).join("\n");
   $("#routeResult").innerHTML = `<div class="rsum"><b>${esc(summary)}</b>
@@ -753,18 +764,75 @@ function renderRoute() {
     ${badLegs.length ? `<h3 class="rsub">Não cabem neste dia</h3><ol class="rlist">${badLegs.map((g) => legHtml(g, 0)).join("")}</ol>` : ""}
     ${R.skipped.length ? `<p class="small">Sem localização no mapa (não entraram): ${R.skipped.map((l) => esc(title(l))).join(", ")}.</p>` : ""}
     ${stops.some((s) => s.hsrc.startsWith("padrão")) ? `<p class="small">⚠ Lojas com horário “padrão” (seg–sex 9h–18h, sáb 9h–14h) não têm horário no mapa: confirme com o vendedor e corrija acima se precisar. Vale ligar ou mandar mensagem antes para agendar e confirmar que o carro ainda está lá.</p>` : ""}
-    <div class="cardActions">${gmaps ? `<a class="btn primary wide" href="${esc(gmaps)}" target="_blank" rel="noopener">Abrir rota no Google Maps ↗</a>` : ""}<button type="button" class="wide" id="routeCopy">Copiar roteiro</button></div>`;
+    <div class="cardActions">${gmaps ? `<a class="btn primary wide" href="${esc(gmaps)}" target="_blank" rel="noopener">Abrir rota no Google Maps ↗</a>` : ""}
+      <button type="button" class="wide" id="routeExport">📄 Exportar roteiro</button><button type="button" class="wide ghost" id="routeCopy">Copiar como texto</button></div>
+    <p class="small">✓ Rota salva${R.saved_at ? ` em ${esc(E.fmtDate(R.saved_at))}` : ""} — continua aqui mesmo se você fechar o app. <a href="#" id="routeForget">Apagar rota salva</a></p>`;
+}
+/** Roteiro “amigável”: página HTML própria (abre em qualquer celular/computador, dá para imprimir ou salvar em PDF). */
+function routeExportHtml() {
+  const R = ROUTE, V = R.view; const e = (x) => esc(String(x ?? ""));
+  const PREC = { endereco: "Endereço do anúncio", loja: "Local da loja no mapa", cidade: "Local aproximado (centro da cidade) — confirme o endereço com o vendedor" };
+  const card = (g, n) => { const s = V.stops[g.i], l = s.l, ok = g.status === "ok";
+    const maps = `https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}`;
+    return `<article class="stop ${ok ? "" : "off"}"><div class="time">${ok ? fmtMin(g.start) : "—"}${ok && g.wait > 4 ? `<small>chega ${fmtMin(g.arrive)}</small>` : ""}</div>
+      <div class="body"><h2>${n ? `<span class="n">${n}</span>` : ""}${e(sellerName(l))}</h2>
+      <p class="car"><b>${e(title(l))} ${e(l.year_model || "")}</b>${l.version ? ` · ${e(l.version)}` : ""}</p>
+      <p class="facts"><span>${e(brl(l.price))}</span><span>${e(num(l.km, " km"))}</span>${l.color ? `<span>${e(l.color)}</span>` : ""}<span>${e(l.city || "")}${l.state ? "/" + e(l.state) : ""}</span></p>
+      <p class="muted">Horário ${e(DAY_PT[DOW_KEY[V.dow]])}: <b>${e(hoursText(s.hours, V.dow))}</b> · ${e(s.hsrc)}</p>
+      <p class="muted">${Math.round(g.travel)} min de carro desde o ponto anterior · ${e(PREC[s.precision])}</p>
+      ${ok ? "" : `<p class="warn">${g.status === "fechada no dia" ? "Loja fechada neste dia" : "Não dá tempo: chega depois do fechamento"}</p>`}
+      ${l.gone ? `<p class="warn">O anúncio saiu do ar — confirme com o vendedor antes de ir.</p>` : ""}
+      <p class="links"><a href="${e(maps)}">📍 Mapa</a><a href="${e(l.url)}">🔗 Anúncio no WebMotors</a></p></div></article>`; };
+  const title0 = `Rota de visitas — ${V.dayName}`;
+  return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title0)}</title>
+<style>:root{--ink:#17201b;--muted:#5d6861;--line:#dfe2dc;--acc:#1f6f5c;--bg:#f4f5f2;--card:#fff;--warn:#a33}
+@media (prefers-color-scheme:dark){:root{--ink:#e7ece8;--muted:#9aa59e;--line:#2c3430;--acc:#5fc5a6;--bg:#111513;--card:#191e1b;--warn:#f08a8a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 40px}h1{font-size:1.45rem;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 18px}.sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.sum b{display:block;font-size:1.15rem}.sum span{color:var(--muted);font-size:.85rem}
+.btn{display:block;text-align:center;background:var(--acc);color:#fff;text-decoration:none;font-weight:600;padding:12px;border-radius:12px;margin:0 0 18px}
+.stop{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 10px;break-inside:avoid}
+.stop.off{opacity:.7}.time{font-size:1.3rem;font-weight:700;color:var(--acc)}.time small{display:block;font-size:.72rem;color:var(--muted);font-weight:400}
+h2{font-size:1.05rem;margin:0 0 4px;display:flex;gap:8px;align-items:center}.n{background:var(--acc);color:#fff;border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;font-size:.8rem}
+p{margin:3px 0}.facts{display:flex;flex-wrap:wrap;gap:6px 12px}.facts span{white-space:nowrap}.muted{color:var(--muted);font-size:.9rem}.warn{color:var(--warn);font-weight:600;font-size:.9rem}
+.links{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px}.links a{color:var(--acc);font-weight:600;text-decoration:none}
+h3{margin:22px 0 8px;font-size:1rem}.foot{color:var(--muted);font-size:.82rem;margin-top:22px}
+@media print{body{background:#fff;color:#000}.btn{display:none}.stop{border-color:#ccc}}</style></head><body><main>
+<h1>🚗 Rota para ver os carros</h1><p class="sub">${e(V.dayName[0].toUpperCase() + V.dayName.slice(1))} · saída às ${e(R.f.start)} de ${e(R.f.origin)}</p>
+<section class="sum"><div><b>${V.okLegs.length}${V.stops.length > V.okLegs.length ? ` de ${V.stops.length}` : ""}</b><span>lojas no horário</span></div>
+<div><b>${fmtMin(V.plan.end)}</b><span>${R.f.back ? "volta prevista" : "fim previsto"}</span></div><div><b>${V.plan.km} km</b><span>no total</span></div>
+<div><b>${R.f.visit} min</b><span>em cada loja</span></div></section>
+${V.gmaps ? `<a class="btn" href="${e(V.gmaps)}">Abrir a rota completa no Google Maps</a>` : ""}
+${V.okLegs.map((g, n) => card(g, n + 1)).join("")}
+${V.badLegs.length ? `<h3>Não cabem neste dia</h3>${V.badLegs.map((g) => card(g, 0)).join("")}` : ""}
+<p class="foot">Tempos de carro estimados (OSRM${R.f.traffic > 1 ? `, +${Math.round((R.f.traffic - 1) * 100)}% para trânsito` : ""}); feriados não considerados. Horários marcados como “padrão” não vêm do mapa — confirme com cada loja e se o carro ainda está disponível. Gerado pelo CarMonitor em ${e(E.fmtDate(new Date().toISOString()))}.</p>
+</main></body></html>`;
+}
+async function exportRoute() {
+  if (!ROUTE?.view) return;
+  const html = routeExportHtml(), name = `rota-carros-${ROUTE.f.day}.html`;
+  const file = new File([html], name, { type: "text/html" });
+  try {
+    if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: "Rota de visitas", text: ROUTE.view.summary }); return; }
+  } catch (err) { if (err?.name === "AbortError") return; }
+  const url = URL.createObjectURL(file), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+  toast("Roteiro baixado: abra o arquivo para ver, imprimir ou salvar em PDF.");
 }
 $("#routeResult").addEventListener("click", (e) => {
   const o = e.target.closest("[data-open]"); if (o) { e.preventDefault(); history.back(); setTimeout(() => openDetail(+o.dataset.open), 150); return; }
+  if (e.target.closest("#routeExport")) { exportRoute(); return; }
+  if (e.target.closest("#routeForget")) { e.preventDefault(); if (!confirm("Apagar a rota salva?")) return; delete S.saved_route; ROUTE = null; persist(); $("#routeResult").innerHTML = ""; renderCards(); toast("Rota apagada."); return; }
   if (e.target.closest("#routeCopy")) { (navigator.clipboard?.writeText(ROUTE.text) || Promise.reject()).then(() => toast("Roteiro copiado.")).catch(() => toast("Não consegui copiar.")); return; }
   const sv = e.target.closest("[data-hsave],[data-hoff]"); if (!sv || !ROUTE) return;
   const i = +(sv.dataset.hsave ?? sv.dataset.hoff), s = ROUTE.stops[i];
   const [y, mo, d] = ROUTE.f.day.split("-").map(Number); const dk = DOW_KEY[new Date(y, mo - 1, d).getDay()];
-  S.settings.store_hours ||= {}; const fix = (S.settings.store_hours[storeKey(s.l)] ||= {});
+  S.settings.store_hours ||= {}; const fix = (S.settings.store_hours[storeKey(routeCar(s))] ||= {});
   if (sv.dataset.hoff != null) fix[dk] = "off";
   else { const a = $(`[data-hopen="${i}"]`).value, b = $(`[data-hclose="${i}"]`).value; if (!a || !b || a >= b) return toast("Horário inválido."); fix[dk] = `${a}-${b}`; }
-  persist(); renderRoute(); toast("Horário salvo para esta loja; rota refeita.");
+  S.saved_route = ROUTE; persist(); renderRoute(); toast("Horário salvo para esta loja; rota refeita.");
 });
 
 // ---------------------------------------------------------------- importar
