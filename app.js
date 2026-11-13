@@ -318,11 +318,12 @@ function renderCards() {
   let items = S.listings.filter((l) => !l.archived);
   const hidden = items.filter((l) => hiddenDiscard(l));
   if (!ui.showHidden) items = items.filter((l) => !hiddenDiscard(l));
-  const counts = { aprovado: 0, pendente: 0, descartado: 0 };
-  items.forEach((l) => counts[tabOf(l)]++);
-  $("#c-aprovado").textContent = counts.aprovado; $("#c-pendente").textContent = counts.pendente;
-  $("#c-descartado").textContent = counts.descartado;
-  $("#c-fav").textContent = items.filter((l) => l.favorite).length;
+  // contadores = número de cartões (o mesmo carro anunciado mais de uma vez conta uma vez só, como na lista)
+  const counts = { aprovado: new Set(), pendente: new Set(), descartado: new Set() }, favs = new Set();
+  items.forEach((l) => { const k = l.duplicate_group ? `g${l.duplicate_group}` : `l${l.id}`; counts[tabOf(l)].add(`${tabOf(l)}:${k}`); if (l.favorite) favs.add(k); });
+  $("#c-aprovado").textContent = counts.aprovado.size; $("#c-pendente").textContent = counts.pendente.size;
+  $("#c-descartado").textContent = counts.descartado.size;
+  $("#c-fav").textContent = favs.size;
   items = ui.status === "favoritos" ? items.filter((l) => l.favorite) : items.filter((l) => tabOf(l) === ui.status);
   if (q) items = items.filter((l) => [l.make, l.model, l.version, l.city, l.title].join(" ").toLowerCase().includes(q));
   const keyf = {
