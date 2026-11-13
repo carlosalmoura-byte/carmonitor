@@ -1,7 +1,7 @@
 {
- "updated_at": "2026-11-12T14:26:48.047Z",
+ "updated_at": "2026-11-13T14:43:40.329Z",
  "origem": "app CarMonitor",
- "nota": "favoritos e aprovados — reconferir todo dia",
+ "nota": "favoritos e aprovados — reconferir todo dia; decisoes = favorito/aprovação/descarte por anúncio (vale a mais recente entre aparelhos)",
  "urls": [
   "https://www.webmotors.com.br/comprar/caoa-chery/tiggo-5x-pro/15-vvt-turbo-iflex-cvt/4-portas/2022-2023/80613467",
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
@@ -30,5 +30,115 @@
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81573575",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
- ]
+ ],
+ "decisoes": {
+  "80282229": {
+   "f": 0,
+   "a": 0,
+   "d": "Preço alto",
+   "at": "2026-10-31T22:19:16.104Z"
+  },
+  "80613467": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-10T02:32:33.958Z"
+  },
+  "80721542": {
+   "f": 1,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-05T10:49:25.911Z"
+  },
+  "80769504": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-10T02:33:15.013Z"
+  },
+  "81074496": {
+   "f": 0,
+   "a": 0,
+   "d": "Vendedor particular",
+   "at": "2026-10-31T16:47:27.791Z"
+  },
+  "81192096": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-09T12:34:52.565Z"
+  },
+  "81202426": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-10T02:31:59.169Z"
+  },
+  "81412916": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-10T02:30:33.511Z"
+  },
+  "81452713": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-05T10:58:02.156Z"
+  },
+  "81458863": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-08T18:22:50.838Z"
+  },
+  "81565973": {
+   "f": 1,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-04T01:44:36.920Z"
+  },
+  "81573575": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-04T01:41:32.458Z"
+  },
+  "81770636": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-11T21:56:04.381Z"
+  },
+  "81845569": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-05T11:18:28.675Z"
+  },
+  "81890197": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-11T21:56:01.023Z"
+  },
+  "81933353": {
+   "f": 0,
+   "a": 0,
+   "d": "",
+   "at": "2026-11-10T02:30:27.609Z"
+  },
+  "82032671": {
+   "f": 1,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-11T21:56:07.424Z"
+  },
+  "82103416": {
+   "f": 1,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-11T20:24:07.319Z"
+  }
+ }
 }
