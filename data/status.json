@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-13T13:04:24.301Z",
- "novos": 12,
- "atualizados": 0,
+ "processed_at": "2026-11-13T14:58:30.177Z",
+ "novos": 0,
+ "atualizados": 1,
  "sairam_do_ar": 0,
- "note": "pesquisa pela nuvem (reserva): 12 anúncios novos (2 Basalt Shine com página completa; 10 só pelo cartão: Polo, Nivus, Virtus x2, Yaris x3, Cronos x3). Reconferência não feita (páginas de anúncio recusadas pela nuvem). Ficha nova: Virtus Comfortline 2025 (ADAS sem fonte). Só a 1ª página de cada listagem foi lida.",
+ "note": "Virtus 80109201 completado pela página do anúncio",
  "last_issue": 3,
  "processed_issues": [
   1,
@@ -12,7 +12,7 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-13T13:04:24.301Z",
+  "at": "2026-11-13T14:58:30.177Z",
   "ok": true
  },
  "conferidos_sem_mudanca": 0,
