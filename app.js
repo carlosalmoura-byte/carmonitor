@@ -400,7 +400,9 @@ function renderCards() {
       </div>
       ${whyBox(l)}
       <div class="chips">${chips}${extra}</div>
+      ${(l.notes || []).length ? `<div class="noteLast small" data-notes="${l.id}">📝 ${esc((l.notes[l.notes.length - 1].text || "🎙 áudio de " + fmtDur(l.notes[l.notes.length - 1].dur)).slice(0, 110))}${l.notes.length > 1 ? ` <b>+${l.notes.length - 1}</b>` : ""}</div>` : ""}
       <div class="cardActions">
+        <button class="wide ghost" data-notes="${l.id}">📝 ${(l.notes || []).length ? `Anotações (${l.notes.length})` : "Anotar (texto ou áudio)"}</button>
         ${l.status !== "descartado" && l.available !== false ? `<button class="wide" data-msg="${l.id}">💬 Mensagem ao vendedor${askList(l).length ? ` <span class="small">(+${askList(l).length} pergunta${askList(l).length > 1 ? "s" : ""})</span>` : ""}</button>` : ""}
         <a class="btn ghost wide" data-ext href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer">Ver anúncio no WebMotors ↗</a>
         ${l.user_discard || l.user_approve ? ""
@@ -505,6 +507,7 @@ $("#cards").addEventListener("click", (e) => {
   if (dc) { openDiscard(+dc.dataset.discard); return; }
   const ud = e.target.closest("[data-undiscard]");
   if (ud) { undiscard(+ud.dataset.undiscard); return; }
+  const nb = e.target.closest("[data-notes]"); if (nb) { openNotes(+nb.dataset.notes); return; }
   const ux = e.target.closest("[data-unexcl]");
   if (ux) { unexclude(+ux.dataset.unexcl); return; }
   const f = e.target.closest("[data-fav]");
@@ -599,6 +602,88 @@ function saveCompare() {
   $("#cmpBarGo").textContent = ui.compare.size >= 2 ? `⇆ Comparar ${ui.compare.size}` : "⇆ Comparar";
   try { localStorage.setItem("cmp", JSON.stringify([...ui.compare])); } catch { /* sem armazenamento */ }
 }
+
+// ---------------------------------------------------------------- anotações por carro (texto, ditado ou áudio) — ficam só neste aparelho
+const fmtDur = (s) => { s = Math.round(s || 0); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+let NOTES_ID = null, recorder = null, recChunks = [], recStart = 0, recognizer = null;
+function openNotes(id) {
+  const l = byId(id); if (!l) return;
+  NOTES_ID = id; $("#notesForm").reset(); $("#noteStatus").textContent = "";
+  renderNotes();
+  openSheet("#notesSheet"); history.pushState({ sheet: 8 }, "");
+}
+function renderNotes() {
+  const l = byId(NOTES_ID); if (!l) return;
+  $("#notesHead").innerHTML = `<b>${esc(title(l))} ${esc(l.year_model || "")}</b> · ${brl(l.price)} · ${esc(sellerName(l))}`;
+  const ns = l.notes || [];
+  $("#notesList").innerHTML = ns.length ? ns.slice().reverse().map((n) => `<li class="note">
+      <div class="small">${esc(E.fmtDate(n.at).slice(0, 17))}${n.dictated ? " · ditado" : ""}</div>
+      ${n.text ? `<div class="noteText">${esc(n.text).replace(/\n/g, "<br>")}</div>` : ""}
+      ${n.audio ? `<audio controls preload="none" src="${n.audio}"></audio><span class="small">${fmtDur(n.dur)}</span>` : ""}
+      <button type="button" class="ghost danger noteDel" data-delnote="${esc(n.id)}" aria-label="Apagar anotação">🗑</button></li>`).join("")
+    : `<li class="small">Nenhuma anotação ainda. Escreva, dite ou grave um áudio sobre o que viu no carro.</li>`;
+}
+function addNote(note) {
+  const l = byId(NOTES_ID); if (!l) return;
+  l.notes = [...(l.notes || []), { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, at: new Date().toISOString(), ...note }];
+  persist(); renderNotes(); renderCards(); if (ui.openId === l.id) renderDetail(l);
+}
+$("#notesForm").addEventListener("submit", (e) => {
+  e.preventDefault(); const t = e.target.text.value.trim();
+  if (!t) return toast("Escreva ou dite algo antes de salvar.");
+  addNote({ text: t, dictated: !!e.target.dataset.dictated }); e.target.reset(); delete e.target.dataset.dictated;
+  $("#noteStatus").textContent = "Anotação salva.";
+});
+$("#notesList").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-delnote]"); if (!b) return;
+  if (!confirm("Apagar esta anotação?")) return;
+  const l = byId(NOTES_ID); l.notes = (l.notes || []).filter((n) => n.id !== b.dataset.delnote);
+  persist(); renderNotes(); renderCards();
+});
+// ditado: reconhecimento de voz do próprio navegador (Chrome/Android), em português; o texto entra na caixa para revisar antes de salvar
+$("#noteDictate").addEventListener("click", () => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast("Este navegador não faz ditado. Use o microfone do teclado ou grave um áudio.");
+  if (recognizer) { recognizer.stop(); return; }
+  const ta = $("#notesForm").text, base = ta.value ? ta.value.replace(/\s*$/, " ") : "";
+  recognizer = new SR(); recognizer.lang = "pt-BR"; recognizer.continuous = true; recognizer.interimResults = true;
+  let finalTxt = "";
+  recognizer.onresult = (ev) => {
+    let interim = "";
+    for (let i = ev.resultIndex; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + " "; else interim += r[0].transcript; }
+    ta.value = (base + finalTxt + interim).trimStart(); $("#notesForm").dataset.dictated = "1";
+  };
+  recognizer.onerror = (ev) => { $("#noteStatus").textContent = ev.error === "not-allowed" ? "Permita o microfone para ditar." : `Ditado parou (${ev.error}).`; };
+  recognizer.onend = () => { recognizer = null; $("#noteDictate").textContent = "🎤 Ditar (vira texto)"; if (ta.value) $("#noteStatus").textContent = "Revise o texto e toque em Salvar."; };
+  recognizer.start(); $("#noteDictate").textContent = "⏹ Parar ditado"; $("#noteStatus").textContent = "Ouvindo… fale normalmente.";
+});
+// áudio: grava com o microfone (qualidade de voz, arquivo pequeno) e guarda junto do carro
+$("#noteRecord").addEventListener("click", async () => {
+  if (recorder) { recorder.stop(); return; }
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return toast("Este navegador não grava áudio.");
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { return toast("Permita o microfone para gravar."); }
+  const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((t) => MediaRecorder.isTypeSupported?.(t)) || "";
+  recorder = new MediaRecorder(stream, { ...(type ? { mimeType: type } : {}), audioBitsPerSecond: 24000 });
+  recChunks = []; recStart = Date.now();
+  recorder.ondataavailable = (ev) => ev.data.size && recChunks.push(ev.data);
+  recorder.onstop = () => {
+    stream.getTracks().forEach((t) => t.stop());
+    const dur = (Date.now() - recStart) / 1000, blob = new Blob(recChunks, { type: recorder.mimeType || "audio/webm" });
+    recorder = null; clearInterval(openNotes._t); $("#noteRecord").textContent = "🎙 Gravar áudio";
+    if (dur < 1) { $("#noteStatus").textContent = "Áudio muito curto, não salvei."; return; }
+    const fr = new FileReader();
+    fr.onload = () => { const txt = $("#notesForm").text.value.trim(); addNote({ audio: fr.result, dur, ...(txt ? { text: txt } : {}) }); $("#notesForm").reset(); $("#noteStatus").textContent = `Áudio de ${fmtDur(dur)} salvo.`; };
+    fr.readAsDataURL(blob);
+  };
+  recorder.start(1000);
+  $("#noteRecord").textContent = "⏹ Parar e salvar";
+  openNotes._t = setInterval(() => { $("#noteStatus").textContent = `Gravando… ${fmtDur((Date.now() - recStart) / 1000)} (até 5 min)`; if (Date.now() - recStart > 300000) recorder?.stop(); }, 500);
+});
+$("#detail").addEventListener("click", (e) => { const b = e.target.closest("[data-notes]"); if (b) { e.preventDefault(); openNotes(+b.dataset.notes); } });
+// fechar a janela no meio da gravação/ditado: para e salva o que já tinha
+window.addEventListener("popstate", () => { if (!$("#notesSheet").classList.contains("open")) { recorder?.stop(); recognizer?.stop(); } });
 
 // ---------------------------------------------------------------- rota de visitas
 /** Horário da loja: o que você corrigiu > OpenStreetMap > padrão de loja. Correção é por loja e dia da semana. */
@@ -822,6 +907,7 @@ function routeExportHtml() {
       <p class="muted">${Math.round(g.travel)} min de carro desde o ponto anterior · ${e(PREC[s.precision])}</p>
       ${ok ? "" : `<p class="warn">${g.status === "fechada no dia" ? "Loja fechada neste dia" : "Não dá tempo: chega depois do fechamento"}</p>`}
       ${l.gone ? `<p class="warn">O anúncio saiu do ar — confirme com o vendedor antes de ir.</p>` : ""}
+      ${(byId(s.id)?.notes || []).filter((n) => n.text).length ? `<p class="muted">📝 ${(byId(s.id).notes || []).filter((n) => n.text).map((n) => e(n.text)).join(" · ")}</p>` : ""}
       <p class="muted">Ir para: ${e(navTarget(s))}</p>
       <p class="links"><a href="${e(maps)}">📍 Google Maps</a><a href="${e(waze)}">🚗 Waze</a><a href="${e(l.url)}">🔗 Anúncio</a></p></div></article>`; };
   const title0 = `Rota de visitas — ${V.dayName}`;
@@ -1074,6 +1160,9 @@ function renderDetail(d) {
     <div class="small">${esc(d.version || "")} · ${num(d.km, " km")} · ${esc(d.city || "")} · ${esc(d.seller || "vendedor não identificado")}${d.seller_type ? ` (${SELLER[d.seller_type]})` : ""}</div>
     ${d.unavailable_since ? `<div class="msg err">Este anúncio saiu do ar em ${esc(E.fmtDate(d.unavailable_since))}. O histórico fica guardado até você excluir.</div>` : ""}
     ${decisionBox(d)}
+    <div class="noteDetail"><b>📝 Anotações</b> ${(d.notes || []).length ? `<span class="small">(${d.notes.length})</span>` : ""}
+      ${(d.notes || []).slice(-3).map((n) => `<div class="small">• ${esc(E.fmtDate(n.at).slice(0, 17))} — ${n.text ? esc(n.text) : `🎙 áudio (${fmtDur(n.dur)})`}</div>`).join("")}
+      <button type="button" class="ghost" data-notes="${d.id}">${(d.notes || []).length ? "Ver / anotar" : "Anotar (texto ou áudio)"}</button></div>
     <p><a class="btn primary" style="width:100%" data-ext href="${esc(safeUrl(d.url))}" target="_blank" rel="noopener noreferrer">Abrir anúncio no WebMotors ↗</a></p>
     <p style="text-align:center;margin-top:-.4rem"><button class="ghost small" id="dReport">⚠ O anúncio deu erro ou tem algo errado? Avise aqui</button></p>
     ${(d.reports || []).length ? `<div class="msg warn">Você reportou: ${esc(d.reports[d.reports.length - 1].kind_label)}${d.reports[d.reports.length - 1].text ? ` — “${esc(d.reports[d.reports.length - 1].text)}”` : ""} (${esc(E.fmtDate(d.reports[d.reports.length - 1].at))})${d.reports[d.reports.length - 1].sent ? " · enviado para a pesquisa reconferir" : ""}.</div>` : ""}
