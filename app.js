@@ -630,6 +630,19 @@ const routeSnap = (l) => ({ id: l.id, make: l.make, model: l.model, title: l.tit
   price: l.price, km: l.km, seller: l.seller, seller_type: l.seller_type, city: l.city, state: l.state, address: l.address, url: l.url, color: l.color });
 /** Dados atuais do carro (se ainda estiver no app) por cima da cópia salva. */
 const routeCar = (s) => { const live = byId(s.id); return live ? { ...s.l, ...routeSnap(live), gone: live.available === false } : { ...s.l, gone: true, missing: true }; };
+/** Endereço da loja que você corrigiu (vale para todas as rotas). */
+const storeAddr = (l) => (S.settings.store_address || {})[storeKey(l)] || null;
+/** O que mandar para o Google Maps/Waze: endereço corrigido > nome da loja + cidade (eles acham a concessionária pelo nome
+ *  muito melhor que o mapa aberto usado no cálculo) > cidade. Coordenadas só como último recurso. */
+function navTarget(s) {
+  const l = s.l || {}, a = storeAddr(l);
+  if (a) return a;
+  if (l.address) return `${l.address}, ${l.city || ""} - ${l.state || ""}`;
+  if (l.seller && l.seller_type !== "particular") return `${sellerName(l)}, ${l.city || ""} - ${l.state || ""}`;
+  return s.coords ? s.coords.join(",") : `${l.city || ""} - ${l.state || ""}`;
+}
+const gmapsSearch = (q) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+const wazeLink = (q) => /^-?\d+\.\d+,-?\d+\.\d+$/.test(q) ? `https://waze.com/ul?ll=${q}&navigate=yes` : `https://waze.com/ul?q=${encodeURIComponent(q)}&navigate=yes`;
 const sellerName = (l) => (l.seller ? l.seller.replace(/\s*\((Loja|Pessoa Física)\)\s*$/, "") : "Vendedor");
 function setRouteSelection(ids, label) {
   const want = ids.slice(0, 12);
@@ -709,7 +722,7 @@ $("#routeForm").addEventListener("submit", (e) => {
     persist();
     const stops = [], skipped = [];
     for (const l of cars) {
-      const loc = await D.locate(S, l.city, l.state, l.address, l.seller_type !== "particular" ? l.seller : null);
+      const loc = await D.locate(S, l.city, l.state, storeAddr(l) || l.address, l.seller_type !== "particular" ? l.seller : null);
       if (!loc) { skipped.push(routeSnap(l)); continue; }
       stops.push({ id: l.id, l: routeSnap(l), coords: loc.coords, precision: loc.precision, osm: loc.hours });
     }
@@ -748,12 +761,17 @@ function renderRoute() {
           <div class="row2"><label>Abre<input type="time" data-hopen="${g.i}" value="${r1 ? fmtMin(r1[0]) : "09:00"}"></label><label>Fecha<input type="time" data-hclose="${g.i}" value="${r1 ? fmtMin(r1[1]) : "18:00"}"></label></div>
           <div class="cardActions"><button type="button" data-hsave="${g.i}">Salvar e refazer rota</button><button type="button" class="ghost" data-hoff="${g.i}">Fechada neste dia</button></div>
         </details>
-        <a class="small" href="https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}" target="_blank" rel="noopener">ver no mapa ↗</a> · ${l.missing ? `<a class="small" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">ver anúncio ↗</a>` : `<a class="small" href="#" data-open="${l.id}">ver anúncio no app</a>`}
+        <details class="rfix"><summary class="small">${storeAddr(l) ? "✓ endereço corrigido por você — alterar" : "corrigir endereço desta loja"}</summary>
+          <label>Endereço da loja (rua, número, cidade)<input data-addr="${g.i}" value="${esc(storeAddr(l) || "")}" placeholder="ex.: Av. Nações Unidas, 12000, São Paulo - SP"></label>
+          <div class="cardActions"><button type="button" data-addrsave="${g.i}">Salvar e refazer rota</button>${storeAddr(l) ? `<button type="button" class="ghost" data-addrclear="${g.i}">Usar o nome da loja</button>` : ""}</div>
+        </details>
+        <span class="small">Ir para: <b>${esc(navTarget(s))}</b></span><br>
+        <a class="small" href="${esc(gmapsSearch(navTarget(s)))}" target="_blank" rel="noopener">Google Maps ↗</a> · <a class="small" href="${esc(wazeLink(navTarget(s)))}" target="_blank" rel="noopener">Waze ↗</a> · ${l.missing ? `<a class="small" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">ver anúncio ↗</a>` : `<a class="small" href="#" data-open="${l.id}">ver anúncio no app</a>`}
       </div></li>`;
   };
-  const wp = okLegs.map((g) => stops[g.i].coords.join(","));
+  const wp = okLegs.map((g) => navTarget(stops[g.i]));
   const dest = R.f.back ? R.originCoords.join(",") : wp.pop();
-  const gmaps = okLegs.length ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${R.originCoords.join(",")}&destination=${dest}${wp.length ? `&waypoints=${encodeURIComponent(wp.join("|"))}` : ""}` : null;
+  const gmaps = okLegs.length ? `https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${R.originCoords.join(",")}&destination=${encodeURIComponent(dest)}${wp.length ? `&waypoints=${encodeURIComponent(wp.join("|"))}` : ""}` : null;
   const summary = `${dayName[0].toUpperCase() + dayName.slice(1)} · saída ${R.f.start} de ${R.f.origin} · ${okLegs.length} de ${stops.length} loja(s) dentro do horário · ${R.f.back ? "volta" : "fim"} prevista ${fmtMin(plan.end)} · ${plan.km} km`;
   ROUTE.view = { summary, gmaps, dayName, dow, plan, okLegs, badLegs, stops };
   ROUTE.text = [`Rota de visitas — ${summary}`, `Saída: ${R.f.origin}`, ...okLegs.map((g, n) => { const s = stops[g.i]; return `${n + 1}. ${fmtMin(g.start)} — ${s.l.seller || "Vendedor"} (${s.l.city}) — ${title(s.l)} ${s.l.year_model || ""} ${brl(s.l.price)} — ${s.l.url}`; }),
@@ -764,16 +782,38 @@ function renderRoute() {
     ${badLegs.length ? `<h3 class="rsub">Não cabem neste dia</h3><ol class="rlist">${badLegs.map((g) => legHtml(g, 0)).join("")}</ol>` : ""}
     ${R.skipped.length ? `<p class="small">Sem localização no mapa (não entraram): ${R.skipped.map((l) => esc(title(l))).join(", ")}.</p>` : ""}
     ${stops.some((s) => s.hsrc.startsWith("padrão")) ? `<p class="small">⚠ Lojas com horário “padrão” (seg–sex 9h–18h, sáb 9h–14h) não têm horário no mapa: confirme com o vendedor e corrija acima se precisar. Vale ligar ou mandar mensagem antes para agendar e confirmar que o carro ainda está lá.</p>` : ""}
+    ${okLegs.length ? `<p class="small">O Waze não abre várias paradas de uma vez: use o link “Waze” de cada loja, na ordem.</p>` : ""}
     <div class="cardActions">${gmaps ? `<a class="btn primary wide" href="${esc(gmaps)}" target="_blank" rel="noopener">Abrir rota no Google Maps ↗</a>` : ""}
       <button type="button" class="wide" id="routeExport">📄 Exportar roteiro</button><button type="button" class="wide ghost" id="routeCopy">Copiar como texto</button></div>
     <p class="small">✓ Rota salva${R.saved_at ? ` em ${esc(E.fmtDate(R.saved_at))}` : ""} — continua aqui mesmo se você fechar o app. <a href="#" id="routeForget">Apagar rota salva</a></p>`;
+}
+/** Salva o endereço certo da loja (ou volta a usar o nome), relocaliza e recalcula os tempos da rota. */
+async function saveStoreAddr(i, clear) {
+  const s = ROUTE.stops[i], l = routeCar(s), key = storeKey(l);
+  S.settings.store_address ||= {};
+  if (clear) delete S.settings.store_address[key];
+  else { const v = ($(`[data-addr="${i}"]`)?.value || "").trim(); if (v.length < 6) return toast("Digite rua, número e cidade."); S.settings.store_address[key] = v; }
+  persist();
+  await act(null, async () => {
+    toast("Localizando a loja e refazendo a rota…");
+    const D = deps.distance;
+    const loc = await D.locate(S, l.city, l.state, storeAddr(l) || l.address, l.seller_type !== "particular" ? l.seller : null);
+    if (!loc) return toast("Não achei esse endereço no mapa; os links do Google Maps/Waze já usam o endereço digitado.");
+    // aplica a todas as paradas da mesma loja
+    for (const t of ROUTE.stops) if (storeKey(routeCar(t)) === key) { t.coords = loc.coords; t.precision = loc.precision; }
+    try {
+      const m = await D.matrix([ROUTE.originCoords, ...ROUTE.stops.map((t) => t.coords)]);
+      ROUTE.matrix = { min: m.min.map((r) => r.map((x) => x * (ROUTE.f.traffic || 1))), km: m.km };
+    } catch { toast("Endereço salvo; não consegui recalcular os tempos agora."); }
+    S.saved_route = ROUTE; persist(); renderRoute(); toast(clear ? "Voltou a usar o nome da loja." : "Endereço salvo para esta loja; rota refeita.");
+  });
 }
 /** Roteiro “amigável”: página HTML própria (abre em qualquer celular/computador, dá para imprimir ou salvar em PDF). */
 function routeExportHtml() {
   const R = ROUTE, V = R.view; const e = (x) => esc(String(x ?? ""));
   const PREC = { endereco: "Endereço do anúncio", loja: "Local da loja no mapa", cidade: "Local aproximado (centro da cidade) — confirme o endereço com o vendedor" };
   const card = (g, n) => { const s = V.stops[g.i], l = s.l, ok = g.status === "ok";
-    const maps = `https://www.google.com/maps/search/?api=1&query=${s.coords[0]},${s.coords[1]}`;
+    const maps = gmapsSearch(navTarget(s)), waze = wazeLink(navTarget(s));
     return `<article class="stop ${ok ? "" : "off"}"><div class="time">${ok ? fmtMin(g.start) : "—"}${ok && g.wait > 4 ? `<small>chega ${fmtMin(g.arrive)}</small>` : ""}</div>
       <div class="body"><h2>${n ? `<span class="n">${n}</span>` : ""}${e(sellerName(l))}</h2>
       <p class="car"><b>${e(title(l))} ${e(l.year_model || "")}</b>${l.version ? ` · ${e(l.version)}` : ""}</p>
@@ -782,7 +822,8 @@ function routeExportHtml() {
       <p class="muted">${Math.round(g.travel)} min de carro desde o ponto anterior · ${e(PREC[s.precision])}</p>
       ${ok ? "" : `<p class="warn">${g.status === "fechada no dia" ? "Loja fechada neste dia" : "Não dá tempo: chega depois do fechamento"}</p>`}
       ${l.gone ? `<p class="warn">O anúncio saiu do ar — confirme com o vendedor antes de ir.</p>` : ""}
-      <p class="links"><a href="${e(maps)}">📍 Mapa</a><a href="${e(l.url)}">🔗 Anúncio no WebMotors</a></p></div></article>`; };
+      <p class="muted">Ir para: ${e(navTarget(s))}</p>
+      <p class="links"><a href="${e(maps)}">📍 Google Maps</a><a href="${e(waze)}">🚗 Waze</a><a href="${e(l.url)}">🔗 Anúncio</a></p></div></article>`; };
   const title0 = `Rota de visitas — ${V.dayName}`;
   return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${e(title0)}</title>
 <style>:root{--ink:#17201b;--muted:#5d6861;--line:#dfe2dc;--acc:#1f6f5c;--bg:#f4f5f2;--card:#fff;--warn:#a33}
@@ -826,6 +867,8 @@ $("#routeResult").addEventListener("click", (e) => {
   if (e.target.closest("#routeExport")) { exportRoute(); return; }
   if (e.target.closest("#routeForget")) { e.preventDefault(); if (!confirm("Apagar a rota salva?")) return; delete S.saved_route; ROUTE = null; persist(); $("#routeResult").innerHTML = ""; renderCards(); toast("Rota apagada."); return; }
   if (e.target.closest("#routeCopy")) { (navigator.clipboard?.writeText(ROUTE.text) || Promise.reject()).then(() => toast("Roteiro copiado.")).catch(() => toast("Não consegui copiar.")); return; }
+  const as = e.target.closest("[data-addrsave],[data-addrclear]");
+  if (as && ROUTE) { saveStoreAddr(+(as.dataset.addrsave ?? as.dataset.addrclear), as.dataset.addrclear != null); return; }
   const sv = e.target.closest("[data-hsave],[data-hoff]"); if (!sv || !ROUTE) return;
   const i = +(sv.dataset.hsave ?? sv.dataset.hoff), s = ROUTE.stops[i];
   const [y, mo, d] = ROUTE.f.day.split("-").map(Number); const dk = DOW_KEY[new Date(y, mo - 1, d).getDay()];
