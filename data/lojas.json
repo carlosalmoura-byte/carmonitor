@@ -1,0 +1,7 @@
+{
+ "updated_at": "2026-11-14T13:40:00.000Z",
+ "nota": "Endereço correto de lojas cujo local o mapa não acha pelo nome. Chave = nome do vendedor como no anúncio, em minúsculas. O app usa como endereço da loja (rota, Google Maps, Waze) quando você não corrigiu no aparelho.",
+ "lojas": {
+  "bexp jeep bexp brooklin (loja)": { "endereco": "Av. Giovanni Gronchi, 6328 - Vila Andrade, São Paulo - SP, 05724-002", "fonte": "informado pelo usuário em 14/11/2026" }
+ }
+}

@@ -717,7 +717,7 @@ const routeSnap = (l) => ({ id: l.id, make: l.make, model: l.model, title: l.tit
 /** Dados atuais do carro (se ainda estiver no app) por cima da cópia salva. */
 const routeCar = (s) => { const live = byId(s.id); return live ? { ...s.l, ...routeSnap(live), gone: live.available === false } : { ...s.l, gone: true, missing: true }; };
 /** Endereço da loja que você corrigiu (vale para todas as rotas). */
-const storeAddr = (l) => (S.settings.store_address || {})[storeKey(l)] || null;
+const storeAddr = (l) => (S.settings.store_address || {})[storeKey(l)] || S.meta?.lojas?.[storeKey(l)]?.endereco || null;
 /** O que mandar para o Google Maps/Waze: endereço corrigido > nome da loja + cidade (eles acham a concessionária pelo nome
  *  muito melhor que o mapa aberto usado no cálculo) > cidade. Coordenadas só como último recurso. */
 function navTarget(s) {
@@ -810,7 +810,7 @@ $("#routeForm").addEventListener("submit", (e) => {
     for (const l of cars) {
       const loc = await D.locate(S, l.city, l.state, storeAddr(l) || l.address, l.seller_type !== "particular" ? l.seller : null);
       if (!loc) { skipped.push(routeSnap(l)); continue; }
-      stops.push({ id: l.id, l: routeSnap(l), coords: loc.coords, precision: loc.precision, osm: loc.hours });
+      stops.push({ id: l.id, l: routeSnap(l), coords: loc.coords, precision: loc.precision, osm: loc.hours, addr_used: storeAddr(l) || null });
     }
     persist(); // cache das coordenadas
     if (!stops.length) { out.innerHTML = `<div class="msg bad">Não consegui localizar nenhuma das lojas no mapa.</div>`; return; }
@@ -886,7 +886,7 @@ async function saveStoreAddr(i, clear) {
     const loc = await D.locate(S, l.city, l.state, storeAddr(l) || l.address, l.seller_type !== "particular" ? l.seller : null);
     if (!loc) return toast("Não achei esse endereço no mapa; os links do Google Maps/Waze já usam o endereço digitado.");
     // aplica a todas as paradas da mesma loja
-    for (const t of ROUTE.stops) if (storeKey(routeCar(t)) === key) { t.coords = loc.coords; t.precision = loc.precision; }
+    for (const t of ROUTE.stops) if (storeKey(routeCar(t)) === key) { t.coords = loc.coords; t.precision = loc.precision; t.addr_used = storeAddr(l) || null; }
     try {
       const m = await D.matrix([ROUTE.originCoords, ...ROUTE.stops.map((t) => t.coords)]);
       ROUTE.matrix = { min: m.min.map((r) => r.map((x) => x * (ROUTE.f.traffic || 1))), km: m.km };
@@ -1696,8 +1696,35 @@ async function syncSpecs() {
     S.remote_specs = list; E.reclassifyAll(S, deps); persist(); return true;
   } catch { return false; }
 }
+/** Endereços de lojas publicados (data/lojas.json): corrigem o local de lojas que o mapa não acha pelo nome. */
+async function syncLojas() {
+  try {
+    const r = await fetch(`data/lojas.json?t=${Date.now()}`, { cache: "no-store" }); if (!r.ok) return;
+    const j = await r.json(); S.meta.lojas = j.lojas || {}; persist();
+    await relocateSavedRoute();
+  } catch { /* sem internet */ }
+}
+/** Rota salva: se o endereço de alguma loja mudou desde que a rota foi feita, relocaliza e recalcula os tempos. */
+async function relocateSavedRoute() {
+  const R = S.saved_route; if (!R?.stops?.length) return;
+  const changed = R.stops.filter((s) => (storeAddr(routeCar(s)) || null) !== (s.addr_used ?? null) && storeAddr(routeCar(s)));
+  if (!changed.length) return;
+  const D = deps.distance; let moved = 0;
+  for (const s of changed) {
+    const l = routeCar(s);
+    const loc = await D.locate(S, l.city, l.state, storeAddr(l), null);
+    if (loc && loc.precision === "endereco") { s.coords = loc.coords; s.precision = loc.precision; moved++; }
+    s.addr_used = storeAddr(l);
+  }
+  if (moved) {
+    try { const m = await D.matrix([R.originCoords, ...R.stops.map((t) => t.coords)]); R.matrix = { min: m.min.map((r) => r.map((x) => x * (R.f.traffic || 1))), km: m.km }; } catch { /* mantém os tempos antigos */ }
+  }
+  S.saved_route = R; if (ROUTE && ROUTE !== R) ROUTE = R; persist();
+  if ($("#routeSheet").classList.contains("open")) { ROUTE = R; renderRoute(); }
+  toast(`Rota salva atualizada com o endereço certo de ${changed.length} parada(s).`);
+}
 async function syncResearch(showNone = false) {
-  await syncSpecs();
+  await syncSpecs(); await syncLojas();
   let feed;
   try {
     const r = await fetch("data/anuncios.json", { cache: "no-store" });
