@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T14:58:30.177Z",
+ "generated_at": "2026-11-14T11:36:20.930Z",
  "by": "Claude (pesquisa a pedido)",
  "criterios": "até R$ 100.000; ano-modelo 2022–2025; até 35.000 km; automático; região de Barueri/SP",
  "nota": "Transcrição dos dados exibidos nas páginas do WebMotors no momento da pesquisa. Nada é inventado; o que não constava fica em branco.",
@@ -355,7 +355,7 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
-   "checked_at": "2026-11-09T10:43:41.771Z",
+   "checked_at": "2026-11-14T11:36:20.930Z",
    "text": "JEEP RENEGADE 1.3 T270 TURBO FLEX LONGITUDE AT6\nPreço: R$ 98.890\nAno: 2024/2024\nKM: 32.201\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Bexp Jeep Bexp Brooklin (Loja)\nFIPE: R$ 104.916 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Cinza\nFinal de placa: 8\nFotos: 8\nItens de veículo: Airbag; Alarme; Ar condicionado; Bancos em couro; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
@@ -420,7 +420,7 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713",
-   "checked_at": "2026-11-09T10:43:41.771Z",
+   "checked_at": "2026-11-14T11:36:20.930Z",
    "text": "VOLKSWAGEN POLO 1.0 170 TSI HIGHLINE AUTOMÁTICO\nPreço: R$ 99.900\nAno: 2025/2025\nKM: 15.543\nCâmbio: Automática\nCidade: Barueri - SP\nVendedor: Oeste Multimarcas (Loja)\nFIPE: R$ 101.245 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Prata\nFinal de placa: 3\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado; Garantia de fábrica\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Retrovisor fotocrômico; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; GPS; Direção com Ajuste; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
@@ -455,7 +455,7 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
-   "checked_at": "2026-11-09T10:43:41.771Z",
+   "checked_at": "2026-11-14T11:36:20.930Z",
    "text": "CITROËN C4 CACTUS 1.6 THP FLEX NOIR EAT6\nPreço: R$ 93.990\nAno: 2023/2024\nKM: 25.564\nCâmbio: Automática\nCidade: Barueri - SP\nVendedor: Renault Sinal Alphaville (Loja)\nFIPE: R$ 94.544 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Cinza\nFinal de placa: 7\nFotos: 8\nItens de veículo: Direção com Ajuste; Computador de Bordo; Chave Inteligente/Presencial; Botão de Ignição/Start button; Ajuste retrovisor elétrico; Alarme com acionamento a distância; Freios ABS com EBD; Freios ABS com BAS; Controle de estabilidade; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
@@ -981,9 +981,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/fiat/pulse/10-turbo-200-flex-impetus-cvt/4-portas/2022-2023/81984883",
-   "checked_at": "2026-11-10T13:17:13.649Z",
-   "text": "FIAT PULSE 1.0 TURBO 200 FLEX IMPETUS CVT\nPreço: R$ 93.700\nAno: 2022/2023\nKM: 35.000\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: não encontrada\nSelo: Abaixo da Fipe\nOrigem: cartão da listagem (página do anúncio não abriu)",
-   "available": true
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/fiat/pulse/10-turbo-200-flex-drive-cvt/4-portas/2021-2022/79515881",
@@ -1023,14 +1022,14 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81890197",
-   "checked_at": "2026-11-11T20:18:50.389Z",
+   "checked_at": "2026-11-14T11:36:20.930Z",
    "text": "FIAT FASTBACK 1.0 TURBO 200 FLEX AUDACE CVT\nPreço: R$ 99.900\nAno: 2023/2024\nKM: 27.672\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Viamar - Nações Unidas (Loja)\nFIPE: R$ 103.566 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 1\nFotos: 8\nItens de veículo: Airbag; Ar quente; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Rádio; Retrovisores elétricos; Rodas de liga leve; Sensor de chuva; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
   {
    "url": "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81770636",
-   "checked_at": "2026-11-11T20:18:50.389Z",
-   "text": "FIAT FASTBACK 1.0 TURBO 200 FLEX AUDACE CVT\nPreço: R$ 99.880\nAno: 2023/2024\nKM: 20.151\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: Grupo Amazonas Celso Garcia U (Loja)\nFIPE: R$ 103.566 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 3\nFotos: 8\nItens de veículo: Travas elétricas; Vidros elétricos; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "FIAT FASTBACK 1.0 TURBO 200 FLEX AUDACE CVT\nPreço: R$ 97.890\nAno: 2023/2024\nKM: 20.151\nCâmbio: CVT\nCidade: São Paulo - SP\nVendedor: Grupo Amazonas Celso Garcia U (Loja)\nFIPE: R$ 103.566 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 3\nFotos: 8\nItens de veículo: Travas elétricas; Vidros elétricos; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
   {
@@ -1184,7 +1183,7 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
-   "checked_at": "2026-11-11T19:07:00.133Z",
+   "checked_at": "2026-11-14T11:36:20.930Z",
    "text": "JEEP RENEGADE 1.3 T270 TURBO FLEX LONGITUDE AT6\nPreço: R$ 99.890\nAno: 2023/2024\nKM: 31.000\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Bexp Jeep Bexp Brooklin (Loja)\nFIPE: R$ 104.916 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 8\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado\nItens de veículo: Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
@@ -1285,8 +1284,8 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-comfortline-automatico/4-portas/2024/82117759",
-   "checked_at": "2026-11-13T13:04:24.301Z",
-   "text": "VOLKSWAGEN POLO 1.0 170 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 87.800\nAno: 2024/2024\nKM: 18.500\nCidade: São Bernardo do Campo - SP\nVendedor: (não verificado)\nFIPE: R$ 87.300 (Tabela Fipe no WebMotors, set/2026)\nOrigem: cartão da listagem do WebMotors em 13/11/2026 (página do anúncio não abriu)",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN POLO 1.0 170 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 87.800\nAno: 2024/2024\nKM: 18.500\nCâmbio: Automática\nCidade: São Bernardo do Campo - SP\nVendedor: Silas (Pessoa Física)\nFIPE: R$ 86.804 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Branco\nFinal de placa: 6\nFotos: 7\nCaracterísticas: IPVA pago; Licenciado; Garantia de fábrica\nItens de veículo: Alarme; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Direção hidráulica; GPS; Direção com Ajuste; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; USB; Bluetooth",
    "available": true
   },
   {
@@ -1297,14 +1296,13 @@
   },
   {
    "url": "https://www.webmotors.com.br/comprar/volkswagen/virtus/10-200-tsi-comfortline-automatico/4-portas/2024-2025/79971509",
-   "checked_at": "2026-11-13T13:04:24.301Z",
-   "text": "VOLKSWAGEN VIRTUS 1.0 200 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 99.990\nAno: 2024/2025\nKM: 34.000\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: R$ 112.603 (Tabela Fipe no WebMotors, set/2026)\nSelo: Abaixo da Fipe (listagem de 13/11/2026)\nOrigem: cartão da listagem do WebMotors em 13/11/2026 (página do anúncio não abriu)",
-   "available": true
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "available": false
   },
   {
    "url": "https://www.webmotors.com.br/comprar/volkswagen/virtus/10-170-tsi-automatico/4-portas/2025/80109201",
-   "checked_at": "2026-11-13T14:58:30.177Z",
-   "text": "VOLKSWAGEN VIRTUS 1.0 170 TSI AUTOMÁTICO\nPreço: R$ 97.500\nAno: 2025/2025\nKM: 34.000\nCâmbio: Automática\nCombustível: Gasolina e álcool\nCidade: São Paulo - SP\nVendedor: nelson (Pessoa Física)\nFIPE: R$ 98.770 (página do anúncio no WebMotors, nov/2026)\nSelo: Abaixo da Fipe (página do anúncio, \"Super Preço\", 13/11/2026)\nCarroceria: Sedã\nCor: Cinza\nFinal de placa: 1\nCaracterísticas: Aceita troca; Único dono; Todas as revisões feitas pela concessionária; IPVA pago; Licenciado; Garantia de fábrica\nItens de veículo: Airbag; Alarme; Ar quente; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Rodas de liga leve; Travas elétricas; Vidros elétricos; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth\nÚnico dono, baixa quilometragem, revisão na concessionária, a última dos 30.000.",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN VIRTUS 1.0 170 TSI AUTOMÁTICO\nPreço: R$ 97.500\nAno: 2025/2025\nKM: 34.000\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: nelson (Pessoa Física)\nFIPE: R$ 98.770 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Sedã\nCor: Cinza\nFinal de placa: 1\nFotos: 5\nCaracterísticas: Único dono; IPVA pago; Licenciado; Garantia de fábrica; Todas as revisões feitas pela concessionária\nItens de veículo: Airbag; Alarme; Ar quente; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Rodas de liga leve; Travas elétricas; Vidros elétricos; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   },
   {
@@ -1341,6 +1339,108 @@
    "url": "https://www.webmotors.com.br/comprar/fiat/cronos/13-firefly-flex-drive-cvt/4-portas/2024-2025/79237894",
    "checked_at": "2026-11-13T13:04:24.301Z",
    "text": "FIAT CRONOS 1.3 FIREFLY FLEX DRIVE CVT\nPreço: R$ 92.990\nAno: 2024/2025\nKM: 39.757\nCidade: São Paulo - SP\nVendedor: (não verificado)\nFIPE: não encontrada\nOrigem: cartão da listagem do WebMotors em 13/11/2026 (página do anúncio não abriu)",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-comfortline-automatico/4-portas/2023-2024/82065220",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN POLO 1.0 170 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 91.140\nAno: 2023/2024\nKM: 38.978\nCâmbio: Automática\nCidade: Osasco - SP\nVendedor: Unidas Seminovos Osasco (Loja)\nFIPE: R$ 86.804 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Branco\nFinal de placa: 1\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado\nItens de veículo: Airbag; Ar quente; Banco com regulagem de altura; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Retrovisor fotocrômico; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Direção com Ajuste; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-cvt/4-portas/2023-2024/82090472",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "FIAT FASTBACK 1.0 TURBO 200 FLEX CVT\nPreço: R$ 95.990\nAno: 2023/2024\nKM: 25.308\nCâmbio: Automática\nCidade: Barueri - SP\nVendedor: Maggi Concessionária Barueri (Loja)\nFIPE: R$ 96.673 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Prata\nFinal de placa: 7\nFotos: 8\nItens de veículo: Ar condicionado; Freio ABS; Retrovisores elétricos; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2023-2024/82244825",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN POLO 1.0 170 TSI HIGHLINE AUTOMÁTICO\nPreço: R$ 89.900\nAno: 2023/2024\nKM: 36.593\nCâmbio: Automática\nCidade: Osasco - SP\nVendedor: Carex Veiculos (Loja)\nFIPE: R$ 94.344 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Branco\nFinal de placa: 4\nFotos: 8\nCaracterísticas: Licenciado\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Retrovisor fotocrômico; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; GPS; Direção com Ajuste; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025-2026/82258795",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN POLO 1.0 170 TSI HIGHLINE AUTOMÁTICO\nPreço: R$ 93.990\nAno: 2025/2026\nKM: 34.730\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Localiza Seminovos São Paulo - Av Nações Unidas (Vcnau) (Loja)\nFIPE: R$ 110.841 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Branco\nFinal de placa: 8\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado\nItens de veículo: Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; Bluetooth; Carregador de smartphone por Indução",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/renault/captur/13-tce-flex-intense-x-tronic/4-portas/2022/79784690",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "RENAULT CAPTUR 1.3 TCE FLEX INTENSE X-TRONIC\nPreço: R$ 85.990\nAno: 2022/2022\nKM: 36.299\nCâmbio: CVT\nCidade: Osasco - SP\nVendedor: Lions Osasco (Loja)\nFIPE: R$ 87.268 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Cinza\nFinal de placa: 4\nFotos: 8\nCaracterísticas: Único dono; IPVA pago\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; GPS; Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Ajuste retrovisor elétrico; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/renault/captur/13-tce-flex-intense-x-tronic/4-portas/2023/79784824",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "RENAULT CAPTUR 1.3 TCE FLEX INTENSE X-TRONIC\nPreço: R$ 87.990\nAno: 2023/2023\nKM: 33.050\nCâmbio: CVT\nCidade: Osasco - SP\nVendedor: Lions Osasco (Loja)\nFIPE: R$ 91.270 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 8\nFotos: 8\nCaracterísticas: Único dono; IPVA pago\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; GPS; Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Ajuste retrovisor elétrico; Alarme com acionamento a distância; Freios ABS com EBD; Freios ABS com BAS; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2025/80611009",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "JEEP RENEGADE 1.3 T270 TURBO FLEX LONGITUDE AT6\nPreço: R$ 98.990\nAno: 2025/2025\nKM: 31.900\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Turbi (Loja)\nFIPE: R$ 113.145 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 7\nFotos: 8\nCaracterísticas: IPVA pago; Licenciado; Todas as revisões feitas pela concessionária\nItens de veículo: Airbag; Alarme; Ar condicionado; Travas elétricas; Vidros elétricos; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/t-cross/10-200-tsi-total-flex-sense-automatico/4-portas/2022/81415790",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN T-CROSS 1.0 200 TSI TOTAL FLEX SENSE AUTOMÁTICO\nPreço: R$ 89.900\nAno: 2022/2022\nKM: 37.107\nCâmbio: Automática\nCidade: Cotia - SP\nVendedor: Carrera - Nissan Cotia (Loja)\nFIPE: R$ 88.527 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 4\nFotos: 8\nItens de veículo: Alarme; Ar condicionado; Rodas de liga leve; Travas elétricas; Vidros elétricos; Bancos em couro; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com BAS; Controle de estabilidade; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/fiat/pulse/13-flex-drive-cvt/4-portas/2024/81464984",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "FIAT PULSE 1.3 FLEX DRIVE CVT\nPreço: R$ 89.990\nAno: 2024/2024\nKM: 34.000\nCâmbio: Automática\nCidade: Osasco - SP\nVendedor: 7 Motors (Loja)\nFIPE: R$ 88.725 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Cinza\nFinal de placa: 8\nFotos: 8\nItens de veículo: Airbag; Alarme; Ar quente; Banco com regulagem de altura; CD Player; Computador de bordo; Controle de tração; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Rádio; Retrovisores elétricos; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; GPS; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/renault/stepway/16-16v-sce-flex-iconic-x-tronic/4-portas/2023-2024/81772031",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "RENAULT STEPWAY 1.6 16V SCE FLEX ICONIC X-TRONIC\nPreço: R$ 81.990\nAno: 2023/2024\nKM: 31.000\nCâmbio: Automática\nCidade: Osasco - SP\nVendedor: Renault Sinal Osasco (Loja)\nFIPE: R$ 80.390 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Prata\nFinal de placa: 5\nFotos: 8\nItens de veículo: Airbag; Ar quente; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Limpador traseiro; Retrovisores elétricos; Rodas de liga leve; Travas elétricas; Vidros elétricos; Direção com Ajuste; Freios ABS com EBD; Controle de estabilidade; Espelhamento com Smartphone; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/citroen/basalt/10-turbo-200-flex-feel-cvt/4-portas/2025/81970027",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "CITROËN BASALT 1.0 TURBO 200 FLEX FEEL CVT\nPreço: R$ 88.990\nAno: 2025/2025\nKM: 21.595\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Nova Toriba Renault (Loja)\nFIPE: R$ 92.554 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 2\nFotos: 1\nCaracterísticas: Único dono; IPVA pago; Todas as revisões feitas pela concessionária\nItens de veículo: Alarme; Ar quente; Computador de bordo; Ar condicionado; Freio ABS; Retrovisores elétricos; Rodas de liga leve; Travas elétricas; Vidros elétricos; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/nivus/10-200-tsi-total-flex-sense-automatico/4-portas/2024/82148215",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN NIVUS 1.0 200 TSI TOTAL FLEX SENSE AUTOMÁTICO\nPreço: R$ 98.890\nAno: 2024/2024\nKM: 11.500\nCâmbio: Automática\nCidade: Barueri - SP\nVendedor: Audi Center Alphaville - Bexp (Loja)\nFIPE: R$ 98.110 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 4\nFotos: 7\nCaracterísticas: Único dono; IPVA pago; Licenciado; Garantia de fábrica; Todas as revisões feitas pela concessionária\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Limpador traseiro; Retrovisores elétricos; Rodas de liga leve; Travas elétricas; Vidros elétricos; Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Alarme com acionamento a distância; Freios ABS com EBD; Freios ABS com BAS; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; USB",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/hyundai/creta/16-16v-flex-action-automatico/4-portas/2022/82158272",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "HYUNDAI CRETA 1.6 16V FLEX ACTION AUTOMÁTICO\nPreço: R$ 94.900\nAno: 2022/2022\nKM: 15.694\nCâmbio: Automática\nCidade: Osasco - SP\nVendedor: TT Motors Ltda (Loja)\nFIPE: R$ 90.394 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Preto\nFinal de placa: 4\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado; Todas as revisões feitas pela concessionária\nItens de veículo: Airbag; Alarme; Ar quente; Computador de bordo; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Rádio; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/volkswagen/virtus/10-200-tsi-comfortline-automatico/4-portas/2023-2024/82242101",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "VOLKSWAGEN VIRTUS 1.0 200 TSI COMFORTLINE AUTOMÁTICO\nPreço: R$ 98.900\nAno: 2023/2024\nKM: 29.143\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: BEE Black Motors (Loja)\nFIPE: R$ 101.049 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Sedã\nCor: Preto\nFinal de placa: 1\nFotos: 8\nCaracterísticas: Único dono; Licenciado; Todas as revisões feitas pela concessionária\nItens de veículo: Airbag; Alarme; Ar quente; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de chuva; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Bancos em couro; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Faróis Full LED; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/honda/city/15-i-vtec-flex-hatch-exl-cvt/4-portas/2024/82245328",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "HONDA CITY 1.5 i-VTEC FLEX HATCH EXL CVT\nPreço: R$ 95.000\nAno: 2024/2024\nKM: 16.000\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Aragon Multimarcas (Loja)\nFIPE: R$ 111.001 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Hatchback\nCor: Cinza\nFinal de placa: 5\nFotos: 8\nCaracterísticas: IPVA pago; Licenciado\nItens de veículo: Alarme; Ar quente; Banco com regulagem de altura; Computador de bordo; Ar condicionado; Encosto de cabeça traseiro; Freio ABS; Limpador traseiro; Controle automático de velocidade; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Retrovisor fotocrômico; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Bancos em couro; Farol de xenônio; GPS; Direção com Ajuste; Chave Inteligente/Presencial; Botão de Ignição/Start button; Ajuste retrovisor elétrico; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/fiat/pulse/13-flex-drive-cvt/4-portas/2023-2024/82111151",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "FIAT PULSE 1.3 FLEX DRIVE CVT\nPreço: R$ 87.990\nAno: 2023/2024\nKM: 34.058\nCâmbio: CVT\nCidade: Barueri - SP\nVendedor: BYD Alphaville (Loja)\nFIPE: R$ 88.725 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Branco\nFinal de placa: 5\nFotos: 1\nItens de veículo: Airbag; Alarme; Ar quente; Banco com regulagem de altura; Computador de bordo; Desembaçador traseiro; Ar condicionado; Freio ABS; Rádio; Retrovisores elétricos; Rodas de liga leve; Sensor de estacionamento; Travas elétricas; Vidros elétricos; Volante com regulagem de altura; Direção hidráulica; Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
+   "available": true
+  },
+  {
+   "url": "https://www.webmotors.com.br/comprar/fiat/pulse/13-flex-drive-cvt/4-portas/2024/82202289",
+   "checked_at": "2026-11-14T11:36:20.930Z",
+   "text": "FIAT PULSE 1.3 FLEX DRIVE CVT\nPreço: R$ 85.790\nAno: 2024/2024\nKM: 20.000\nCâmbio: Automática\nCidade: São Paulo - SP\nVendedor: Toriba Seminovos Barra Funda (Loja)\nFIPE: R$ 88.725 (página do anúncio no WebMotors, nov/2026)\nCarroceria: Utilitário esportivo\nCor: Prata\nFinal de placa: 8\nFotos: 8\nCaracterísticas: Único dono; IPVA pago; Licenciado; Garantia de fábrica; Todas as revisões feitas pela concessionária\nItens de veículo: Direção com Ajuste; Alarme com acionamento a distância; Freios ABS com EBD; Controle de estabilidade; Sensor de pressão dos pneus; Tela Multimídia; Espelhamento com Smartphone; USB; Bluetooth",
    "available": true
   }
  ]

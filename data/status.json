@@ -1,9 +1,9 @@
 {
- "processed_at": "2026-11-13T14:58:30.177Z",
- "novos": 0,
- "atualizados": 1,
- "sairam_do_ar": 0,
- "note": "Virtus 80109201 completado pela página do anúncio",
+ "processed_at": "2026-11-14T11:36:20.930Z",
+ "novos": 17,
+ "atualizados": 3,
+ "sairam_do_ar": 2,
+ "note": "pesquisa a pedido pelo navegador do computador (14/11 ~8h): listagens de São Paulo (3 págs.), Barueri, Osasco (2), Santana de Parnaíba, Cotia e Carapicuíba — 109 anúncios novos nos cartões, 21 abertos (os demais são reprovados pela ficha, manuais, 0 km ou fora da Grande SP); 6 favoritos/aprovados reconferidos (no ar); 2 'só cartão' saíram do ar; 10 fichas novas; 2 verificações humanas liberadas pelo usuário.",
  "last_issue": 3,
  "processed_issues": [
   1,
@@ -12,14 +12,9 @@
  ],
  "filter_used_at": "2026-11-01T17:15:57.181Z",
  "last_attempt": {
-  "at": "2026-11-13T14:58:30.177Z",
+  "at": "2026-11-14T11:36:20.930Z",
   "ok": true
  },
- "conferidos_sem_mudanca": 0,
- "fichas_pendentes": null,
- "running": {
-  "since": "2026-11-14T11:07:43.350Z",
-  "kind": "pedido",
-  "filter_at": "2026-11-01T17:15:57.181Z"
- }
+ "conferidos_sem_mudanca": 5,
+ "fichas_pendentes": null
 }
