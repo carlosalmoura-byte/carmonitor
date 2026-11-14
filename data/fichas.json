@@ -1430,7 +1430,7 @@
   ],
   "version_excludes": [],
   "year_from": 2023,
-  "year_to": 2023,
+  "year_to": 2024,
   "items": {
    "android_auto_sem_fio": {
     "state": "confirmado",
@@ -2977,5 +2977,274 @@
    "url": "https://conexaoto.com.br/2024/12/19/volkswagen-reforca-versatilidade-e-inovacao-do-virtus-2025"
   },
   "note": "Fontes secundárias citam indução e AA sem fio em todas as versões 2025. ADAS sem fonte para a Comfortline (imprensa associa AEB/ACC às versões mais caras; lista completa de série não encontrada)."
+ },
+ {
+  "id": "jeep-renegade-longitude-2025",
+  "make": "jeep",
+  "model": "renegade",
+  "version_includes": [
+   "longitude"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Renegade 2025 Longitude: “Carregador de telefone por indução ventilado”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Longitude = “Itens da Altitude +”; Altitude: “Conectividade sem fio Android Auto e Apple Carplay”, central de 8,4″"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem autônoma de emergência",
+     "Monitoramento de mudança de faixa",
+     "Detector de fadiga"
+    ],
+    "quote": "Altitude (herdado pela Longitude): “Frenagem autônoma de emergência”, “Detector de fadiga”, “Monitoramento de mudança de faixa”"
+   }
+  },
+  "source": {
+   "title": "Vrum — Jeep Renegade 2025: volta do Willys e preço mais baixo na linha",
+   "quality": "secundária",
+   "url": "https://www.vrum.com.br/noticias/2024/07/6906867-jeep-renegade-2025-volta-do-willis-e-preco-mais-baixo-na-linha.html"
+  },
+  "note": "Mesma lista em Mecânica Online (jul/2024) https://mecanicaonline.com.br/2024/07/renegade-2025-novas-versoes-e-edicao-limitada-celebram-500-mil-unidades-vendidas/"
+ },
+ {
+  "id": "renault-captur-intense-2022",
+  "make": "renault",
+  "model": "captur",
+  "version_includes": [
+   "intense"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2023,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Captur 2022 (lista de série Zen/Intense/Iconic): carregador de celular por indução não consta em nenhuma versão"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Captur 2023: “todas as versões estão equipadas com a central multimídia Easylink de 8 polegadas, que possibilita a conectividade sem fio através dos aplicativos Android Auto e Apple CarPlay”"
+   }
+  },
+  "source": {
+   "title": "Comprecar — Renault Captur 2022 chega mais potente e equipado",
+   "quality": "secundária",
+   "url": "https://www.comprecar.com.br/revista/renault-captur-2022-chega-mais-potente-e-equipado"
+  },
+  "note": "Android Auto sem fio: Garagem360 Captur 2023 https://garagem360.com.br/renault-captur-2023. Ponto cego: Comprecar 2022 põe só na Iconic; Garagem360 2023 diz Intense e topo — ADAS sem conclusão."
+ },
+ {
+  "id": "vw-tcross-sense-2022",
+  "make": "volkswagen",
+  "model": "t-cross",
+  "version_includes": [
+   "sense"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2022,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "T-Cross 2022: carregador por indução “vem nas versões Comfortline e Highline” — a Sense (entrada) não tem"
+   }
+  },
+  "source": {
+   "title": "Vrum — Linha 2022 do VW T-Cross ganha novos equipamentos desde a versão de entrada",
+   "quality": "secundária",
+   "url": "https://www.vrum.com.br/noticias/linha-2022-do-vw-t-cross-ganha-novos-equipamentos-desde-a-versao-de-entrada/"
+  },
+  "note": "Multimídia e ADAS da Sense não detalhados na fonte."
+ },
+ {
+  "id": "fiat-pulse-drive-cvt-2024",
+  "make": "fiat",
+  "model": "pulse",
+  "version_includes": [
+   "drive",
+   "cvt"
+  ],
+  "version_excludes": [
+   "turbo"
+  ],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Pulse 2024: na versão 1.3, “carregador por indução” é de série só na S-Design — itens que “estavam relegados às versões com motor 1.0 turbo”"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Pulse: central multimídia de 8,4 polegadas com espelhamento sem fio (Android Auto e Apple CarPlay) em toda a linha"
+   }
+  },
+  "source": {
+   "title": "AutoPapo — Fiat Pulse 2024 ganha versão 1.3 com equipamentos da 1.0 turbo",
+   "quality": "secundária",
+   "url": "https://autopapo.com.br/noticia/fiat-pulse-2024-s-design/"
+  },
+  "note": "Na linha 2023 o carregador era opcional no Pack Plus da Drive; em 2024 não aparece para a Drive 1.3."
+ },
+ {
+  "id": "renault-stepway-iconic-2023",
+  "make": "renault",
+  "model": "stepway",
+  "version_includes": [
+   "iconic"
+  ],
+  "version_excludes": [],
+  "year_from": 2023,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Ficha técnica e lista de equipamentos Stepway 2022/2023: carregador por indução não consta (Iconic CVT inclusive)"
+   },
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Stepway Iconic: “MEDIA Evolution com Android Auto® e Apple CarPlay® e tela touchscreen 7\"” — sem conexão sem fio"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Stepway: só câmera de ré, sensor de estacionamento e HSA — sem ADAS"
+   }
+  },
+  "source": {
+   "title": "Ficha Técnica e lista de equipamentos Stepway (Renault, via concessionária)",
+   "quality": "concessionária",
+   "url": "https://carroscomcamanzi.com.br/wp-content/uploads/2023/07/Ficha-Tecnica-e-lista-de-equipamentos-Stepway.pdf"
+  }
+ },
+ {
+  "id": "vw-nivus-sense-2024",
+  "make": "volkswagen",
+  "model": "nivus",
+  "version_includes": [
+   "sense"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "ausente",
+    "quote": "Nivus Sense 2024 perde em relação à Comfortline “o carregamento de smartphone por indução”"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Controle adaptativo de velocidade (ACC)",
+     "Frenagem autônoma de emergência com detecção de pedestres"
+    ],
+    "quote": "Sense mantém “cruise control adaptativo (ACC)” e “frenagem autônoma de emergência com detecção de pedestres”"
+   }
+  },
+  "source": {
+   "title": "AutoPapo — Volkswagen Nivus Sense passa a ser oferecido para o público geral",
+   "quality": "secundária",
+   "url": "https://autopapo.com.br/noticia/volkswagen-nivus-sense-2024"
+  },
+  "note": "Central Composition Touch II (não VW Play); Android Auto sem fio não confirmado."
+ },
+ {
+  "id": "citroen-basalt-feel-2025",
+  "make": "citroen",
+  "model": "basalt",
+  "version_includes": [
+   "feel"
+  ],
+  "version_excludes": [],
+  "year_from": 2025,
+  "year_to": 2025,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "Basalt Feel 2025: “Citroën Connect Touchscreen de 10” com Android Auto e Apple Carplay sem fio”"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Lista de série da Basalt Feel 2025: só “Três entradas USB”, sem carregador sem fio (nem a Shine, topo, tem)"
+   },
+   "adas": {
+    "state": "ausente",
+    "quote": "Basalt Feel 2025: segurança = airbags laterais, câmera de ré, alarme — sem ADAS"
+   }
+  },
+  "source": {
+   "title": "Stellantis Media — Citroën Basalt Feel é o SUV mais acessível e econômico do seu segmento",
+   "quality": "oficial",
+   "url": "https://www.media.stellantis.com/br-pt/citroen/press/citroen-basalt-feel-e-o-suv-mais-acessivel-e-economico-do-seu-segmento"
+  }
+ },
+ {
+  "id": "vw-virtus-comfortline-2024",
+  "make": "volkswagen",
+  "model": "virtus",
+  "version_includes": [
+   "200 tsi comfortline"
+  ],
+  "version_excludes": [],
+  "year_from": 2024,
+  "year_to": 2024,
+  "items": {
+   "inducao": {
+    "state": "confirmado",
+    "quote": "Virtus: carregador de celular por indução de série em todas as versões desde a linha 2023 (“De série em todas as versões, o sedã ganhou carregador de celular por indução”) e mantido na 2025"
+   },
+   "android_auto_sem_fio": {
+    "state": "confirmado",
+    "quote": "VW Play passa a oferecer Android Auto sem fio nos modelos produzidos a partir de 2022 (Polo, Virtus, Nivus, T-Cross…) — Revista Carro, abr/2022; versão com “VW Play” de 10,1″"
+   },
+   "adas": {
+    "state": "confirmado",
+    "names": [
+     "Frenagem autônoma de emergência (AEB)",
+     "Controle adaptativo de velocidade (ACC)"
+    ],
+    "quote": "[AEB e ACC] são funções de série em todas as versões com câmbio automático"
+   }
+  },
+  "source": {
+   "title": "Comprecar — Volkswagen Virtus 2023 evolui e ganha novo visual e equipamentos",
+   "quality": "secundária",
+   "url": "https://www.comprecar.com.br/revista/volkswagen-virtus-2023-evolui-e-ganha-novo-visual-e-equipamentos"
+  },
+  "note": "Linha 2024 entre a 2023 (Comprecar) e a 2025 (ficha vw-virtus-comfortline-2025), ambas com indução e VW Play de série."
+ },
+ {
+  "id": "hyundai-creta-action-2022",
+  "make": "hyundai",
+  "model": "creta",
+  "version_includes": [
+   "action"
+  ],
+  "version_excludes": [],
+  "year_from": 2022,
+  "year_to": 2023,
+  "items": {
+   "android_auto_sem_fio": {
+    "state": "ausente",
+    "quote": "Creta Action 2022: só “rádio blueAudio” (sem central multimídia com espelhamento)"
+   },
+   "inducao": {
+    "state": "ausente",
+    "quote": "Creta Action 2022: itens de série com rádio blueAudio, piloto automático, controle de tração/estabilidade — sem carregador por indução"
+   }
+  },
+  "source": {
+   "title": "Garagem360 — Hyundai Creta Action 2022: preços, equipamentos e itens de série",
+   "quality": "secundária",
+   "url": "https://garagem360.com.br/hyundai-creta-action-2022-precos-equipamentos-e-itens-de-serie-do-suv/"
+  },
+  "note": "A Action é a versão de entrada da geração anterior; a Action 2024/2025 também vem só com rádio Bluetooth (ficha hyundai-creta-action-2025)."
  }
 ]
