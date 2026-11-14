@@ -604,6 +604,7 @@ function saveCompare() {
 }
 
 // ---------------------------------------------------------------- anotações por carro (texto, ditado ou áudio) — ficam só neste aparelho
+const noteBox = () => document.querySelector("#notesForm textarea[name=text]") || { value: "" };
 const fmtDur = (s) => { s = Math.round(s || 0); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 let NOTES_ID = null, recorder = null, recChunks = [], recStart = 0, recognizer = null;
 function openNotes(id) {
@@ -629,7 +630,7 @@ function addNote(note) {
   persist(); renderNotes(); renderCards(); if (ui.openId === l.id) renderDetail(l);
 }
 $("#notesForm").addEventListener("submit", (e) => {
-  e.preventDefault(); const t = e.target.text.value.trim();
+  e.preventDefault(); const t = noteBox().value.trim();
   if (!t) return toast("Escreva ou dite algo antes de salvar.");
   addNote({ text: t, dictated: !!e.target.dataset.dictated }); e.target.reset(); delete e.target.dataset.dictated;
   $("#noteStatus").textContent = "Anotação salva.";
@@ -645,7 +646,7 @@ $("#noteDictate").addEventListener("click", () => {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return toast("Este navegador não faz ditado. Use o microfone do teclado ou grave um áudio.");
   if (recognizer) { recognizer.stop(); return; }
-  const ta = $("#notesForm").text, base = ta.value ? ta.value.replace(/\s*$/, " ") : "";
+  const ta = noteBox(), base = ta.value ? ta.value.replace(/\s*$/, " ") : "";
   recognizer = new SR(); recognizer.lang = "pt-BR"; recognizer.continuous = true; recognizer.interimResults = true;
   let finalTxt = "";
   recognizer.onresult = (ev) => {
@@ -674,7 +675,7 @@ $("#noteRecord").addEventListener("click", async () => {
     recorder = null; clearInterval(openNotes._t); $("#noteRecord").textContent = "🎙 Gravar áudio";
     if (dur < 1) { $("#noteStatus").textContent = "Áudio muito curto, não salvei."; return; }
     const fr = new FileReader();
-    fr.onload = () => { const txt = $("#notesForm").text.value.trim(); addNote({ audio: fr.result, dur, ...(txt ? { text: txt } : {}) }); $("#notesForm").reset(); $("#noteStatus").textContent = `Áudio de ${fmtDur(dur)} salvo.`; };
+    fr.onload = () => { const txt = noteBox().value.trim(); addNote({ audio: fr.result, dur, ...(txt ? { text: txt } : {}) }); $("#notesForm").reset(); $("#noteStatus").textContent = `Áudio de ${fmtDur(dur)} salvo.`; };
     fr.readAsDataURL(blob);
   };
   recorder.start(1000);
