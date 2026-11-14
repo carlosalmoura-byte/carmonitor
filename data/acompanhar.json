@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-14T12:03:29.755Z",
+ "updated_at": "2026-11-14T12:03:38.498Z",
  "origem": "app CarMonitor",
  "nota": "favoritos e aprovados — reconferir todo dia; decisoes = favorito/aprovação/descarte por anúncio (vale a mais recente entre aparelhos)",
  "urls": [
@@ -16,7 +16,8 @@
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
   "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81770636",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
-  "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973"
+  "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
+  "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2025/80611009"
  ],
  "aprovados": [
   "https://www.webmotors.com.br/comprar/citroen/c4-cactus/16-thp-flex-noir-eat6/4-portas/2023-2024/80721542",
@@ -37,10 +38,10 @@
    "at": "2026-10-31T22:19:16.104Z"
   },
   "80611009": {
-   "f": 0,
+   "f": 1,
    "a": 1,
    "d": null,
-   "at": "2026-11-14T12:02:48.187Z"
+   "at": "2026-11-14T12:03:33.049Z"
   },
   "80613467": {
    "f": 0,
