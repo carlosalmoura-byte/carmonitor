@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-13T22:14:17.321Z",
+ "updated_at": "2026-11-14T12:02:51.050Z",
  "origem": "app CarMonitor",
  "nota": "favoritos e aprovados — reconferir todo dia; decisoes = favorito/aprovação/descarte por anúncio (vale a mais recente entre aparelhos)",
  "urls": [
@@ -8,6 +8,7 @@
   "https://www.webmotors.com.br/comprar/fiat/fastback/10-turbo-200-flex-audace-cvt/4-portas/2023-2024/81890197",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
+  "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2025/80611009",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
  ],
  "favoritos": [
@@ -23,6 +24,7 @@
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2023-2024/82103416",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81565973",
   "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2024/81573575",
+  "https://www.webmotors.com.br/comprar/jeep/renegade/13-t270-turbo-flex-longitude-at6/4-portas/2025/80611009",
   "https://www.webmotors.com.br/comprar/volkswagen/polo/10-170-tsi-highline-automatico/4-portas/2025/81452713"
  ],
  "decisoes": {
@@ -31,6 +33,12 @@
    "a": 0,
    "d": "Preço alto",
    "at": "2026-10-31T22:19:16.104Z"
+  },
+  "80611009": {
+   "f": 0,
+   "a": 1,
+   "d": null,
+   "at": "2026-11-14T12:02:48.187Z"
   },
   "80613467": {
    "f": 0,
